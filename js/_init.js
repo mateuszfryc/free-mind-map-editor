@@ -3,15 +3,28 @@ const input = 'input';
 const click = 'click';
 const body = document.body;
 const log = console.log;
+const listen = document.addEventListener
 const mouse = {
     isLeftButtonDown: false,
     x: 0,
     y: 0,
 }
 
-function onMouseDown() {
+function onMouseDown(event) {
 
 }
+
+function onMouseUp(event) {
+
+}
+
+function onMouseMove(event) {
+
+}
+
+listen("mousemove", onMouseDown);
+listen("mouseup",   onMouseUp);
+listen("mousedown", onMouseMove);
 
 body.width = window.innerWidth && document.documentElement.clientWidth
   ? Math.min( window.innerWidth, document.documentElement.clientWidth )
