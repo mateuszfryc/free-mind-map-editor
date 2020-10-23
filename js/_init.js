@@ -1,12 +1,21 @@
 const { log } = console;
-const listen = document.addEventListener
+const listen = document.addEventListener;
+const get = (query, element = document) => element.querySelector(query);
+const ideas = [];
 const body = document.body;
+const textLengthArea = get('.text-length');
 const textarea = 'textarea';
-const thought = 'thought';
-let selectedThought = undefined;
+const classNames = {
+    thought: 'thought',
+}
 const keysCodes = {
     tab: 9,
     delete: 46,
+    esc: 27,
+}
+const actionKeys = {
+    addChild: keysCodes.tab,
+    deleteSelected: keysCodes.esc,
 };
 const mouse = {
     isLeftButtonDown: false,
@@ -23,6 +32,8 @@ const mouse = {
         this.y = y;
     }
 }
+
+let selectedThought = undefined;
 
 body.width = window.innerWidth && document.documentElement.clientWidth
     ? Math.min( window.innerWidth, document.documentElement.clientWidth )
@@ -61,6 +72,10 @@ listen('mousemove', onMouseMove);
 listen('mouseup' , onMouseUp);
 listen('mousedown', onMouseDown);
 
+function isKeyBindToAction(keyCode) {
+    return Object.entries(actionKeys).map(code => code[1]).includes(keyCode);
+}
+
 function getScreenCenterCoords() {
     return {
         x: document.body.width * 0.5,
@@ -68,57 +83,158 @@ function getScreenCenterCoords() {
     }
 }
 
-function getElementSize(element, shouldReturnHalfValues = false) {
-    const { clientWidth, clientHeight } = element;
-    return {
-        width: shouldReturnHalfValues ? clientWidth * 0.5 : clientWidth,
-        height: shouldReturnHalfValues ? clientHeight * 0.5 : clientHeight,
-    }
+const Thought = function(pos, parent = undefined) {
+    const me = this;
+    me.x = pos.x;
+    me.y = pos.y;
+    me.content = '';
+    me.children = [];
+    me.parentRef = parent;
+
+    me.createElement = function() {
+        const element = document.createElement(textarea);
+        element.className = classNames.thought;
+        if (!element.hasOwnProperty('remove')) {
+            Object.defineProperty(element, 'remove', {
+                configurable: true,
+                enumerable: true,
+                writable: true,
+                value: function remove() {
+                this.parentNode.removeChild(this);
+                }
+            });
+        };
+        element.getWidth = function() {
+            const style = element.currentStyle || window.getComputedStyle(element);
+            const width = element.offsetWidth || style.width;
+            const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+            const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+            const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+
+            return width + margin - padding - border;
+        };
+        element.getHeight = function() {
+            const style = element.currentStyle || window.getComputedStyle(element);
+            const height = element.offsetHeight || style.height;
+            const margin = parseFloat(style.marginTop) + parseFloat(style.marginBottom);
+            const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+            const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
+
+            return height + margin - padding + border;
+        };
+        element.getSize = function(returnHalfValues = false) {
+            const width = element.getWidth();
+            const height = element.getHeight();
+
+            return {
+                width: returnHalfValues ? width * 0.5 : width,
+                height: returnHalfValues ? height * 0.5 : height,
+            }
+        };
+        element.getPosition = function() {
+            const { left, top } = element.style;
+            return {
+                x: parseInt(left, 10),
+                y: parseInt(top, 10),
+            };
+        };
+
+        element.setAttribute('rows', 1);
+        element.setAttribute('cols', 10);
+
+        function resize() {
+            textLengthArea.innerHTML = element.value;
+            const textLength = textLengthArea.clientWidth;
+            const width = element.getWidth();
+            if (element.value === '' && textLength < width) {
+                return;
+            };
+            const nuberOfLines = Math.ceil(textLength / width);
+            log(textLength, width, nuberOfLines);
+            const height = nuberOfLines * parseInt(window.getComputedStyle(element)['lineHeight']);
+            element.style.height = height + 'px';
+        };
+
+        /* 0-timeout to get the already changed text */
+        function delayedResize () {
+            window.setTimeout(resize, 0);
+        }
+
+        function observe(event, handler) {
+            element.addEventListener(event, handler, false);
+        };
+
+        observe('change',  resize);
+        ['cut', 'paste', 'drop'].forEach(function(event) {
+            observe(event, delayedResize);
+        });
+        observe('keydown', function(event) {
+            const { keyCode } = event;
+            if (isKeyBindToAction(keyCode)) {
+                return;
+            }
+            delayedResize();
+        });
+
+        document.body.appendChild(element);
+        element.thoughtRef = me;
+        return element;
+    };
+
+    me.elementRef = me.createElement();
+
+    me.setPosition = function(newPosition) {
+        const { x, y } = newPosition;
+        me.x = x;
+        me.y = y;
+        const { width, height } = me.elementRef.getSize(true);
+        me.elementRef.setAttribute('style', `left: ${x - width}px; top: ${y - height}px`);
+    };
+
+    me.getPosition = function() {
+        return {
+            x: me.x,
+            y: me.y,
+        }
+    };
+
+    me.addChildThought = function() {
+        const { width, height } = me.elementRef.getSize();
+        let { x, y } = me.getPosition();
+        x += width * 1.5;
+        // y += height * 0.75;
+        me.children.push(new Thought({ x, y }, me));
+    };
+
+    me.removeChildThought = function(childToBeRemoved) {
+        me.children = me.children.filter(function(child) {
+            return child.x + child.y !== childToBeRemoved.x + childToBeRemoved.y;
+        });
+    };
+
+    me.updateContent = function(event) {        
+        me.content = event.target.value;
+    };
+
+    me.removeSelf = function() {
+        me.children.forEach(function(child){
+            child.removeSelf();
+        });
+        me.elementRef.remove();
+        if (me.parentRef) me.parentRef.removeChildThought(me);
+    };
+    
+    me.elementRef.addEventListener('input', me.updateContent);
+    me.setPosition(pos);
+    // me.elementRef.focus();
+    me.elementRef.click();
 }
 
-function addNode(position, shouldFocusNewElement = true) {
-    const element = document.createElement(textarea);
-    element.className = thought;
-    const { x, y } = position;
-    document.body.appendChild(element);
-    const { width, height } = getElementSize(element);
-    element.setAttribute('style', `left: ${x - (element.clientWidth * 0.5)}px; top: ${y - (element.clientHeight * 0.5)}px`);
-    if (shouldFocusNewElement) {
-        element.focus();
-    };
-    if (!element.hasOwnProperty('remove')) {
-        Object.defineProperty(element, 'remove', {
-            configurable: true,
-            enumerable: true,
-            writable: true,
-            value: function remove() {
-              this.parentNode.removeChild(this);
-            }
-        });
-    }
-};
-
-addNode(getScreenCenterCoords());
+// add first top node
+ideas.push(new Thought(getScreenCenterCoords()));
 
 function getActiveElement() {
     return document.activeElement;
-}
-
-function getElementPosition(element) {
-    const { left, top } = element.style;
-    return {
-        x: parseInt(left, 10),
-        y: parseInt(top, 10),
-    }
-}
-
-function addChildThought() {
-    const activeElement = getActiveElement();
-    const { width, height } = getElementSize(activeElement);
-    const position = getElementPosition(activeElement);
-    position.x += (width * 2);
-    position.y += (height * 0.5);
-    addNode(position);
 }
 
 function deleteSelectedThought() {
@@ -127,13 +243,14 @@ function deleteSelectedThought() {
 
 function onKeyDown(event) {
     const { keyCode, target } = event;
-    if (target.className.includes(thought)) {
+    const { thoughtRef } = getActiveElement();
+    if (target.className.includes(classNames.thought) && target.thoughtRef) {
         switch(keyCode) {
-            case keysCodes.tab:
-                addChildThought();
+            case actionKeys.addChild:
+                thoughtRef.addChildThought();
                 return;
-            case keysCodes.delete:
-                deleteSelectedThought();
+            case actionKeys.deleteSelected:
+                thoughtRef.removeSelf();
             default:
                 return;
         }
