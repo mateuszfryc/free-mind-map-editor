@@ -5,8 +5,11 @@ const ideas = [];
 const body = document.body;
 const textLengthArea = get('.text-length');
 const textarea = 'textarea';
+const svg = 'svg';
+const SVG_NS = 'http://www.w3.org/2000/svg';
 const classNames = {
     thought: 'thought',
+    connector: 'connector',
 }
 const keysCodes = {
     tab: 9,
@@ -21,19 +24,25 @@ const mouse = {
     isLeftButtonDown: false,
     x: 0,
     y: 0,
+    xPrev: 0,
+    yPrev: 0,
     getPosition: function(e) {
-    return {
-        x: e.pageX || e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft,
-        y: e.pageY || e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-    }
+        return {
+            x: this.x,
+            y: this.y,
+        }
     },
-    setPosition: function(x, y) {
-        this.x = x;
-        this.y = y;
-    }
+    setPosition: function(pos) {
+        this.x = pos.x;
+        this.y = pos.y;
+    },
+    savePosition: function() {
+        this.xPrev = this.x;
+        this.yPrev = this.y;
+    },
 }
 
-let selectedThought = undefined;
+let highlightedThought = undefined;
 
 body.width = window.innerWidth && document.documentElement.clientWidth
     ? Math.min( window.innerWidth, document.documentElement.clientWidth )
@@ -57,14 +66,21 @@ function onMouseUp(event) {
 
 function onMouseMove(event) {
     event = event || window.event;  
-    const { x, y } = mouse.getPosition(event);  
-    mouse.setPosition(x, y);
+    mouse.savePosition();
+    const x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+    const y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    mouse.setPosition({ x, y });
 
     const { target } = event;
     const { tagName } = target;
 
-    if (tagName === textarea.toUpperCase()) {
-        selectedThought = target;
+    if (!mouse.isLeftButtonDown) {
+        highlightedThought = tagName === textarea.toUpperCase() ? target.thoughtRef : undefined;
+    }
+    else {
+        if (highlightedThought) {
+            highlightedThought.setPosition(mouse);
+        }
     }
 }
 
@@ -83,6 +99,19 @@ function getScreenCenterCoords() {
     }
 }
 
+function addRemoveSelfToElement(element) {
+    if (!element.hasOwnProperty('remove')) {
+        Object.defineProperty(element, 'remove', {
+            configurable: true,
+            enumerable: true,
+            writable: true,
+            value: function remove() {
+                this.parentNode.removeChild(this);
+            }
+        });
+    };
+}
+
 const Thought = function(pos, parent = undefined) {
     const me = this;
     me.x = pos.x;
@@ -90,19 +119,19 @@ const Thought = function(pos, parent = undefined) {
     me.content = '';
     me.children = [];
     me.parentRef = parent;
+    me.connector = undefined;
 
-    me.createElement = function() {
+    me.addVisualRepresentation = function() {
         const element = document.createElement(textarea);
         element.className = classNames.thought;
-        if (!element.hasOwnProperty('remove')) {
-            Object.defineProperty(element, 'remove', {
-                configurable: true,
-                enumerable: true,
-                writable: true,
-                value: function remove() {
-                this.parentNode.removeChild(this);
-                }
-            });
+        addRemoveSelfToElement(element);
+        element.getOuterWidth = function() {
+            const style = element.currentStyle || window.getComputedStyle(element);
+            return element.offsetWidth || style.width;
+        };
+        element.getOuterHeight = function() {
+            const style = element.currentStyle || window.getComputedStyle(element);
+            return element.offsetHeight || style.height;
         };
         element.getWidth = function() {
             const style = element.currentStyle || window.getComputedStyle(element);
@@ -111,7 +140,7 @@ const Thought = function(pos, parent = undefined) {
             const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
             const border = parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
 
-            return width + margin - padding - border;
+            return width - margin - padding - border;
         };
         element.getHeight = function() {
             const style = element.currentStyle || window.getComputedStyle(element);
@@ -120,11 +149,20 @@ const Thought = function(pos, parent = undefined) {
             const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
             const border = parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth);
 
-            return height + margin - padding + border;
+            return height - margin - padding + border;
         };
         element.getSize = function(returnHalfValues = false) {
             const width = element.getWidth();
             const height = element.getHeight();
+
+            return {
+                width: returnHalfValues ? width * 0.5 : width,
+                height: returnHalfValues ? height * 0.5 : height,
+            }
+        };
+        element.getOuterSize = function(returnHalfValues = false) {
+            const width = element.getOuterWidth();
+            const height = element.getOuterHeight();
 
             return {
                 width: returnHalfValues ? width * 0.5 : width,
@@ -155,7 +193,7 @@ const Thought = function(pos, parent = undefined) {
             element.style.height = height + 'px';
         };
 
-        /* 0-timeout to get the already changed text */
+        /* 0 timeout to get text after its value was changed */
         function delayedResize () {
             window.setTimeout(resize, 0);
         }
@@ -181,14 +219,77 @@ const Thought = function(pos, parent = undefined) {
         return element;
     };
 
-    me.elementRef = me.createElement();
+    me.elementRef = me.addVisualRepresentation();
+
+    me.addConnector = function() {
+        const connector = document.createElementNS(SVG_NS, svg);
+
+        const container = document.createElement('div');
+        container.setAttribute('class', classNames.connector);
+        container.appendChild(connector);
+        addRemoveSelfToElement(container);
+
+        container.update = function() {
+            const color = '#d1d1d1';
+            const { parentRef: parent, x, y  } = me;
+            const strokeWidth = 4;            
+
+            const leftTopCorner = {
+                x: Math.min(x, parent.x),
+                y: Math.min(y, parent.y),
+            };
+            const rightBottomCorner = {
+                x: Math.max(x, parent.x),
+                y: Math.max(y, parent.y),
+            };
+
+            const width = Math.abs(rightBottomCorner.x - leftTopCorner.x) || strokeWidth;
+            const height = Math.abs(rightBottomCorner.y - leftTopCorner.y) || strokeWidth;
+
+            connector.innerHTML = `
+                <path
+                    d="
+                        M 0 0
+                        l ${rightBottomCorner.x - leftTopCorner.x} ${rightBottomCorner.y - leftTopCorner.y}
+                        Z
+                    "
+                    stroke-width="4"
+                    stroke="${color}"
+                    fill="none"
+                    width="${width}"
+                    height="${height}"
+                />
+            `;
+            connector.setAttribute('width', width);
+            connector.setAttribute('height', height);
+            connector.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            connector.setAttributeNS(null, "viewBox", `0 0 ${width} ${height}`);
+            
+            container.setAttribute('style', `
+                left: ${leftTopCorner.x}px;
+                top: ${leftTopCorner.y}px;
+                width: ${rightBottomCorner}px;
+                height: ${rightBottomCorner}px;
+            `);
+        };
+        container.update();
+
+        body.appendChild(container);
+        me.connector = container;
+    };
 
     me.setPosition = function(newPosition) {
         const { x, y } = newPosition;
         me.x = x;
         me.y = y;
-        const { width, height } = me.elementRef.getSize(true);
+        const { width, height } = me.elementRef.getOuterSize(true);
         me.elementRef.setAttribute('style', `left: ${x - width}px; top: ${y - height}px`);
+        if (me.connector) me.connector.update();
+        if (me.children.length > 0) {
+            me.children.forEach(child => {
+                child.connector.update();
+            });
+        };
     };
 
     me.getPosition = function() {
@@ -201,7 +302,7 @@ const Thought = function(pos, parent = undefined) {
     me.addChildThought = function() {
         const { width, height } = me.elementRef.getSize();
         let { x, y } = me.getPosition();
-        x += width * 1.5;
+        x += width * 2;
         // y += height * 0.75;
         me.children.push(new Thought({ x, y }, me));
     };
@@ -221,13 +322,14 @@ const Thought = function(pos, parent = undefined) {
             child.removeSelf();
         });
         me.elementRef.remove();
+        me.connector.remove();
         if (me.parentRef) me.parentRef.removeChildThought(me);
     };
     
     me.elementRef.addEventListener('input', me.updateContent);
     me.setPosition(pos);
-    // me.elementRef.focus();
     me.elementRef.click();
+    if (me.parentRef) me.addConnector();
 }
 
 // add first top node
@@ -237,7 +339,7 @@ function getActiveElement() {
     return document.activeElement;
 }
 
-function deleteSelectedThought() {
+function deletehighlightedThought() {
     getActiveElement().remove();
 }
 
