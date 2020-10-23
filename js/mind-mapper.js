@@ -8,16 +8,17 @@ const textLengthArea = get('.text-length');
 const canvas = get('#canvas');
 const context = canvas.getContext('2d');
 const textarea = 'textarea';
+const keysDown = [];
 const classNames = {
     thought: 'thought',
 }
 // shift + tab : focus parent
-// shift + mouse drag : drag with children
 const keysCodes = {
     tab: 9,
     delete: 46,
     esc: 27,
     enter: 13,
+    leftShift: 16,
 }
 const actionKeys = {
     addChild: keysCodes.tab,
@@ -28,8 +29,6 @@ const mouse = {
     isLeftButtonDown: false,
     x: 0,
     y: 0,
-    xPrev: 0,
-    yPrev: 0,
 
     getPosition: function(e) {
         return {
@@ -41,11 +40,6 @@ const mouse = {
     setPosition: function(pos) {
         this.x = pos.x;
         this.y = pos.y;
-    },
-
-    savePosition: function() {
-        this.xPrev = this.x;
-        this.yPrev = this.y;
     },
 }
 
@@ -77,6 +71,12 @@ canvas.redraw = function() {
 
 function onMouseDown() {
     mouse.isLeftButtonDown = true;
+    if (highlightedThought) {
+        highlightedThought.saveMousePositionDiff();
+        if (keysCodes.leftShift in keysDown) {
+            highlightedThought.getChildren(true).forEach(child => child.saveMousePositionDiff());
+        }
+    }
 }
 
 function onMouseUp() {
@@ -85,7 +85,6 @@ function onMouseUp() {
 
 function onMouseMove(event) {
     event = event || window.event;  
-    mouse.savePosition();
     const x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     const y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     mouse.setPosition({ x, y });
@@ -98,7 +97,14 @@ function onMouseMove(event) {
     }
     else {
         if (highlightedThought) {
-            highlightedThought.setPosition(mouse);
+            const { x: a, y: b } = highlightedThought.mousePositionDiff;
+            highlightedThought.setPosition({ x: mouse.x + a, y: mouse.y + b });
+            if (keysCodes.leftShift in keysDown) {
+                highlightedThought.getChildren(true).forEach(child => {
+                    const { x: c, y: d } = child.mousePositionDiff;
+                    child.setPosition({ x: mouse.x + c, y: mouse.y + d })
+                })
+            }
             canvas.redraw();
         }
     }
@@ -194,6 +200,7 @@ const Thought = function(pos, parent = undefined) {
     me.children = [];
     me.parent = parent;
     me.elementRef = undefined;
+    me.mousePositionDiff = undefined;
 
     me.addVisualRepresentation = function() {
         const element = document.createElement(textarea);
@@ -300,6 +307,7 @@ const Thought = function(pos, parent = undefined) {
         document.body.appendChild(element);
         element.thoughtRef = me;
         me.elementRef = element;
+        element.autofocus = true;
 
         return element;
     }
@@ -368,12 +376,17 @@ const Thought = function(pos, parent = undefined) {
         // me.getBoundingRectangle().draw();
     }
 
-    me.setPosition = function(newPosition) {
+    me.setPosition = function(newPosition, shouldPropagateToChildren) {
         const { x, y } = newPosition;
         me.x = x;
         me.y = y;
         const { width, height } = me.elementRef.getOuterSize(true);
         me.elementRef.setAttribute('style', `left: ${x - width}px; top: ${y - height}px`);
+        if (shouldPropagateToChildren) {
+            me.getChildren(true).forEach(child => {
+                //
+            })
+        }
     }
 
     me.getPosition = function() {
@@ -383,11 +396,17 @@ const Thought = function(pos, parent = undefined) {
         }
     }
 
+    me.saveMousePositionDiff = function() {
+        me.mousePositionDiff = {
+            x: me.x - mouse.x,
+            y: me.y - mouse.y,
+        }
+    }
+
     me.addChildThought = function() {
-        const { width, height } = me.elementRef.getSize();
+        const { width } = me.elementRef.getSize();
         let newPosition = me.getPosition();
         newPosition.x += width * 2;
-        // newPosition.y += height * 0.75;
         const newChild = new Thought(newPosition, me);
         me.children.push(newChild);
         newChild.resolveOverlaps();
@@ -402,6 +421,19 @@ const Thought = function(pos, parent = undefined) {
 
     me.hasChildren = function() {
         return me.children.length > 0;
+    }
+
+    function childrenReducer(acc, val) {
+        const subChildren = val.getChildren(true);
+        return acc.concat(val, subChildren)
+    }
+
+    me.getChildren = function(withSubChildren = false) {
+        if (withSubChildren) {
+            return me.children.reduce(childrenReducer, []);
+        }
+
+        return me.children;
     }
 
     me.hasParent = function() {
@@ -425,14 +457,15 @@ const Thought = function(pos, parent = undefined) {
 
     me.getFocus = function() {
         setTimeout(() => {
-            me.elementRef.click();
-        }, 10);
+            // me.elementRef.click();
+            me.elementRef.focus();
+        }, 0);
     }
     
     listen('input', me.updateContent, me.elementRef);
     me.setPosition(pos);
     me.drawConnector();
-    me.getFocus();
+    // me.getFocus();
     thoughts.push(me);
     return me;
 }
@@ -440,27 +473,37 @@ const Thought = function(pos, parent = undefined) {
 // add first top node
 ideas.push(new Thought(getScreenCenterCoords()));
 
-function onKeyDown(event) {
+function evaluateKyes(event) {
     const { keyCode, target } = event;
     const selected = getSelectedThought();
 
     if (target.className.includes(classNames.thought) && target.thoughtRef) {
-        switch(keyCode) {
-            case actionKeys.addChild:
-                selected.addChildThought();
-                return;
 
-            case actionKeys.addSibling:
-                selected.parent.addChildThought();
-                return;
+        if (actionKeys.addChild in keysDown && !(keysCodes.leftShift in keysDown)) {
+            selected.addChildThought();
+            return;
+        }
 
-            case actionKeys.deleteSelected:
-                selected.removeSelf();
+        if (actionKeys.addSibling in keysDown && !(keysCodes.leftShift in keysDown)) {
+            selected.parent.addChildThought();
+            return;
+        }
 
-            default:
-                return;
+        if (actionKeys.deleteSelected in keysDown && !(keysCodes.leftShift in keysDown)) {
+            selected.removeSelf();
+            return;
         }
     }
 }
 
-listen('keydown', onKeyDown);
+function pressKey(event) {
+    keysDown[event.keyCode] = true;
+    evaluateKyes(event);
+} 
+
+function releaseKey(event) {
+    delete keysDown[event.keyCode];
+}
+
+listen("keydown", pressKey);
+listen("keyup", releaseKey);
