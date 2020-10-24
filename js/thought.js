@@ -2,7 +2,7 @@ function Thought(pos, parent) {
     const me = this;
 
     me.id = ++state.lastUsedID;
-    me.position = new Vector().copyFrom(pos);
+    me.position = new Vector().setV(pos);
     me.mousePositionDiff = new Vector();
     me.content = '';
     me.parent = parent || undefined;
@@ -54,9 +54,7 @@ function Thought(pos, parent) {
                 resolvesCount++;
                 // if (resolvesCount > maxNumOfResolves) return;
                 const { other, overlap: amount } = overlap;
-                const { height } = other.parent.getPosition();
                 const newPosition = other.parent.getPosition();
-                // newPosition.x += amount.x + (Math.sign(amount.x) * 5);
                 newPosition.y += amount.y * 0.5 + (Math.sign(amount.y) * 2);
                 other.parent.setPosition(newPosition);
                 canvas.redraw();
@@ -79,15 +77,24 @@ function Thought(pos, parent) {
         // me.getBoundingRectangle().draw();
     }
 
-    me.setPosition = function(newPosition) {
-        me.position.copyFrom(newPosition);
-        const { x, y } = newPosition;
+    me.updatePosition = function() {
+        const { x, y } = me.getPosition();
         const { width, height } = me.interactable.getOuterSize(true);
         me.interactable.setAttribute('style', `left: ${x - width}px; top: ${y - height}px`);
     }
 
+    me.setPosition = function(newPosition) {
+        me.position.setV(newPosition);
+        me.updatePosition();
+    }
+
+    me.addPosition = function(positionToAdd) {
+        me.position.add(positionToAdd);
+        me.updatePosition();
+    }
+
     me.getPosition = function() {
-        return new Vector().copyFrom(me.position);;
+        return me.position.getCopy();
     }
 
     me.saveMousePositionDiff = function() {
@@ -148,15 +155,15 @@ function Thought(pos, parent) {
 
     me.getFocus = function() {
         setTimeout(() => {
-            // me.interactable.click();
-            me.interactable.focus();
+            // me.interactable.focus();
+            me.interactable.click();
         }, 0);
     }
     
     listen('input', me.updateContent, me.interactable);
     me.setPosition(pos);
     me.drawConnector();
-    // me.getFocus();
+    me.getFocus();
     state.thoughts.push(me);
     return me;
 }

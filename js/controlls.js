@@ -38,6 +38,9 @@ function evaluateKyes(event) {
 
 function pressKey(event) {
     state.keysDown[event.keyCode] = true;
+    if (keysCodes.enter in state.keysDown && state.highlight) {
+        event.preventDefault();
+    }
     evaluateKyes(event);
 } 
 
@@ -51,13 +54,18 @@ listen("keyup", releaseKey);
 const mouse = {
     isLeftButtonDown: false,
     position: new Vector(),
+    lastPosition: undefined,
 
     getPosition: function() {
-        return new Vector().copyFrom(this.position);
+        return this.position.getCopy();
     },
 
     setPosition: function(newPosition) {
-        this.position.copyFrom(newPosition)
+        this.position.setV(newPosition)
+    },
+
+    storeCurrentPosition: function() {
+        this.lastPosition = this.getPosition();
     },
 }
 
@@ -77,7 +85,8 @@ function onMouseUp() {
 }
 
 function onMouseMove(event) {
-    event = event || window.event;  
+    event = event || window.event;
+    mouse.storeCurrentPosition();
     const x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     const y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
     mouse.setPosition({ x, y });
@@ -97,9 +106,17 @@ function onMouseMove(event) {
                     child.setPosition(mouse.getPosition().add(child.mousePositionDiff));
                 })
             }
-
-            canvas.redraw();
+            
         }
+        else {
+            const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
+            canvas.offset.setV(mouseDiff);
+            state.ideas.forEach(idea => {
+                idea.addPosition(mouseDiff);
+                idea.getChildren(true).forEach(child => child.addPosition(mouseDiff));
+            })
+        }
+        canvas.redraw();
     }
 }
 

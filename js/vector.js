@@ -12,11 +12,15 @@ Vector.prototype.set = function(x, y) {
     return this;
 }
 
-Vector.prototype.copyFrom = function(vector) {
+Vector.prototype.setV = function(vector) {
     this.x = vector.x;
     this.y = vector.y;
 
     return this;
+}
+
+Vector.prototype.getCopy = function() {
+    return new Vector(this.x, this.y);
 }
 
 Vector.prototype.add = function(other) {

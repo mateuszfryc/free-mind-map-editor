@@ -10,7 +10,7 @@ function Rectangle(x, y, width, height, parent) {
 }
 
 Rectangle.prototype.getPosition = function() {
-    return new Vector().copyFrom(this.position);
+    return this.position.getCopy();
 }
 
 Rectangle.prototype.isOverlappingWith = function(other) {
@@ -29,7 +29,7 @@ Rectangle.prototype.isOverlappingWith = function(other) {
             mixedWidth - ((other.x - x) * 2),
             mixedHeight - ((other.y - y) * 2),
         )
-log(y > other.y ? other.y - y : other.y + y)
+
         return {
             me,
             other,
