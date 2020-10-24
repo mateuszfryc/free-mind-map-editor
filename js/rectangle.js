@@ -23,13 +23,18 @@ Rectangle.prototype.isOverlappingWith = function(other) {
                         x <= other.x + other.width;
 
     if (isColliding) {
+        const mixedWidth = width + other.width;
+        const mixedHeight = height + other.height;
+        const overlap = new Vector(
+            mixedWidth - ((other.x - x) * 2),
+            mixedHeight - ((other.y - y) * 2),
+        )
+log(y > other.y ? other.y - y : other.y + y)
         return {
             me,
             other,
-            overlap: new Vector(
-                x - other.x,
-                y - other.y || height
-        )};
+            overlap, 
+        };
     }
 
     return false;

@@ -114,7 +114,7 @@ function createInteractableTextarea(parent) {
 
     document.body.appendChild(element);
     element.thoughtRef = parent;
-    parent.elementRef = element;
+    parent.interactable = element;
     element.autofocus = true;
 
     return element;

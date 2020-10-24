@@ -43,14 +43,21 @@ function Thought(pos, parent) {
         return overlaps;
     }
 
+    const maxNumOfResolves = 4;
+    let resolvesCount = 1;
+
     me.resolveOverlaps = function() {
         const overlaps = me.findOverlaps();
 
         if (overlaps.length > 0) {
             overlaps.forEach(overlap => {
+                resolvesCount++;
+                // if (resolvesCount > maxNumOfResolves) return;
                 const { other, overlap: amount } = overlap;
+                const { height } = other.parent.getPosition();
                 const newPosition = other.parent.getPosition();
-                newPosition.y += amount.y + (Math.sign(amount.y) * 15);
+                // newPosition.x += amount.x + (Math.sign(amount.x) * 5);
+                newPosition.y += amount.y * 0.5 + (Math.sign(amount.y) * 2);
                 other.parent.setPosition(newPosition);
                 canvas.redraw();
                 other.parent.resolveOverlaps();
