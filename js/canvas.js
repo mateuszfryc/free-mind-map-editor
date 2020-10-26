@@ -1,11 +1,11 @@
 const canvas = get('#canvas');
-canvas.offset = new Vector();
 const context = canvas.getContext('2d');
 
+canvas.offset = new Vector();
 canvas.redraw = function() {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    state.ideas.forEach(idea => {
+    store.ideas.forEach(idea => {
         idea.drawConnector(true);
     })
 }

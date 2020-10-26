@@ -1,39 +1,49 @@
-function Thought(pos, parent) {
-    const me = this;
+class Thought {
+    constructor(position, parent) {
+        this.id = ++store.lastUsedID;
+        this.element = new ThoughtVisual(this);
+        this.position = new Vector();
+        this.mousePositionDiff = new Vector();
+        this.savedSize = new Vector();
+        this.content = '';
+        this.parent = parent || undefined;
+        this.children = [];
+        this.state = THOUGHT_STATE.IDLE;
+        
+        this.setPosition(position);
+        this.drawConnector();
+        store.thoughts.push(this);
+    }
 
-    me.id = ++state.lastUsedID;
-    me.position = new Vector().setV(pos);
-    me.mousePositionDiff = new Vector();
-    me.content = '';
-    me.parent = parent || undefined;
-    me.children = [];
-    me.interactable = createInteractableTextarea(me);
+    getElement() {
+        return this.element.getElement();
+    }
 
-    me.getBoundingRectangle = function() {
-        const { width, height } = me.interactable.getOuterSize();
-        const { x, y } = me.getPosition();
+    getBoundingRectangle() {
+        const { width, height } = this.element.getOuterSize();
+        const { x, y } = this.getPosition();
 
         return new Rectangle(
             x - (width * 0.5),
             y - (height * 0.5),
             width,
             height,
-            me,
+            this,
         )
     }
 
-    me.isOverlappingOther = function(other) {
-        const myBounds = me.getBoundingRectangle();
+    isOverlappingOther(other) {
+        const myBounds = this.getBoundingRectangle();
         const otherBounds = other.getBoundingRectangle();
 
         return myBounds.isOverlappingWith(otherBounds);
     }
 
-    me.findOverlaps = function() {
+    findOverlaps() {
         const overlaps = [];
-        state.thoughts.forEach(thought => {
-            if (thought.id !== me.id) {
-                const result = me.isOverlappingOther(thought);
+        store.thoughts.forEach(thought => {
+            if (thought.id !== this.id) {
+                const result = this.isOverlappingOther(thought);
                 if (result) {
                     overlaps.push(result);
                 }
@@ -43,127 +53,157 @@ function Thought(pos, parent) {
         return overlaps;
     }
 
-    const maxNumOfResolves = 4;
-    let resolvesCount = 1;
-
-    me.resolveOverlaps = function() {
-        const overlaps = me.findOverlaps();
+    resolveOverlaps() {
+        const overlaps = this.findOverlaps();
 
         if (overlaps.length > 0) {
             overlaps.forEach(overlap => {
-                resolvesCount++;
-                // if (resolvesCount > maxNumOfResolves) return;
                 const { other, overlap: amount } = overlap;
                 const newPosition = other.parent.getPosition();
                 newPosition.y += amount.y * 0.5 + (Math.sign(amount.y) * 2);
                 other.parent.setPosition(newPosition);
-                canvas.redraw();
                 other.parent.resolveOverlaps();
             })
+            canvas.redraw();
         }
     }
 
-    me.drawConnector = function(drawChildrenConnectors = false) {
-        if (me.hasParent()) {
-            const my = me.getPosition();
-            const parent = me.parent.getPosition();
+    drawConnector(drawChildrenConnectors = false) {
+        if (this.hasParent()) {
+            const my = this.getPosition();
+            const parent = this.parent.getPosition();
             Draw.bezierCurve(my, parent, my, parent);
         }
-        if (drawChildrenConnectors && me.hasChildren()) {
-            me.children.forEach(child => {
+        if (drawChildrenConnectors && this.hasChildren()) {
+            this.children.forEach(child => {
                 child.drawConnector(true);
             });
         }
         // me.getBoundingRectangle().draw();
     }
 
-    me.updatePosition = function() {
-        const { x, y } = me.getPosition();
-        const { width, height } = me.interactable.getOuterSize(true);
-        me.interactable.setAttribute('style', `left: ${x - width}px; top: ${y - height}px`);
+    updatePosition() {
+        const element = this.element;
+        const { x, y } = this.getPosition();
+        const { width, height } = element.getOuterSize(true);
+        const newX = (x - width) * store.scale;
+        const newY = (y - height) * store.scale;
+        element.setPosition(newX, newY);
     }
 
-    me.setPosition = function(newPosition) {
-        me.position.setV(newPosition);
-        me.updatePosition();
+    updateVisuals() {
+        this.getElement().updateScale();
     }
 
-    me.addPosition = function(positionToAdd) {
-        me.position.add(positionToAdd);
-        me.updatePosition();
+    setPosition(newPosition) {
+        this.position.setV(newPosition);
+        this.updatePosition();
     }
 
-    me.getPosition = function() {
-        return me.position.getCopy();
+    addPosition(positionToAdd) {
+        this.position.add(positionToAdd);
+        this.updatePosition();
     }
 
-    me.saveMousePositionDiff = function() {
-        me.mousePositionDiff = me.getPosition().subtract(mouse.getPosition());
+    getPosition() {
+        return this.position.getCopy();
     }
 
-    me.addChildThought = function() {
-        const { width } = me.interactable.getSize();
-        let newPosition = me.getPosition();
+    getSize() {
+        return new Vector(
+            this.element.getWidth(),
+            this.element.getHeight(),
+        )
+    }
+
+    saveCurrentSize() {
+        const { width, height } = this.element.getSize();
+        this.savedSize.set(width, height);
+    }
+
+    saveMousePositionDiff() {
+        this.mousePositionDiff = this.getPosition().subtract(mouse.getPosition());
+    }
+
+    addChildThought() {
+        const { width } = this.element.getSize();
+        let newPosition = this.getPosition();
         newPosition.x += width * 2;
-        const newChild = new Thought(newPosition, me);
-        me.children.push(newChild);
+        const newChild = new Thought(newPosition, this);
+        this.children.push(newChild);
         newChild.resolveOverlaps();
+        newChild.edit();
     }
 
-    me.removeChildThought = function(childToBeRemoved) {
-        me.children = me.children.filter(function(child) {
+    removeChildThought(childToBeRemoved) {
+        this.children = this.children.filter(function(child) {
             return child.id !== childToBeRemoved.id;
         });
         canvas.redraw();
     }
 
-    me.hasChildren = function() {
-        return me.children.length > 0;
+    hasChildren() {
+        return this.children.length > 0;
     }
 
-    function childrenReducer(acc, val) {
-        const subChildren = val.getChildren(true);
-        return acc.concat(val, subChildren)
-    }
-
-    me.getChildren = function(withSubChildren = false) {
+    getChildren(withSubChildren = false) {
         if (withSubChildren) {
-            return me.children.reduce(childrenReducer, []);
+            return this.children.reduce((acc, val) => {
+                const subChildren = val.getChildren(true);
+                return acc.concat(val, subChildren)
+            }, []);
         }
 
-        return me.children;
+        return this.children;
     }
 
-    me.hasParent = function() {
-        return me.parent !== undefined;
+    hasParent() {
+        return this.parent !== undefined;
     }
 
-    me.updateContent = function(event) {        
-        me.content = event.target.value;
-    }
-
-    me.removeSelf = function() {
-        me.children.forEach(function(child){
+    removeSelf() {
+        this.children.forEach(function(child){
             child.removeSelf();
         });
-        me.interactable.remove();
-        state.thoughts = state.thoughts.filter(function(thought) {
-            return thought.id !== me.id;
+        this.getElement().remove();
+        store.thoughts = store.thoughts.filter(function(thought) {
+            return thought.id !== this.id;
         })
-        if (me.parent) me.parent.removeChildThought(me);
+        if (this.parent) this.parent.removeChildThought(this);
     }
 
-    me.getFocus = function() {
-        setTimeout(() => {
-            // me.interactable.focus();
-            me.interactable.click();
-        }, 0);
+    select() {
+        if (store.selection) store.selection.unselect();
+        this.getElement().className += ' selected';
+        this.saveMousePositionDiff();
+        this.saveCurrentSize();
+        this.state = THOUGHT_STATE.SELECTED;
+        store.selection = this;
     }
-    
-    listen('input', me.updateContent, me.interactable);
-    me.setPosition(pos);
-    me.drawConnector();
-    me.getFocus();
-    state.thoughts.push(me);
-    return me;
+
+    unselect() {
+        const element = this.getElement();
+        const innerTextarea = get('textarea', element);
+        if (innerTextarea) {
+            const value = innerTextarea.value;
+            element.innerHTML = value;
+        }
+        element.className = element.className.replace(/\s*selected\s*/g, '');
+        this.state = THOUGHT_STATE.IDLE;
+        store.selection = undefined;
+    }
+
+    edit() {
+        if (this.state === THOUGHT_STATE.IDLE) this.select();
+        const element = this.getElement();
+        const value = element.innerHTML;
+        const textarea = document.createElement('textarea');
+        textarea.id = this.id;
+        textarea.className = 'thought-textarea';
+        textarea.value = value;
+        element.innerHTML = '';
+        element.appendChild(textarea);
+        this.state = THOUGHT_STATE.EDITED;
+        textarea.focus();
+    }
 }

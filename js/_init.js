@@ -1,2 +1,2 @@
 // add first top node
-state.ideas.push(new Thought(getScreenCenterCoords()));
+store.ideas.push(new Thought(getScreenCenterCoords()));

@@ -1,45 +1,44 @@
-function Rectangle(x, y, width, height, parent) {
-    const me = this;
+class Rectangle {
+    constructor(x, y, width, height, parent) {
+        this.position = new Vector(x, y);
+        this.width = width;
+        this.height = height;
+        this.parent = parent;
+    }
     
-    me.position = new Vector(x, y);
-    me.x = x;
-    me.y = y;
-    me.width = width;
-    me.height = height;
-    me.parent = parent;
-}
-
-Rectangle.prototype.getPosition = function() {
-    return this.position.getCopy();
-}
-
-Rectangle.prototype.isOverlappingWith = function(other) {
-    const me = this;
-    const { width, height } = me;
-    const { x, y } = me.getPosition();
-    const isColliding = x + width >= other.x &&
-                        y + height >= other.y &&
-                        y <= other.y + other.height &&
-                        x <= other.x + other.width;
-
-    if (isColliding) {
-        const mixedWidth = width + other.width;
-        const mixedHeight = height + other.height;
-        const overlap = new Vector(
-            mixedWidth - ((other.x - x) * 2),
-            mixedHeight - ((other.y - y) * 2),
-        )
-
-        return {
-            me,
-            other,
-            overlap, 
-        };
+    getPosition() {
+        return this.position.getCopy();
     }
 
-    return false;
-}
+    isOverlappingWith(other) {
+        const me = this;
+        const { width, height } = me;
+        const { x, y } = this.getPosition();
+        const { x: a, y: b } = other.getPosition();
+        const isColliding = x + width >= a &&
+                            y + height >= b &&
+                            y <= b + other.height &&
+                            x <= a + other.width;
 
-Rectangle.prototype.draw = function() {
-    Draw.rectangle(this);
+        if (isColliding) {
+            const mixedWidth = width + other.width;
+            const mixedHeight = height + other.height;
+            const overlap = new Vector(
+                mixedWidth - ((a - x) * 2),
+                mixedHeight - ((b - y) * 2),
+            )
+    
+            return {
+                me,
+                other,
+                overlap, 
+            };
+        }
+    
+        return false;
+    }
+
+    draw() {
+        Draw.rectangle(this);
+    }
 }

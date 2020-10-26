@@ -1,38 +1,56 @@
-function Vector(x, y) {
-    this.x = x || 0;
-    this.y = y || 0;
+class Vector {
+    constructor(x, y) {
+        this.x = x || 0;
+        this.y = y || 0;
+    }
 
-    return this;
-}
+    set(x, y) {
+        this.x = x;
+        this.y = y;
+    
+        return this;
+    }
 
-Vector.prototype.set = function(x, y) {
-    this.x = x;
-    this.y = y;
+    setV(vector) {
+        this.x = vector.x;
+        this.y = vector.y;
+    
+        return this;
+    }
 
-    return this;
-}
+    equals(vector) {
+        return this.x === vector.x && this.y === vector.y;
+    }
 
-Vector.prototype.setV = function(vector) {
-    this.x = vector.x;
-    this.y = vector.y;
+    multiply(number) {
+        this.x *= number;
+        this.y *= number;
+    
+        return this;
+    }
 
-    return this;
-}
+    multiplyV(vector) {
+        this.x *= vector.x;
+        this.y *= vector.y;
+    
+        return this;
+    }
 
-Vector.prototype.getCopy = function() {
-    return new Vector(this.x, this.y);
-}
+    getCopy() {
+        return new Vector(this.x, this.y);
+    }
 
-Vector.prototype.add = function(other) {
-    this.x += other.x;
-    this.y += other.y;
+    add(other) {
+        this.x += other.x;
+        this.y += other.y;
+    
+        return this;
+    }
 
-    return this;
-}
-
-Vector.prototype.subtract = function(other) {
-    this.x -= other.x;
-    this.y -= other.y;
-
-    return this;
+    subtract(other) {
+        this.x -= other.x;
+        this.y -= other.y;
+    
+        return this;
+    }
 }
