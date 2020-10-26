@@ -10,53 +10,90 @@ class Key {
     }
 }
 
-const keysState = {
-    enter:     new Key(13, 'Enter'),
-    esc:       new Key(27, 'Escape'),
-    leftShift: new Key(16, 'Shift'),
-    tab:       new Key(9, 'Tab'),
-    delete:    new Key(46, 'Delete'),
+const ENTER = 'Enter';
+const ESCAPE = 'Escape';
+const SHIFT = 'Shift';
+const TAB = 'Tab';
+const DELETE = 'Delete';
+const SPACE = ' ';
+
+const KEYS = {
+    [ ENTER  ]: new Key( 13, ENTER  ),
+    [ ESCAPE ]: new Key( 27, ESCAPE ),
+    [ SHIFT  ]: new Key( 16, SHIFT  ),
+    [ TAB    ]: new Key( 9,  TAB    ),
+    [ DELETE ]: new Key( 46, DELETE ),
+    [ SPACE  ]: new Key( 32, SPACE  ),
 }
 
 const actionKeys = {
-    addChild: keysState.tab,
-    addSibling: keysState.enter,
-    deleteSelected: keysState.delete,
+    addChild: KEYS[TAB],
+    addSibling: KEYS[ENTER],
+    deleteSelected: KEYS[DELETE],
+    exitEditState: KEYS[ESCAPE]
 }
 
 function onPressKey(event) {
-    event = event || window.event;
-    keysState.forEach(key => {
-        key.setState(event);
-    });
+    const { key, keyCode, shiftKey } = event;
 
-    if (keysState.enter.isPressed && store.selection || keysState.tab.isPressed) {
+    if (key) {
+        if (KEYS[key]) {
+            KEYS[key].isPressed = true;
+        }
+    }
+    else if (keyCode) {
+        Object.values(KEYS).find(key => key.code === keyCode).isPressed = false;
+    }
+
+    KEYS[SHIFT].isPressed = shiftKey;
+
+    if (KEYS[ENTER].isPressed && store.selection || KEYS[TAB].isPressed) {
         event.preventDefault();
     }
 
     const { selection } = store;
-
+    
     if (selection) {
+        const hasParent = selection.hasParent()
 
-        if (actionKeys.addChild.isPressed && !keysState.leftShift.isPressed) {
-            selection.addChildThought();
-            return;
+        if (KEYS[SHIFT].isPressed) {
+            if (KEYS[TAB].isPressed && hasParent) {
+                selection.parent.select();
+            }
         }
-        else if (actionKeys.addSibling.isPressed && !keysState.leftShift.isPressed && selection.hasParent()) {
-            selection.parent.addChildThought();
-            return;
-        }
-        else if (actionKeys.deleteSelected.isPressed && !keysState.leftShift.isPressed) {
-            selection.removeSelf();
-            return;
+        else {
+            if (actionKeys.addChild.isPressed) {
+                selection.addChildThought();
+                return;
+            }
+            else if (actionKeys.addSibling.isPressed && hasParent) {
+                selection.parent.addChildThought();
+                return;
+            }
+            else if (actionKeys.exitEditState.isPressed && selection.state === THOUGHT_STATE.EDITED) {
+                selection.stopEditing();
+            }
+            else if (actionKeys.deleteSelected.isPressed && selection.state !== THOUGHT_STATE.EDITED) {
+                selection.removeSelf();
+                return;
+            }
         }
     }
 } 
 
 function onReleaseKey(event) {
-    keysState.forEach(key => {
-        key.setState(event);
-    });
+    const { key, keyCode, shiftKey } = event;
+
+    if (key) {
+        if (KEYS[key]) {
+            KEYS[key].isPressed = false;
+        }
+    }
+    else if (keyCode) {
+        Object.values(KEYS).find(key => key.code === keyCode).isPressed = false;
+    }
+
+    KEYS[SHIFT].isPressed = shiftKey;
 }
 
 on("keydown", onPressKey);
@@ -81,7 +118,6 @@ const mouse = {
 }
 
 function onMouseDown(event) {
-    event = event || window.event;
     const { target } = event;
     const { highlight } = store;
     mouse.isLeftButtonDown = true;
@@ -91,7 +127,7 @@ function onMouseDown(event) {
 
         if (target.thoughtRef && !target.thoughtRef.state === THOUGHT_STATE.SELECTED) target.thoughtRef.select();
 
-        if (keysState.leftShift.isPressed) {
+        if (KEYS[SHIFT].isPressed) {
             highlight.getChildren(true).forEach(child => child.saveMousePositionDiff());
         }
     }
@@ -107,7 +143,6 @@ function onMouseUp() {
 }
 
 function onMouseMove(event) {
-    event = event || window.event;
     mouse.storeCurrentPosition();
     const x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     const y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
@@ -124,8 +159,8 @@ function onMouseMove(event) {
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
                 store.highlight.setPosition(mouse.getPosition().add(store.highlight.mousePositionDiff));
 
-                // if shift is pressed also drag children
-                if (keysState.leftShift.isPressed) {
+                // if Shift is pressed also drag children
+                if (KEYS[SHIFT].isPressed) {
                     store.highlight.getChildren(true).forEach(child => {
                         child.setPosition(mouse.getPosition().add(child.mousePositionDiff));
                     })
@@ -183,6 +218,6 @@ on('mousedown', onMouseDown);
 
 canvas.on('wheel', onMouseScroll);
 
-function isKeyBindToAction(keyCode) {
-    return Object.entries(actionKeys).map(code => code[1]).includes(keyCode);
+function isKeyBindToAction(event) {
+    return Object.values(actionKeys).some(key => key.name === event.key || key.code === event.keyCode);
 }

@@ -48,8 +48,8 @@ class ThoughtVisual {
         element.on('paste',  delayedResize);
         element.on('drop',   delayedResize);
 
-        on('keydown', ({ keyCode }) => {
-            if (isKeyBindToAction(keyCode)) {
+        on('keydown', (event) => {
+            if (isKeyBindToAction(event)) {
                 return;
             }
             delayedResize();

@@ -162,14 +162,15 @@ class Thought {
     }
 
     removeSelf() {
+        const me = this;
         this.children.forEach(function(child){
             child.removeSelf();
         });
         this.getElement().remove();
         store.thoughts = store.thoughts.filter(function(thought) {
-            return thought.id !== this.id;
+            return thought.id !== me.id;
         })
-        if (this.parent) this.parent.removeChildThought(this);
+        if (this.parent) this.parent.removeChildThought(me);
     }
 
     select() {
@@ -182,12 +183,8 @@ class Thought {
     }
 
     unselect() {
+        this.stopEditing();
         const element = this.getElement();
-        const innerTextarea = get('textarea', element);
-        if (innerTextarea) {
-            const value = innerTextarea.value;
-            element.innerHTML = value;
-        }
         element.className = element.className.replace(/\s*selected\s*/g, '');
         this.state = THOUGHT_STATE.IDLE;
         store.selection = undefined;
@@ -205,5 +202,14 @@ class Thought {
         element.appendChild(textarea);
         this.state = THOUGHT_STATE.EDITED;
         textarea.focus();
+    }
+
+    stopEditing() {
+        const element = this.getElement();
+        const innerTextarea = get('textarea', element);
+        if (innerTextarea) {
+            const value = innerTextarea.value;
+            element.innerHTML = value;
+        }
     }
 }
