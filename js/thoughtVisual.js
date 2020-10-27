@@ -63,13 +63,7 @@ class ThoughtVisual {
             borderLeftWidth,
             borderRightWidth
         } = window.getComputedStyle(this.element);
-log(parseInt(width)
-+ parseInt(paddingLeft)
-+ parseInt(paddingRight)
-+ parseInt(marginLeft)
-+ parseInt(marginRight)
-+ parseInt(borderLeftWidth)
-+ parseInt(borderRightWidth))
+
         return parseInt(width)
             + parseInt(paddingLeft)
             + parseInt(paddingRight)

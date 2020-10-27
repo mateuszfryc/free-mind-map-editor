@@ -188,7 +188,7 @@ class Thought {
         if (this.parent) this.parent.removeChildThought(me);
     }
 
-    select() {log('select')
+    select() {
         if (store.selection && store.selection.id !== this.id) store.selection.unselect();
         this.getElement().className += ' selected';
         this.saveMousePositionDiff();
@@ -197,7 +197,7 @@ class Thought {
         store.selection = this;
     }
 
-    unselect() {log('unselect')
+    unselect() {
         if (this.state === THOUGHT_STATE.EDITED) this.stopEditing();
         const element = this.getElement();
         element.className = element.className.replace(/\s*selected\s*/g, '');
@@ -252,7 +252,7 @@ class Thought {
         textarea.focus();
     }
 
-    edit() {log('edit')
+    edit() {
         if (this.state === THOUGHT_STATE.IDLE
             && store.selection
             && store.selection.id !== this.id) {
@@ -263,7 +263,7 @@ class Thought {
         this.state = THOUGHT_STATE.EDITED;
     }
 
-    stopEditing() {log('stop edit')
+    stopEditing() {
         const value = this.element.getValue();
         const element = this.getElement();
         element.innerHTML = value;
