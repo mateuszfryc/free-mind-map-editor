@@ -67,7 +67,7 @@ function onPressKey(event) {
                 return;
             }
             else if (actionKeys.addSibling.isPressed && hasParent) {
-                selection.parent.addChildThought();
+                selection.addSiblingThought();
                 return;
             }
             else if (actionKeys.exitEditState.isPressed && selection.state === THOUGHT_STATE.EDITED) {

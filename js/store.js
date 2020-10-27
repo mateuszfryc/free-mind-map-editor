@@ -8,4 +8,5 @@ const store = {
     scaleStep: 0.1,
     styleSheet: get.styleSheetByName('base'),
     defaultThought: 'What would it be?',
+    defaultSpawnGap: 10,
 }

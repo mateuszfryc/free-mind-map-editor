@@ -128,13 +128,26 @@ class Thought {
 
     addChildThought() {
         const myPosition = this.getPosition();
-        const newChild = new Thought(myPosition, this, store.defaultThought);
+        const newChild = new Thought(myPosition, this);
         const widthHalf = this.element.getOuterWidth() * 0.5;
         const childWidthHalf = newChild.element.getOuterWidth() * 0.5;
-        newChild.addPosition(new Vector(widthHalf + childWidthHalf + 20, 0));
+        newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap, 0));
         this.children.push(newChild);
         newChild.resolveOverlaps();
         newChild.edit();
+        canvas.redraw();
+    }
+
+    addSiblingThought() {
+        const myPosition = this.getPosition();
+        const newChild = new Thought(myPosition, this.parent);
+        const heightHalf = this.element.getOuterHeight() * 0.5;
+        const childHeightHalf = newChild.element.getOuterHeight() * 0.5;
+        newChild.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap));
+        this.parent.children.push(newChild);
+        newChild.resolveOverlaps();
+        newChild.edit();
+        canvas.redraw();
     }
 
     removeChildThought(childToBeRemoved) {
