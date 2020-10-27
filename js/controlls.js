@@ -123,7 +123,7 @@ function onMouseDown(event) {
     mouse.isLeftButtonDown = true;
 
     if (highlight) {
-        highlight.select();
+        if (highlight.state === THOUGHT_STATE.IDLE) highlight.select();
 
         if (target.thoughtRef && !target.thoughtRef.state === THOUGHT_STATE.SELECTED) target.thoughtRef.select();
 
@@ -151,10 +151,11 @@ function onMouseMove(event) {
     const { className } = target;
 
     if (!mouse.isLeftButtonDown) {
-        store.highlight = className.includes('thought') ? target.thoughtRef : undefined;
+        store.highlight = className.includes('thought') ? target.getThought() : undefined;
     }
     else {
         if (store.highlight) {
+            if (store.highlight.state === THOUGHT_STATE.EDITED) return;
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
                 store.highlight.setPosition(mouse.getPosition().add(store.highlight.mousePositionDiff));
@@ -166,17 +167,17 @@ function onMouseMove(event) {
                     })
                 }
             }
+            canvas.redraw();
+            return;
             
         }
-        else {
-            // drag view / pan camera by holding mouse left button on background
-            const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
-            canvas.offset.setV(mouseDiff);
-            store.ideas.forEach(idea => {
-                idea.addPosition(mouseDiff);
-                idea.getChildren(true).forEach(child => child.addPosition(mouseDiff));
-            })
-        }
+        // drag view / pan camera by holding mouse left button on background
+        const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
+        canvas.offset.setV(mouseDiff);
+        store.ideas.forEach(idea => {
+            idea.addPosition(mouseDiff);
+            idea.getChildren(true).forEach(child => child.addPosition(mouseDiff));
+        })
         canvas.redraw();
     }
 }

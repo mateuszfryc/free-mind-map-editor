@@ -9,6 +9,9 @@ class ThoughtVisual {
         element.id = parent.id;
         element.className = 'thought';
         element.thoughtRef = parent;
+        element.getThought = function() {
+            return parent;
+        }
         document.body.appendChild(element);
 
         if (!element.hasOwnProperty('remove')) {
@@ -22,39 +25,6 @@ class ThoughtVisual {
             })
         }
 
-        function resize() {
-            store.textTestElement.innerHTML = element.value;
-            store.textTestElement.style.fontSize = element.style.fontSize;
-            store.textTestElement.style.lineHeight = element.style.lineHeight;
-            const textLength = parseInt(window.getComputedStyle(store.textTestElement).width);
-            const myWidth = me.getWidth();
-            const lineHeight = me.getLineHeight();
-            if (element.value === '') {
-                me.setHeight(lineHeight);
-                return;
-            }
-            const nuberOfLines = Math.ceil(textLength / myWidth);
-            const height = nuberOfLines * lineHeight;
-            me.setHeight(height);
-        }
-
-        /* 0 timeout to get text after its value was changed */
-        function delayedResize () {
-            window.setTimeout(resize, 1);
-        }
-
-        element.on('change', resize);
-        element.on('cut',    delayedResize);
-        element.on('paste',  delayedResize);
-        element.on('drop',   delayedResize);
-
-        on('keydown', (event) => {
-            if (isKeyBindToAction(event)) {
-                return;
-            }
-            delayedResize();
-        });
-
         function edit() {
             if (parent.state !== THOUGHT_STATE.EDITED) parent.edit();
         }
@@ -66,6 +36,16 @@ class ThoughtVisual {
 
     getElement() {
         return this.element;
+    }
+
+    getValue() {
+        const textarea = get('textarea', this.element);
+
+        if (textarea) {
+            return textarea.value;
+        }
+
+        return this.element.innerHTML;
     }
 
     getOuterWidth() {
@@ -142,12 +122,6 @@ class ThoughtVisual {
 
     setHeight(height, withScale = true) {
         this.element.style.height = `${withScale ? height * store.scale : height}px`;
-    }
-
-    getLineHeight() {
-        const { lineHeight } = window.getComputedStyle(this.element);
-
-        return parseInt(lineHeight);
     }
 
     getPosition() {

@@ -1,12 +1,11 @@
 class Thought {
     constructor(position, parent) {
+        this.parent = parent || undefined;
         this.id = ++store.lastUsedID;
         this.element = new ThoughtVisual(this);
         this.position = new Vector();
         this.mousePositionDiff = new Vector();
         this.savedSize = new Vector();
-        this.content = '';
-        this.parent = parent || undefined;
         this.children = [];
         this.state = THOUGHT_STATE.IDLE;
         
@@ -54,15 +53,17 @@ class Thought {
     }
 
     resolveOverlaps() {
+        const me = this;
         const overlaps = this.findOverlaps();
 
         if (overlaps.length > 0) {
             overlaps.forEach(overlap => {
                 const { other, overlap: amount } = overlap;
-                const newPosition = other.parent.getPosition();
-                newPosition.y += amount.y * 0.5 + (Math.sign(amount.y) * 2);
-                other.parent.setPosition(newPosition);
-                other.parent.resolveOverlaps();
+                const targetPosition = store.selection.getPosition();
+                const { y } = other.parent.getPosition();
+                targetPosition.y = y + amount.y * 0.5 + (Math.sign(amount.y) * 2);
+                me.setPosition(targetPosition);
+                me.resolveOverlaps();
             })
             canvas.redraw();
         }
@@ -173,8 +174,8 @@ class Thought {
         if (this.parent) this.parent.removeChildThought(me);
     }
 
-    select() {
-        if (store.selection) store.selection.unselect();
+    select() {log('select')
+        if (store.selection && store.selection.id !== this.id) store.selection.unselect();
         this.getElement().className += ' selected';
         this.saveMousePositionDiff();
         this.saveCurrentSize();
@@ -182,34 +183,80 @@ class Thought {
         store.selection = this;
     }
 
-    unselect() {
-        this.stopEditing();
+    unselect() {log('unselect')
+        if (this.state === THOUGHT_STATE.EDITED) this.stopEditing();
         const element = this.getElement();
         element.className = element.className.replace(/\s*selected\s*/g, '');
         this.state = THOUGHT_STATE.IDLE;
         store.selection = undefined;
     }
 
-    edit() {
-        if (this.state === THOUGHT_STATE.IDLE) this.select();
-        const element = this.getElement();
-        const value = element.innerHTML;
+    insertTextarea() {
+        const me = this;
+        const parent = this.element;
+        const element = parent.getElement();
         const textarea = document.createElement('textarea');
         textarea.id = this.id;
         textarea.className = 'thought-textarea';
-        textarea.value = value;
+        textarea.value = parent.getValue();
+        textarea.getThought = function() {
+            return me;
+        }
+
+        function resize() {
+            let { fontSize, lineHeight } = window.getComputedStyle(element);
+            fontSize = parseInt(fontSize);
+            lineHeight = parseInt(lineHeight);
+            const testTest = store.textTestElement;
+            testTest.innerHTML = parent.innerHTML;
+            testTest.style.fontSize = fontSize;
+            testTest.style.lineHeight = lineHeight;
+            const textLength = parseInt(window.getComputedStyle(testTest).width);
+            const myWidth = parent.getWidth();
+            if (textarea.value === '' || textLength < myWidth) {
+                parent.setHeight(lineHeight);
+                return;
+            }
+            const nuberOfLines = Math.ceil(textLength / myWidth);
+            const height = nuberOfLines * lineHeight;
+            parent.setHeight(height);
+        }
+
+        /* 0 timeout to get text after its value was changed */
+        function delayedResize () {
+            window.setTimeout(resize, 1);
+        }
+
+        textarea.on('change', resize);
+        textarea.on('cut',    delayedResize);
+        textarea.on('paste',  delayedResize);
+        textarea.on('drop',   delayedResize);
+
+        on('keydown', event => {
+            if (isKeyBindToAction(event)) {
+                return;
+            }
+            delayedResize();
+        });
+
         element.innerHTML = '';
         element.appendChild(textarea);
-        this.state = THOUGHT_STATE.EDITED;
         textarea.focus();
     }
 
-    stopEditing() {
+    edit() {log('edit')
+        if (this.state === THOUGHT_STATE.IDLE
+            && store.selection
+            && store.selection.id !== this.id) {
+                this.select();
+            }
         const element = this.getElement();
-        const innerTextarea = get('textarea', element);
-        if (innerTextarea) {
-            const value = innerTextarea.value;
-            element.innerHTML = value;
-        }
+        this.insertTextarea();
+        this.state = THOUGHT_STATE.EDITED;
+    }
+
+    stopEditing() {log('stop edit')
+        const value = this.element.getValue();
+        this.getElement().innerHTML = value;
     }
 }
