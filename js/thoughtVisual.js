@@ -1,14 +1,15 @@
 class ThoughtVisual {
-    constructor(parent) {
-        this.element = this.createElement(parent);
+    constructor(parent, defaultText) {
+        this.element = this.createElement(parent, defaultText);
     }
 
-    createElement(parent) {
+    createElement(parent, defaultText) {
         const me = this;
         const element = get('.thought-visual-template').cloneNode();
         element.id = parent.id;
         element.className = 'thought';
         element.thoughtRef = parent;
+        element.innerHTML = defaultText;
         element.getThought = function() {
             return parent;
         }
@@ -48,6 +49,10 @@ class ThoughtVisual {
         return this.element.innerHTML;
     }
 
+    getStyle() {
+        return window.getComputedStyle(this.element);
+    }
+
     getOuterWidth() {
         const {
             width,
@@ -58,7 +63,13 @@ class ThoughtVisual {
             borderLeftWidth,
             borderRightWidth
         } = window.getComputedStyle(this.element);
-
+log(parseInt(width)
++ parseInt(paddingLeft)
++ parseInt(paddingRight)
++ parseInt(marginLeft)
++ parseInt(marginRight)
++ parseInt(borderLeftWidth)
++ parseInt(borderRightWidth))
         return parseInt(width)
             + parseInt(paddingLeft)
             + parseInt(paddingRight)

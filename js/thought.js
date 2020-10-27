@@ -1,8 +1,8 @@
 class Thought {
-    constructor(position, parent) {
+    constructor(position, parent, defaultText = store.defaultThought) {
         this.parent = parent || undefined;
         this.id = ++store.lastUsedID;
-        this.element = new ThoughtVisual(this);
+        this.element = new ThoughtVisual(this, defaultText);
         this.position = new Vector();
         this.mousePositionDiff = new Vector();
         this.savedSize = new Vector();
@@ -93,7 +93,7 @@ class Thought {
     }
 
     updateVisuals() {
-        this.getElement().updateScale();
+        // this.getElement().updateScale();
     }
 
     setPosition(newPosition) {
@@ -127,10 +127,11 @@ class Thought {
     }
 
     addChildThought() {
-        const { width } = this.element.getSize();
-        let newPosition = this.getPosition();
-        newPosition.x += width * 2;
-        const newChild = new Thought(newPosition, this);
+        const myPosition = this.getPosition();
+        const newChild = new Thought(myPosition, this, store.defaultThought);
+        const widthHalf = this.element.getOuterWidth() * 0.5;
+        const childWidthHalf = newChild.element.getOuterWidth() * 0.5;
+        newChild.addPosition(new Vector(widthHalf + childWidthHalf + 20, 0));
         this.children.push(newChild);
         newChild.resolveOverlaps();
         newChild.edit();
@@ -194,32 +195,26 @@ class Thought {
     insertTextarea() {
         const me = this;
         const parent = this.element;
+        const parentStyle = parent.getStyle();
         const element = parent.getElement();
         const textarea = document.createElement('textarea');
         textarea.id = this.id;
         textarea.className = 'thought-textarea';
         textarea.value = parent.getValue();
+        textarea.style.width = `${parent.getWidth() || parentStyle.maxWidth}px`;
+        textarea.style.height = `${parent.getHeight() || parentStyle.lineHeight}px`;
         textarea.getThought = function() {
             return me;
         }
 
         function resize() {
-            let { fontSize, lineHeight } = window.getComputedStyle(element);
-            fontSize = parseInt(fontSize);
-            lineHeight = parseInt(lineHeight);
-            const testTest = store.textTestElement;
-            testTest.innerHTML = parent.innerHTML;
-            testTest.style.fontSize = fontSize;
-            testTest.style.lineHeight = lineHeight;
-            const textLength = parseInt(window.getComputedStyle(testTest).width);
-            const myWidth = parent.getWidth();
-            if (textarea.value === '' || textLength < myWidth) {
-                parent.setHeight(lineHeight);
-                return;
+            const textHeight = parseInt(textarea.scrollHeight);
+            const parentHeight = parent.getHeight();
+            if (textHeight >  parentHeight) {
+                textarea.style.height = `${textHeight}px`;
+                parent.setHeight(textHeight);
             }
-            const nuberOfLines = Math.ceil(textLength / myWidth);
-            const height = nuberOfLines * lineHeight;
-            parent.setHeight(height);
+            
         }
 
         /* 0 timeout to get text after its value was changed */
@@ -257,6 +252,8 @@ class Thought {
 
     stopEditing() {log('stop edit')
         const value = this.element.getValue();
-        this.getElement().innerHTML = value;
+        const element = this.getElement();
+        element.innerHTML = value;
+        element.style.height = '';
     }
 }

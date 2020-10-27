@@ -7,5 +7,5 @@ const store = {
     scale: 1,
     scaleStep: 0.1,
     styleSheet: get.styleSheetByName('base'),
-    textTestElement: get('.text-width-test-element'),
+    defaultThought: 'What would it be?',
 }
