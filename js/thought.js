@@ -268,5 +268,7 @@ class Thought {
         const element = this.getElement();
         element.innerHTML = value;
         element.style.height = '';
+        this.updatePosition();
+        canvas.redraw();
     }
 }
