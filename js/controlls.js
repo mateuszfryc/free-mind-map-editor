@@ -10,12 +10,12 @@ class Key {
     }
 }
 
-const ENTER = 'Enter';
+const ENTER  = 'Enter';
 const ESCAPE = 'Escape';
-const SHIFT = 'Shift';
-const TAB = 'Tab';
+const SHIFT  = 'Shift';
+const TAB    = 'Tab';
 const DELETE = 'Delete';
-const SPACE = ' ';
+const SPACE  = ' ';
 
 const KEYS = {
     [ ENTER  ]: new Key( 13, ENTER  ),
@@ -27,11 +27,11 @@ const KEYS = {
 }
 
 const actionKeys = {
-    addChild: KEYS[TAB],
-    addSibling: KEYS[ENTER],
-    deleteSelected: KEYS[DELETE],
-    edit: KEYS[SPACE],
-    exitEditState: KEYS[ESCAPE],
+    addChild:       KEYS[ TAB    ],
+    addSibling:     KEYS[ ENTER  ],
+    deleteSelected: KEYS[ DELETE ],
+    edit:           KEYS[ SPACE  ],
+    exitEditState:  KEYS[ ESCAPE ],
 }
 
 function onPressKey(event) {
@@ -71,7 +71,7 @@ function onPressKey(event) {
                 selection.addSiblingThought();
                 return;
             }
-            else if (selection.state === THOUGHT_STATE.EDITED) {
+            else if (selection.isEdited()) {
                 if (actionKeys.exitEditState.isPressed) {
                     selection.stopEditing();
                 }
@@ -132,9 +132,9 @@ function onMouseDown(event) {
     mouse.isLeftButtonDown = true;
 
     if (highlight) {
-        if (highlight.state === THOUGHT_STATE.IDLE) highlight.select();
+        if (highlight.isIdle()) highlight.select();
 
-        if (target.thoughtRef && !target.thoughtRef.state === THOUGHT_STATE.SELECTED) target.thoughtRef.select();
+        if (target.thoughtRef && !target.thoughtRef.isSelected()) target.thoughtRef.select();
 
         if (KEYS[SHIFT].isPressed) {
             highlight.getChildren(true).forEach(child => child.saveMousePositionDiff());
@@ -164,7 +164,7 @@ function onMouseMove(event) {
     }
     else {
         if (store.highlight) {
-            if (store.highlight.state === THOUGHT_STATE.EDITED) return;
+            if (store.highlight.isEdited()) return;
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
                 store.highlight.setPosition(mouse.getPosition().add(store.highlight.mousePositionDiff));
@@ -176,56 +176,56 @@ function onMouseMove(event) {
                     })
                 }
             }
-            canvas.redraw();
+            draw.thoughtConnectors();
             return;
             
         }
         // drag view / pan camera by holding mouse left button on background
         const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
-        canvas.offset.setV(mouseDiff);
+        draw.cameraOffset.setV(mouseDiff);
         store.thoughts.forEach(thought => {
             thought.addPosition(mouseDiff);
         })
-        canvas.redraw();
+        draw.thoughtConnectors();
     }
 }
 
-function onMouseScroll( event ) {
-    // zoom in / out on wheel if mouse is over canvas
-    if( !event.wheelDelta && !event.deltaY ) {
-        if( event === '+' ) store.scale += store.scaleStep
-        else if( e === '-' ) store.scale -= store.scaleStep;
-    }
-    else {
-        if( event.wheelDelta ) {
-            store.scale = event.wheelDelta > 0 ? store.scale + store.scaleStep : store.scale - store.scaleStep;
-        }
-        else if( event.deltaY ) {
-            store.scale = event.deltaY < 0 ? store.scale + store.scaleStep : store.scale - store.scaleStep;
-        }
-    }
+// function onMouseScroll( event ) {
+//     // zoom in / out on wheel if mouse is over canvas
+//     if( !event.wheelDelta && !event.deltaY ) {
+//         if( event === '+' ) store.scale += store.scaleStep
+//         else if( e === '-' ) store.scale -= store.scaleStep;
+//     }
+//     else {
+//         if( event.wheelDelta ) {
+//             store.scale = event.wheelDelta > 0 ? store.scale + store.scaleStep : store.scale - store.scaleStep;
+//         }
+//         else if( event.deltaY ) {
+//             store.scale = event.deltaY < 0 ? store.scale + store.scaleStep : store.scale - store.scaleStep;
+//         }
+//     }
   
-    // When zooming in or out update canvas offset and push it's center little bit closer
-    // to where the mouse pointer currenlty is.
-    // Below factor divides distance from center of vieport to mouse pointer
-    // allowing for more smooth transition:
-    let f = 5;
+//     // When zooming in or out update canvas offset and push it's center little bit closer
+//     // to where the mouse pointer currenlty is.
+//     // Below factor divides distance from center of vieport to mouse pointer
+//     // allowing for more smooth transition:
+//     let f = 5;
   
-    if( mouse.x < canvas.width / 2) canvas.offset.x += ( canvas.width / 2 - mouse.x ) / f
-    else canvas.offset.x -= ( mouse.x - canvas.width / 2 ) / f;
+//     if( mouse.x < draw.canvas.width / 2) draw.cameraOffset.x += ( draw.canvas.width / 2 - mouse.x ) / f
+//     else draw.cameraOffset.x -= ( mouse.x - canvas.width / 2 ) / f;
   
-    if( mouse.y < canvas.height / 2) canvas.offset.y += ( canvas.height / 2 - mouse.y ) / f
-    else canvas.offset.y -= ( mouse.y - canvas.height / 2 ) / f;
+//     if( mouse.y < draw.canvas.height / 2) draw.cameraOffset.y += ( draw.canvas.height / 2 - mouse.y ) / f
+//     else draw.cameraOffset.y -= ( mouse.y - draw.canvas.height / 2 ) / f;
 
-    store.thoughts.forEach(thought => thought.updateVisuals());
-    canvas.redraw();
-};
+//     store.thoughts.forEach(thought => thought.updateVisuals());
+//     draw.thoughtConnectors();
+// };
 
 on('mousemove', onMouseMove);
 on('mouseup', onMouseUp);
 on('mousedown', onMouseDown);
 
-// canvas.on('wheel', onMouseScroll);
+// draw.canvas.on('wheel', onMouseScroll);
 
 function isKeyBindToAction(event) {
     return Object.values(actionKeys).some(key => key.name === event.key || key.code === event.keyCode);

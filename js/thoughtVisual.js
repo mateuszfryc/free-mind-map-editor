@@ -13,7 +13,7 @@ class ThoughtVisual {
         element.getThought = function() {
             return parent;
         }
-        mindMap.appendChild(element);
+        get('#mindmap').appendChild(element);
 
         if (!element.hasOwnProperty('remove')) {
             Object.defineProperty(element, 'remove', {
@@ -27,7 +27,7 @@ class ThoughtVisual {
         }
 
         function edit() {
-            if (parent.state !== THOUGHT_STATE.EDITED) parent.edit();
+            if (parent.isEdited()) parent.edit();
         }
 
         element.on('dblclick', edit);
@@ -141,24 +141,5 @@ class ThoughtVisual {
     setPosition(x, y) {
         this.element.style.left = `${x}px`;
         this.element.style.top = `${y}px`;
-    }
-
-    updateScale() {
-        // let { borderWidth, marginTop, marginRight, marginBottom, marginLeft, fontSize } = element.style;
-        // borderWidth = parseInt(borderWidth) * store.scale;
-        // if (borderWidth < 1) borderWidth = 1;
-        // marginTop = parseInt(marginTop) * store.scale;
-        // marginRight = parseInt(marginRight) * store.scale;
-        // marginBottom = parseInt(marginBottom) * store.scale;
-        // marginLeft = parseInt(marginLeft) * store.scale;
-        // fontSize = parseInt(fontSize) * store.scale;
-
-        // const newStyle = `
-        //     width: ${element.getWidth() * store.scale}px;
-        //     height: ${element.getHeight() * store.scale}px;
-        //     border-width: ${borderWidth}px;
-        //     margin: ${marginTop}px ${marginRight}px ${marginBottom}px ${marginLeft}px;
-        // `;
-        // element.setAttribute('style', newStyle);
     }
 }

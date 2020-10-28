@@ -37,8 +37,4 @@ class Rectangle {
     
         return false;
     }
-
-    draw() {
-        Draw.rectangle(this);
-    }
 }
