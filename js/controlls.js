@@ -30,6 +30,7 @@ const actionKeys = {
     addChild: KEYS[TAB],
     addSibling: KEYS[ENTER],
     deleteSelected: KEYS[DELETE],
+    edit: KEYS[SPACE],
     exitEditState: KEYS[ESCAPE]
 }
 
@@ -70,12 +71,20 @@ function onPressKey(event) {
                 selection.addSiblingThought();
                 return;
             }
-            else if (actionKeys.exitEditState.isPressed && selection.state === THOUGHT_STATE.EDITED) {
-                selection.stopEditing();
+            else if (selection.state === THOUGHT_STATE.EDITED) {
+                if (actionKeys.exitEditState.isPressed) {
+                    selection.stopEditing();
+                }
             }
-            else if (actionKeys.deleteSelected.isPressed && selection.state !== THOUGHT_STATE.EDITED) {
-                selection.removeSelf();
-                return;
+            else {
+                if (actionKeys.deleteSelected.isPressed) {
+                    selection.removeSelf();
+                    return;
+                }
+                else if (actionKeys.edit.isPressed) {
+                    selection.edit();
+                    return;
+                }
             }
         }
     }
@@ -174,9 +183,8 @@ function onMouseMove(event) {
         // drag view / pan camera by holding mouse left button on background
         const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
         canvas.offset.setV(mouseDiff);
-        store.ideas.forEach(idea => {
-            idea.addPosition(mouseDiff);
-            idea.getChildren(true).forEach(child => child.addPosition(mouseDiff));
+        store.thoughts.forEach(thought => {
+            thought.addPosition(mouseDiff);
         })
         canvas.redraw();
     }

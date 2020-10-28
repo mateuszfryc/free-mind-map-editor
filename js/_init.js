@@ -1,2 +1,3 @@
 // add first top node
-store.ideas.push(new Thought(getScreenCenterCoords()));
+store.rootThought = new Thought(getScreenCenterCoords(), undefined, 'Map your new idea');
+canvas.drawInstructions.push(Draw.thoughtConnectors);

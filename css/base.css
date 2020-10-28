@@ -18,20 +18,21 @@ canvas {
 }
 
 .thought {
-    background-color: #fff;
-    border-radius: 5px 20px;
-    border: 1px solid rgba(200, 200, 200, 1);
+    color: #444;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 3px;
+    border-bottom: 3px solid red;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
     box-shadow: none;
     left: 0;
     outline: none;
     overflow: hidden;
-    padding: 16px 18px;
+    padding: 3px 5px;
     position: fixed;
     top: 0;
-    max-width: 150px;
-    transition: box-shadow 0.3s ease-in-out, border 0.3s ease-in-out;
+    max-width: 220px;
+    transition: color 0.3s ease, border 0.3s ease;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -42,13 +43,19 @@ canvas {
     overflow-wrap: break-word;
 }
 
+.thought:hover {
+    /* -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.12);
+    -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.12);
+    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.12); */
+    color: red;
+}
+
 .thought:focus,
-.thought:hover,
 .thought.selected {
-    border: 1px solid rgba(0, 150, 255, 1);
-    -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 150, 255, 0.3);
-    -moz-box-shadow: 0px 0px 15px 0px rgba(0, 150, 255, 0.3);
-    box-shadow: 0px 0px 15px 0px rgba(0, 150, 255, 0.3);
+    /* border: 1px solid rgba(0, 150, 255, 1); */
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(0, 150, 255, 0.4);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(0, 150, 255, 0.4);
+    box-shadow: 0px 0px 20px 0px rgba(0, 150, 255, 0.4);
 }
 
 .thought-textarea {

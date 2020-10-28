@@ -1,6 +1,10 @@
 class Thought {
-    constructor(position, parent, defaultText = store.defaultThought) {
-        this.parent = parent || undefined;
+    constructor(
+        position,
+        parent = undefined,
+        defaultText = store.defaultThought,
+    ) {
+        this.parent = parent;
         this.id = ++store.lastUsedID;
         this.element = new ThoughtVisual(this, defaultText);
         this.position = new Vector();
@@ -10,7 +14,6 @@ class Thought {
         this.state = THOUGHT_STATE.IDLE;
         
         this.setPosition(position);
-        this.drawConnector();
         store.thoughts.push(this);
     }
 
@@ -69,18 +72,43 @@ class Thought {
         }
     }
 
-    drawConnector(drawChildrenConnectors = false) {
-        if (this.hasParent()) {
-            const my = this.getPosition();
-            const parent = this.parent.getPosition();
-            Draw.bezierCurve(my, parent, my, parent);
+    getCorners() {
+        const width = this.element.getOuterWidth() * 0.5;
+        const height = this.element.getOuterHeight() * 0.5;
+        const { x, y } = this.getPosition();
+
+        return {
+            top: {
+                left: new Vector(x - width, y - height - 1),
+                right: new Vector(x + width, y - height - 1),
+            },
+            bottom: {
+                left: new Vector(x - width, y + height - 1),
+                right: new Vector(x + width, y + height - 1),
+            },
         }
-        if (drawChildrenConnectors && this.hasChildren()) {
-            this.children.forEach(child => {
-                child.drawConnector(true);
-            });
+    }
+
+    getConnectorStartAndEnd(isRootOnMyLeft) {
+        const myCorners = this.getCorners();
+        const parentCorners = this.parent.getCorners();
+
+        return {
+            me: isRootOnMyLeft ? myCorners.bottom.left : myCorners.bottom.right,
+            parent: isRootOnMyLeft ? parentCorners.bottom.right : parentCorners.bottom.left,
         }
-        // me.getBoundingRectangle().draw();
+    }
+
+    isParentOnLeft() {
+        const { x } = this.getPosition();
+        const { x: a } = this.parent.getPosition();
+
+        return a < x;
+    }
+
+    drawConnector(isRootOnTheLeft) {
+        const { me, parent } = this.getConnectorStartAndEnd(isRootOnTheLeft);
+        Draw.bezierCurve(me, parent, me, parent);
     }
 
     updatePosition() {
@@ -131,9 +159,10 @@ class Thought {
         const newChild = new Thought(myPosition, this);
         const widthHalf = this.element.getOuterWidth() * 0.5;
         const childWidthHalf = newChild.element.getOuterWidth() * 0.5;
-        newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap, 0));
+        newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap.horiz, 0));
         this.children.push(newChild);
         newChild.resolveOverlaps();
+        // newChild.select();
         newChild.edit();
         canvas.redraw();
     }
@@ -143,9 +172,10 @@ class Thought {
         const newChild = new Thought(myPosition, this.parent);
         const heightHalf = this.element.getOuterHeight() * 0.5;
         const childHeightHalf = newChild.element.getOuterHeight() * 0.5;
-        newChild.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap));
+        newChild.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap.vert));
         this.parent.children.push(newChild);
         newChild.resolveOverlaps();
+        // newChild.select();
         newChild.edit();
         canvas.redraw();
     }
