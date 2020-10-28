@@ -8,16 +8,24 @@ html, body {
 }
 
 canvas {
-    background-color: #f7f7f7;
+    background-color: #fdfdfd;
+    background-image: url('../img/chessboard.svg');
+    background-size: 60px;
+    background-repeat: repeat;
     height: 100%;
     width: 100%;
     z-index: 1;
 }
 
+.mindmap {
+    height: 100%;
+    width: 100%;
+}
+
 .thought {
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
-    background-color: #f7f7f7;
+    background-color: #f9f9f9;
     border-bottom: 3px solid red;
     border-radius: 3px;
     box-shadow: none;
@@ -28,7 +36,7 @@ canvas {
     overflow-wrap: break-word;
     overflow: hidden;
     padding: 3px 5px;
-    position: fixed;
+    position: absolute;
     top: 0;
     transition: color 0.3s ease, border 0.3s ease;
     -webkit-touch-callout: none;
@@ -159,7 +167,7 @@ canvas {
 }
 
 .section.dimmed {
-    background-color: #f7f7f7;
+    background-color: #f9f9f9;
 }
 
 section.dimmed .section-header {

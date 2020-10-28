@@ -48,14 +48,16 @@ function getScreenCenterCoords() {
     }
 }
 
+const mindMap = get('#mindmap');
+
 function updateWindowInnerSize() {
-    document.body.width = canvas.width = window.innerWidth && document.documentElement.clientWidth
+    document.body.width = mindMap.width = canvas.width = window.innerWidth && document.documentElement.clientWidth
         ? Math.min( window.innerWidth, document.documentElement.clientWidth )
         : window.innerWidth
             || document.documentElement.clientWidth
             || document.getElementsByTagName('body')[0].clientWidth;
     
-    document.body.height = canvas.height = window.innerHeight && document.documentElement.clientHeight
+    document.body.height = mindMap.width = canvas.height = window.innerHeight && document.documentElement.clientHeight
         ? Math.min(window.innerHeight, document.documentElement.clientHeight)
         : window.innerHeight
             || document.documentElement.clientHeight

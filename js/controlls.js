@@ -31,7 +31,7 @@ const actionKeys = {
     addSibling: KEYS[ENTER],
     deleteSelected: KEYS[DELETE],
     edit: KEYS[SPACE],
-    exitEditState: KEYS[ESCAPE]
+    exitEditState: KEYS[ESCAPE],
 }
 
 function onPressKey(event) {
