@@ -225,7 +225,7 @@ on('mousemove', onMouseMove);
 on('mouseup', onMouseUp);
 on('mousedown', onMouseDown);
 
-canvas.on('wheel', onMouseScroll);
+// canvas.on('wheel', onMouseScroll);
 
 function isKeyBindToAction(event) {
     return Object.values(actionKeys).some(key => key.name === event.key || key.code === event.keyCode);

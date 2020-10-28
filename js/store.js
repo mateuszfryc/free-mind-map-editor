@@ -11,6 +11,6 @@ const store = {
     scale: 1,
     scaleStep: 0.1,
     selection: undefined,
-    styleSheet: get.styleSheetByName('base'),
+    styleSheet: get.styleSheetByName('default'),
     thoughts: [],
 }

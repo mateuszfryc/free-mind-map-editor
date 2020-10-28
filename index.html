@@ -5,10 +5,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mind Mapper</title>
     <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/default.css">
 </head>
 <body>
+    <header id="menu">
+        <div class="link-wrapper">
+            <a href="#makemap" class="link link-selected">Mind Map</a>
+            <a href="#about" class="link">About</a>
+            <a href="#howto" class="link">How to?</a>
+            <a href="#settings" class="link">Settings</a>
+            <a href="#faq" class="link">FAQ</a>
+            <a href="#donate" class="link donate">Donate</a>
+        </div>
+    </header>
     <canvas id="canvas"></canvas>
+
+    <div class="main">
+        <div id="about" class='section'>
+            <div class="section-content">
+                <h3 class="section-header">About</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>                
+            </div>
+        </div>
+
+        <div id="howto" class='section'>
+            <div class="section-content">
+                <h3 class="section-header">How To</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
+            </div>
+        </div>
+
+        <div id="settings" class='section'>
+            <div class="section-content">
+                <h3 class="section-header">Settings</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>                
+            </div>
+        </div>
+
+        <div id="faq" class='section'>
+            <div class="section-content">
+                <h3 class="section-header">FAQ</h3>
+                <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>                
+            </div>
+        </div>
+
+        <div id="footer" class='section'>
+            <div class="section-content">
+                Footer              
+            </div>
+        </div>
+    </div>
+
     <div class="thought-visual-template hidden" style="font-size: 14px; line-height: 18px;"></div>
 
     <script src="js/polyfills.js"></script>
