@@ -4,8 +4,7 @@ const on = function(event, callback, element = document, bubble = false) {
     element.addEventListener(event, callback, bubble)
 };
 
-function get(query, element) {
-    element = element || document;
+function get(query, element = document) {
     return element.querySelector(query);
 }
 
@@ -14,6 +13,10 @@ get.styleSheetByName = function(name) {
         .find(sheet => 
             sheet.find(entry => 
                 entry.href && entry.href.includes(`css/${name}.css`)))[1].cssRules;
+}
+
+get.all = function(query, element = document) {
+    return Array.from(element.querySelectorAll(query));
 }
 
 function isElementOverflowing(element) {

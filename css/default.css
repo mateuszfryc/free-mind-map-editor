@@ -2,6 +2,8 @@ html, body {
     background: transparent;;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-size: 16px;
+    --scroll-behavior: smooth;
+    scroll-behavior: smooth;
     width: 100%;
 }
 
@@ -76,7 +78,7 @@ canvas {
     right: 0;
     text-align: center;
     top: 0;
-    z-index: 2;
+    z-index: 4;
 }
 
 #menu > .link-wrapper {
@@ -107,12 +109,12 @@ canvas {
     border-left: 1px solid #d1d1d1;
 }
 #menu > .link-wrapper > .link-selected {
-    border-bottom: 3px solid #444;
+    border-bottom: 3px solid #008fd5;
 }
 
 #menu > .link-wrapper > .link:not(.link-selected):hover {
     color: #000;
-    border-bottom: 3px solid #b71313;
+    border-bottom: 3px solid #666;
 }
 
 #menu > .link-wrapper > .link:first-child {
@@ -140,9 +142,12 @@ canvas {
 }
 
 .section .section-header {
+    border-bottom: 3px solid #008fd5;
+    display: inline-block;
     font-size: 30px;
     line-height: 35px;
     margin-bottom: 20px;
+    padding: 0 25px 10px 5px;
 }
 
 .section .section-content {
@@ -151,4 +156,12 @@ canvas {
     margin: 0 auto;
     max-width: 1100px;
     padding: 30px;
+}
+
+.section.dimmed {
+    background-color: #f7f7f7;
+}
+
+section.dimmed .section-header {
+    border-bottom-color: #999 !important;
 }
