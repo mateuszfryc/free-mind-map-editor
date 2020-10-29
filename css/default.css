@@ -154,13 +154,13 @@ canvas {
     display: inline-block;
     font-size: 30px;
     line-height: 35px;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     padding: 0 25px 10px 5px;
 }
 
 .section .section-content {
     font-size: 15px;
-    line-height: 20px;
+    line-height: 28px;
     margin: 0 auto;
     max-width: 1100px;
     padding: 30px;
@@ -172,4 +172,40 @@ canvas {
 
 section.dimmed .section-header {
     border-bottom-color: #999 !important;
+}
+
+.section .paragraph {
+    margin-bottom: 20px;
+}
+
+.faq-item {
+    position: relative;
+}
+
+.faq-item:not(:last-child) {
+    border-bottom: 1px solid #d7d7d7;
+    margin-bottom: 30px;
+    padding-bottom: 30px;
+}
+
+.faq-question {
+    font-size: 20px;
+    margin-bottom: 10px;
+    margin-left: 30px;
+}
+
+.faq-question:before {
+    content: 'Q:';
+    position: absolute;
+    left: 0;
+}
+
+.faq-answer {
+    margin-left: 30px;
+}
+
+.faq-answer:before {
+    content: 'A:';
+    position: absolute;
+    left: 0;
 }

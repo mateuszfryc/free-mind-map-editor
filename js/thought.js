@@ -1,15 +1,10 @@
 (function() {
 
-    const IDLE = 'idle'
-    const HIGHLIGHTED = 'highlighted';
-    const SELECTED = 'selected';
-    const EDITED = 'edited';
-
     const THOUGHT_STATE = {
-        IDLE,
-        HIGHLIGHTED,
-        SELECTED,
-        EDITED,
+        IDLE        : 0,
+        HIGHLIGHTED : 1,
+        SELECTED    : 2,
+        EDITED      : 3,
     }
 
     class Thought {
