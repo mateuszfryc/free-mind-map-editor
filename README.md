@@ -2,6 +2,10 @@
 
 ### TO DO:
 - drag & drop thoughts to change parent
+- input
+    - view: select type of input
+    - touch controlls
+    - keyboard controlls
 - mirror thoughts when moving from one side of the root thought to the other
 - settings (in modal)
     - dark mode
