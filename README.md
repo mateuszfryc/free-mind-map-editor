@@ -1,13 +1,17 @@
 # mind-mapper
 
 ### TO DO:
+- welcome splashscreen (modal)
 - drag & drop thoughts to change parent
 - input
     - view: select type of input
     - touch controlls
     - keyboard controlls
 - mirror thoughts when moving from one side of the root thought to the other
+- styles
+    - curvy connectors
 - settings (in modal)
+    - background change
     - dark mode
     - two more styles
 - persistance in cache?
@@ -22,10 +26,8 @@
     - export as PDF
     - load
 - content
-    - about
     - how to
-    - FAQ
-        - do I collect your data? - NO!
+    - FAQ - are there any other questions to answer?
     - footer
         - email
 - donations service (PayPal?)
