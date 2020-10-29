@@ -105,23 +105,23 @@ class ThoughtVisual {
         return parseInt(height);
     }
 
-    getSize(returnHalfValues = false) {
+    getSize(isReturningHalf = false) {
         const width = this.getWidth();
         const height = this.getHeight();
 
         return {
-            width: returnHalfValues ? width * 0.5 : width,
-            height: returnHalfValues ? height * 0.5 : height,
+            width: isReturningHalf ? width * 0.5 : width,
+            height: isReturningHalf ? height * 0.5 : height,
         }
     }
 
-    getOuterSize(returnHalfValues = false) {
+    getOuterSize(isReturningHalf = false) {
         const width = this.getOuterWidth();
         const height = this.getOuterHeight();
 
         return {
-            width: returnHalfValues ? width * 0.5 : width,
-            height: returnHalfValues ? height * 0.5 : height,
+            width: isReturningHalf ? width * 0.5 : width,
+            height: isReturningHalf ? height * 0.5 : height,
         }
     }
 

@@ -17,7 +17,7 @@
 - settings (in modal)
     - background change
     - dark mode
-    - two more styles
+    - two more themes with unique names
 - persistance in cache?
 - cokies info
 - tools

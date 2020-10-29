@@ -96,7 +96,7 @@
             return false;
         }
     
-        resolveOverlaps(bResolveChildren) {
+        resolveOverlaps() {
             const me = this;
             const overlaps = this.findOverlaps();
     
@@ -110,10 +110,6 @@
                     me.resolveOverlaps();
                 })
                 draw.thoughtConnectors();
-            }
-
-            if (bResolveChildren) {
-                this.children.forEach(child => child.resolveOverlaps());
             }
         }
     
@@ -237,8 +233,8 @@
             return this.children.length > 0;
         }
     
-        getChildren(withSubChildren = false) {
-            if (withSubChildren) {
+        getChildren(isReturningSubChildren = false) {
+            if (isReturningSubChildren) {
                 return this.children.reduce((acc, val) => {
                     const subChildren = val.getChildren(true);
                     return acc.concat(val, subChildren)
