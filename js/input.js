@@ -64,11 +64,11 @@ function onPressKey(event) {
         }
         else {
             if (actionKeys.addChild.isPressed) {
-                selection.addChildThought();
+                selection.createChildThought();
                 return;
             }
             else if (actionKeys.addSibling.isPressed && hasParent) {
-                selection.addSiblingThought();
+                selection.createSiblingThought();
                 return;
             }
             else if (selection.isEdited()) {
@@ -149,6 +149,16 @@ function onMouseDown(event) {
 
 function onMouseUp() {
     mouse.isLeftButtonDown = false;
+
+    if (store.highlight) {
+        const { closestOverlap, parent } = store.highlight;
+        if (closestOverlap && closestOverlap.id !== parent.id) {
+            if (parent) parent.removeChildThought(store.highlight);
+            closestOverlap.addChildThought(store.highlight);
+        }
+
+        store.highlight.element.resetZIndex();
+    }
 }
 
 function onMouseMove(event) {
@@ -167,8 +177,11 @@ function onMouseMove(event) {
             if (store.highlight.isEdited()) return;
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
+                store.highlight.element.setOnTop();
                 store.highlight.setPosition(mouse.getPosition().add(store.highlight.mousePositionDiff));
-
+                
+                // check for overlaps and if one exist note it
+                store.highlight.closestOverlap = store.highlight.findClosestOverlap();
                 // if Shift is pressed also drag children
                 if (KEYS[SHIFT].isPressed) {
                     store.highlight.getChildren(true).forEach(child => {
@@ -177,8 +190,8 @@ function onMouseMove(event) {
                 }
             }
             draw.thoughtConnectors();
+
             return;
-            
         }
         // drag view / pan camera by holding mouse left button on background
         const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());

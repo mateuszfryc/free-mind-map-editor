@@ -142,4 +142,12 @@ class ThoughtVisual {
         this.element.style.left = `${x}px`;
         this.element.style.top = `${y}px`;
     }
+
+    setOnTop() {
+        this.element.style.zIndex = '3';
+    }
+
+    resetZIndex() {
+        this.element.style.zIndex = '2';
+    }
 }

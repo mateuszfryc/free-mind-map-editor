@@ -2,13 +2,17 @@
 
 ### TO DO:
 - welcome splashscreen (modal)
-- drag & drop thoughts to change parent
+- fix overlaps resolove function
 - input
     - view: select type of input
     - touch controlls
     - keyboard controlls
 - mirror thoughts when moving from one side of the root thought to the other
+- code
+    - set all booleans to start with 'b'
 - styles
+    - donate button should turn green upon hover
+    - donate links style (same as button?)
     - curvy connectors
 - settings (in modal)
     - background change

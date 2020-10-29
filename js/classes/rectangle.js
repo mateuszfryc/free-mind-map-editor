@@ -5,16 +5,12 @@ class Rectangle {
         this.height = height;
         this.parent = parent;
     }
-    
-    getPosition() {
-        return this.position.getCopy();
-    }
 
     isOverlappingWith(other) {
         const me = this;
         const { width, height } = me;
-        const { x, y } = this.getPosition();
-        const { x: a, y: b } = other.getPosition();
+        const { x, y } = this.position.getCopy();
+        const { x: a, y: b } = other.position.getCopy();
         const isColliding = x + width >= a &&
                             y + height >= b &&
                             y <= b + other.height &&

@@ -26,6 +26,12 @@ get.screenCenterCoords = function() {
     )
 }
 
+get.twoPointsDistance = function(p1, p2) {
+    const a = p1.x - p2.x;
+    const b = p1.y - p2.y;
+    return Math.sqrt(a * a + b * b);
+}
+
 get.windowInnerSize = function() {
     return {
         width: window.innerWidth && document.documentElement.clientWidth
