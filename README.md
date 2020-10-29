@@ -3,13 +3,12 @@
 ### TO DO:
 - welcome splashscreen (modal)
 - fix overlaps resolove function
+- add movement animation
 - input
     - view: select type of input
     - touch controlls
     - keyboard controlls
 - mirror thoughts when moving from one side of the root thought to the other
-- code
-    - set all booleans to start with 'b'
 - styles
     - donate button should turn green upon hover
     - donate links style (same as button?)

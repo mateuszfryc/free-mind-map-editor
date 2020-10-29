@@ -133,9 +133,13 @@ canvas {
     border-bottom-right-radius: 5px;
 }
 
-#menu > .link-wrapper > .link.donate {
-    background-color: #b71313 !important;
+#menu > .link-wrapper > .donate {
+    background-color: #b71313;
     color: #fff !important;
+}
+
+#menu > .link-wrapper > .donate:hover {
+    background-color: #33a809;
 }
 
 .main {
