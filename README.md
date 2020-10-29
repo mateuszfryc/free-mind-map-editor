@@ -1,8 +1,8 @@
 # mind-mapper
 
 ### TO DO:
+- no js message
 - welcome splashscreen (modal)
-- fix overlaps resolove function
 - add movement animation
 - input
     - view: select type of input
@@ -10,16 +10,17 @@
     - keyboard controlls
 - mirror thoughts when moving from one side of the root thought to the other
 - styles
-    - donate button should turn green upon hover
     - donate links style (same as button?)
     - curvy connectors
 - settings (in modal)
+    - auto alignment on/off
     - background change
     - dark mode
     - two more themes with unique names
 - persistance in cache?
 - cokies info
 - tools
+    - selection tool
     - zoom in/out
     - align all in selected style
 - mind map menu submenu:

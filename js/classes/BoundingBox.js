@@ -1,4 +1,4 @@
-class Rectangle {
+class BoundingBox {
     constructor(x, y, width, height, parent) {
         this.position = new Vector(x, y);
         this.width = width;
@@ -17,17 +17,15 @@ class Rectangle {
                             x <= a + other.width;
 
         if (isColliding) {
-            const mixedWidth = width + other.width;
-            const mixedHeight = height + other.height;
-            const overlap = new Vector(
-                mixedWidth - ((a - x) * 2),
-                mixedHeight - ((b - y) * 2),
+            const amount = new Vector(
+                -x + a + width,
+                -y + b + height,
             )
     
             return {
-                me,
-                other,
-                overlap, 
+                me: me.parent,
+                other: other.parent,
+                amount, 
             };
         }
     

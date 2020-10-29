@@ -40,7 +40,7 @@ class Vector {
         return new Vector(this.x, this.y);
     }
 
-    add(other) {
+    addV(other) {
         this.x += other.x;
         this.y += other.y;
     

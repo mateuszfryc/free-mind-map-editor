@@ -44,3 +44,5 @@ get.windowInnerSize = function() {
                     || document.getElementsByTagName('body')[0].clientHeight,
     }
 }
+
+get.time = typeof performance === 'function' ? performance.now : Date.now;

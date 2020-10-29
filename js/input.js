@@ -64,12 +64,12 @@ function onPressKey(event) {
         }
         else {
             if (actionKeys.addChild.isPressed) {
-                selection.createChildThought();
-                return;
+                selection.createChildThought().resolveOverlaps().edit();
+                draw.connectors();
             }
             else if (actionKeys.addSibling.isPressed && hasParent) {
-                selection.createSiblingThought();
-                return;
+                selection.createSiblingThought().resolveOverlaps().edit();
+                draw.connectors();
             }
             else if (selection.isEdited()) {
                 if (actionKeys.exitEditState.isPressed) {
@@ -79,11 +79,9 @@ function onPressKey(event) {
             else {
                 if (actionKeys.deleteSelected.isPressed) {
                     selection.removeSelf();
-                    return;
                 }
                 else if (actionKeys.edit.isPressed) {
                     selection.edit();
-                    return;
                 }
             }
         }
@@ -131,10 +129,16 @@ function onMouseDown(event) {
     const { highlight } = store;
     mouse.isLeftButtonDown = true;
 
-    if (highlight) {
-        if (highlight.isIdle()) highlight.select();
+    if (highlight && highlight.id === target.thoughtRef.id) {
+        highlight.saveChildrenRelativePosition();
 
-        if (target.thoughtRef && !target.thoughtRef.isSelected()) target.thoughtRef.select();
+        if (highlight.isIdle()) {
+            highlight.select();
+        };
+
+        if (highlight && !highlight.isSelected()) {
+            highlight.select();
+        };
 
         if (KEYS[SHIFT].isPressed) {
             highlight.getChildren(true).forEach(child => child.saveMousePositionDiff());
@@ -155,6 +159,9 @@ function onMouseUp() {
         if (closestOverlap && closestOverlap.id !== parent.id) {
             if (parent) parent.removeChildThought(store.highlight);
             closestOverlap.addChildThought(store.highlight);
+            store.highlight.resolveOverlaps('x').restoreChildrenRelativePosition();
+            store.highlight.getChildren(true).forEach(child => child.resolveOverlaps());
+            draw.connectors();
         }
 
         store.highlight.element.resetZIndex();
@@ -178,18 +185,18 @@ function onMouseMove(event) {
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
                 store.highlight.element.setOnTop();
-                store.highlight.setPosition(mouse.getPosition().add(store.highlight.mousePositionDiff));
+                store.highlight.setPosition(mouse.getPosition().addV(store.highlight.mousePositionDiff));
                 
                 // check for overlaps and if one exist note it
                 store.highlight.closestOverlap = store.highlight.findClosestOverlap();
                 // if Shift is pressed also drag children
                 if (KEYS[SHIFT].isPressed) {
                     store.highlight.getChildren(true).forEach(child => {
-                        child.setPosition(mouse.getPosition().add(child.mousePositionDiff));
-                    })
+                        child.setPosition(mouse.getPosition().addV(child.mousePositionDiff));
+                    });
                 }
             }
-            draw.thoughtConnectors();
+            draw.connectors();
 
             return;
         }
@@ -199,7 +206,7 @@ function onMouseMove(event) {
         store.thoughts.forEach(thought => {
             thought.addPosition(mouseDiff);
         })
-        draw.thoughtConnectors();
+        draw.connectors();
     }
 }
 
@@ -231,7 +238,7 @@ function onMouseMove(event) {
 //     else draw.cameraOffset.y -= ( mouse.y - draw.canvas.height / 2 ) / f;
 
 //     store.thoughts.forEach(thought => thought.updateVisuals());
-//     draw.thoughtConnectors();
+//     draw.connectors();
 // };
 
 on('mousemove', onMouseMove);

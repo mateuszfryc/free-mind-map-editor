@@ -1,13 +1,11 @@
 const store = {
     // settings
-    defaultSpawnGap: {
-        horiz: 30,
-        vert: 15
-    },
+    defaultSpawnGap: new Vector(25, 10),
     isDebugDrawOn: false,
     scaleStep: 0.1,
     
     // state
+    animationQueue: [],
     highlight: undefined,
     rootThought: undefined,
     scale: 1,

@@ -26,4 +26,6 @@ window.on('load', () => {
             }
         });
     });
+
+    animate();
 });

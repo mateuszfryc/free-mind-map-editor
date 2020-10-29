@@ -127,6 +127,8 @@ class ThoughtVisual {
 
     setHeight(height, withScale = true) {
         this.element.style.height = `${withScale ? height * store.scale : height}px`;
+
+        return this;
     }
 
     getPosition() {
@@ -141,13 +143,19 @@ class ThoughtVisual {
     setPosition(x, y) {
         this.element.style.left = `${x}px`;
         this.element.style.top = `${y}px`;
+
+        return this;
     }
 
     setOnTop() {
         this.element.style.zIndex = '3';
+
+        return this;
     }
 
     resetZIndex() {
         this.element.style.zIndex = '2';
+
+        return this;
     }
 }

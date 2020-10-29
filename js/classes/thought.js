@@ -23,6 +23,7 @@
             this.children = [];
             this.state = THOUGHT_STATE.IDLE;
             this.closestOverlap = undefined;
+            this.childrenRelativePosition = [];
             
             this.setPosition(position);
             store.thoughts.push(this);
@@ -44,11 +45,11 @@
             return this.state === THOUGHT_STATE.EDITED;
         }
     
-        getBoundingRectangle() {
+        getBoundingBox() {
             const { width, height } = this.element.getOuterSize();
             const { x, y } = this.getPosition();
     
-            return new Rectangle(
+            return new BoundingBox(
                 x - (width * 0.5),
                 y - (height * 0.5),
                 width,
@@ -57,13 +58,13 @@
             )
         }
     
-        findOverlaps(bReturnClosestOnly = false) {
-            const myBounds = this.getBoundingRectangle();
+        findOverlaps(returnFirstOnly = false) {
+            const myBounds = this.getBoundingBox();
             let overlaps = [];
 
             store.thoughts.forEach(thought => {
                 if (thought.id !== this.id) {
-                    const otherBounds = thought.getBoundingRectangle();
+                    const otherBounds = thought.getBoundingBox();
                     const result = myBounds.isOverlappingWith(otherBounds);
 
                     if (result) {
@@ -71,8 +72,16 @@
                     }
                 }
             });
-    
-            return overlaps.length > 0 ? overlaps : false;
+
+            if (overlaps.length > 0) {
+                if (returnFirstOnly) {
+                    return overlaps[0];
+                }
+
+                return overlaps;
+            }
+
+            return false;
         }
 
         findClosestOverlap() {
@@ -83,36 +92,34 @@
 
             if (overlaps) {
                 overlaps.forEach((overlap, index) => {
-                    const otherPosition = overlap.other.parent.getPosition();
+                    const otherPosition = overlap.other.getPosition();
                     const distance = get.twoPointsDistance(myPosition, otherPosition);
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestIndex = index;
                     } 
                 });
-                return overlaps[closestIndex].other.parent;
+                return overlaps[closestIndex].other;
             }
 
             return false;
         }
     
-        resolveOverlaps() {
+        resolveOverlaps(axis = 'y') {
             const me = this;
-            const overlaps = this.findOverlaps();
+            const overlap = this.findOverlaps(true);
     
-            if (overlaps) {
-                overlaps.forEach(overlap => {
-                    const { other, overlap: amount } = overlap;
-                    const targetPosition = store.selection.getPosition();
-                    const { y } = other.parent.getPosition();
-                    targetPosition.y = y + amount.y * 0.5 + (Math.sign(amount.y) * 2);
-                    me.setPosition(targetPosition);
-                    me.resolveOverlaps();
-                })
-                draw.thoughtConnectors();
+            if (overlap) {
+                const { amount } = overlap;
+                const targetPosition = me.getPosition();
+                targetPosition[axis] += amount[axis] + (Math.sign(amount[axis]) * store.defaultSpawnGap[axis]);
+                me.setPosition(targetPosition);
+                me.resolveOverlaps('y');
             }
+
+            return this;
         }
-    
+
         getCorners() {
             const width = this.element.getOuterWidth() * 0.5;
             const height = this.element.getOuterHeight() * 0.5;
@@ -130,7 +137,7 @@
             }
         }
     
-        getConnectorStartAndEnd(isRootOnMyLeft) {
+        getConnectorPoints(isRootOnMyLeft) {
             const myCorners = this.getCorners();
             const parentCorners = this.parent.getCorners();
     
@@ -154,16 +161,22 @@
             const newX = (x - width) * store.scale;
             const newY = (y - height) * store.scale;
             element.setPosition(newX, newY);
+
+            return this;
         }
     
         setPosition(newPosition) {
             this.position.setV(newPosition);
             this.updatePosition();
+
+            return this;
         }
     
         addPosition(positionToAdd) {
-            this.position.add(positionToAdd);
+            this.position.addV(positionToAdd);
             this.updatePosition();
+
+            return this;
         }
     
         getPosition() {
@@ -180,10 +193,38 @@
         saveCurrentSize() {
             const { width, height } = this.element.getSize();
             this.savedSize.set(width, height);
+
+            return this;
         }
     
         saveMousePositionDiff() {
             this.mousePositionDiff = this.getPosition().subtract(mouse.getPosition());
+
+            return this;
+        }
+
+        saveChildrenRelativePosition() {
+            const myPosition = this.getPosition();
+            this.childrenRelativePosition = this.getChildren(true).map(child => {
+                const position = child.getPosition().subtract(myPosition);
+                position.id = child.id;
+
+                return position;
+            });
+
+            return this;
+        }
+
+        restoreChildrenRelativePosition() {
+            const myPosition = this.getPosition();
+            this.childrenRelativePosition.forEach(position => {
+                if (this.children.length > 0) {
+                    this.children.find(child => child.id === position.id)
+                        .setPosition(myPosition.getCopy().addV(position));
+                }
+            });
+
+            return this;
         }
     
         createChildThought() {
@@ -191,34 +232,30 @@
             const newChild = new Thought(myPosition, this);
             const widthHalf = this.element.getOuterWidth() * 0.5;
             const childWidthHalf = newChild.element.getOuterWidth() * 0.5;
-            newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap.horiz, 0));
+            newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap.x, 0));
             this.children.push(newChild);
-            newChild.resolveOverlaps();
-            // newChild.select();
-            newChild.edit();
-            draw.thoughtConnectors();
+
+            return newChild;
         }
     
         createSiblingThought() {
             const myPosition = this.getPosition();
-            const newChild = new Thought(myPosition, this.parent);
+            const newSibling = new Thought(myPosition, this.parent);
             const heightHalf = this.element.getOuterHeight() * 0.5;
-            const childHeightHalf = newChild.element.getOuterHeight() * 0.5;
-            newChild.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap.vert));
-            this.parent.children.push(newChild);
-            newChild.resolveOverlaps();
-            // newChild.select();
-            newChild.edit();
-            draw.thoughtConnectors();
+            const childHeightHalf = newSibling.element.getOuterHeight() * 0.5;
+            newSibling.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap.y));
+            this.parent.children.push(newSibling);
+
+            return newSibling;
         }
 
         addChildThought(child) {
             if (this.children.every(myChild => myChild.id !== child.id)) {
                 this.children.push(child);
                 child.parent = this;
-                child.resolveOverlaps();
-                draw.thoughtConnectors();
             }
+
+            return this;
         }
     
         removeChildThought(childToBeRemoved) {
@@ -226,7 +263,8 @@
                 return child.id !== childToBeRemoved.id;
             });
             childToBeRemoved.parent = undefined;
-            draw.thoughtConnectors();
+
+            return this;
         }
     
         hasChildren() {
@@ -257,7 +295,10 @@
             store.thoughts = store.thoughts.filter(function(thought) {
                 return thought.id !== me.id;
             })
-            if (this.parent) this.parent.removeChildThought(me);
+            if (this.parent) {
+                this.parent.removeChildThought(me);
+                draw.connectors();
+            };
         }
     
         select() {
@@ -267,6 +308,8 @@
             this.saveCurrentSize();
             this.state = THOUGHT_STATE.SELECTED;
             store.selection = this;
+
+            return this;
         }
     
         unselect() {
@@ -275,6 +318,8 @@
             element.className = element.className.replace(/\s*selected\s*/g, '');
             this.state = THOUGHT_STATE.IDLE;
             store.selection = undefined;
+
+            return this;
         }
     
         insertTextarea() {
@@ -333,6 +378,8 @@
             const element = this.getElement();
             this.insertTextarea();
             this.state = THOUGHT_STATE.EDITED;
+
+            return this;
         }
     
         stopEditing() {
@@ -341,7 +388,9 @@
             element.innerHTML = value;
             element.style.height = '';
             this.updatePosition();
-            draw.thoughtConnectors();
+            draw.connectors();
+
+            return this;
         }
     }
 
