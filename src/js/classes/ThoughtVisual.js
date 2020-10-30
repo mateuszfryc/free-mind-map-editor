@@ -1,13 +1,13 @@
 class ThoughtVisual {
-    constructor(parent, defaultText) {
-        this.element = this.createElement(parent, defaultText);
+    constructor(parent, defaultText, isRootThought = false) {
+        this.element = this.createElement(parent, defaultText, isRootThought);
     }
 
-    createElement(parent, defaultText) {
+    createElement(parent, defaultText, isRootThought) {
         const me = this;
         const element = get('.thought-visual-template').cloneNode();
         element.id = parent.id;
-        element.className = 'thought';
+        element.className = `thought ${isRootThought && 'thought-root'}`;
         element.thoughtRef = parent;
         element.innerHTML = defaultText;
         element.getThought = function() {

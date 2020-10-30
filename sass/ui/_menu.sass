@@ -1,0 +1,53 @@
+#menu
+  height: 32px
+  font-size: 0
+  left: 0
+  position: fixed
+  right: 0
+  text-align: center
+  top: 0
+  z-index: 4
+
+  & > .link-wrapper
+    @include shadow-black
+    border-bottom-left-radius: 5px
+    border-bottom-right-radius: 5px
+    display: inline-block
+    height: 32px
+    margin: 0 auto
+    padding: 0
+    text-align: center
+
+    & > .link
+      background-color: $white
+      border-bottom: 1px solid $gray-light
+      color: $gray-dark
+      display: inline-block
+      font-size: $font-size-normal
+      height: 22px
+      line-height: 19px
+      margin: 0
+      padding: 5px 18px
+      text-decoration: none
+      transition: color 0.2s ease, background-color 0.2s ease, border 0.2s ease
+      border-left: 1px solid $gray-light
+
+      &:not(.link-selected):hover
+        color: $black
+        border-bottom: 3px solid $gray-dark
+  
+      &:first-child
+        border-bottom-left-radius: 5px
+
+      &-selected
+        border-bottom: 3px solid $primary
+
+      &:last-child
+        border-bottom-right-radius: 5px
+
+    & > .donate
+      background-color: $red-donate
+      color: $white !important
+
+      &:hover
+        background-color: $green-dontate

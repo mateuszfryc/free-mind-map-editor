@@ -10,20 +10,22 @@
     class Thought {
         constructor(
             position,
-            parent = undefined,
-            defaultText = 'Type your idea',
+            parent        = undefined,
+            isRootThought = false,
+            defaultText   = 'Type your idea',
         ) {
-            this.parent = parent;
             const lastThought = store.thoughts[store.thoughts.length - 1];
-            this.id = lastThought ? lastThought.id + 1 : 0;
-            this.element = new ThoughtVisual(this, defaultText);
-            this.position = new Vector();
-            this.mousePositionDiff = new Vector();
-            this.savedSize = new Vector();
+
             this.children = [];
-            this.state = THOUGHT_STATE.IDLE;
-            this.closestOverlap = undefined;
             this.childrenRelativePosition = [];
+            this.closestOverlap = undefined;
+            this.element = new ThoughtVisual(this, defaultText, isRootThought);
+            this.id = lastThought ? lastThought.id + 1 : 0;
+            this.mousePositionDiff = new Vector();
+            this.parent = parent;
+            this.position = new Vector();
+            this.savedSize = new Vector();
+            this.state = THOUGHT_STATE.IDLE;
             
             this.setPosition(position);
             store.thoughts.push(this);

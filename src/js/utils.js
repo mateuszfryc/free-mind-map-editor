@@ -8,13 +8,6 @@ const get = function(query, element = document) {
     return element.querySelector(query);
 }
 
-get.styleSheetByName = function(name) {
-    return Object.entries(document.styleSheets)
-        .find(sheet => 
-            sheet.find(entry => 
-                entry.href && entry.href.includes(`css/${name}.css`)))[1].cssRules;
-}
-
 get.all = function(query, element = document) {
     return Array.from(element.querySelectorAll(query));
 }

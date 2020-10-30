@@ -10,6 +10,5 @@ const store = {
     rootThought: undefined,
     scale: 1,
     selection: undefined,
-    styleSheet: get.styleSheetByName('default'),
     thoughts: [],
 }

@@ -1,0 +1,47 @@
+.thought
+  -moz-box-shadow: none
+  -webkit-box-shadow: none
+  background-color: $white-broken
+  border-bottom: 3px solid $primary
+  border-radius: 3px
+  box-shadow: none
+  color: $gray-dark
+  left: 0
+  max-width: 220px
+  outline: none
+  overflow-wrap: break-word
+  overflow: hidden
+  padding: 3px 5px
+  position: absolute
+  top: 0
+  transition: color 0.2s ease, border 0.2s ease, box-shadow 0.2s ease
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
+  z-index: 2
+
+  &-root
+    background-color: $primary
+    color: $white
+
+  &:hover
+    @include shadow-black
+
+  &:focus,
+  &.selected
+    @include shadow-black
+
+  &-textarea
+    border: none
+    font-family: inherit
+    font-size: inherit
+    height: 100%
+    line-height: inherit
+    margin: 0
+    overflow: hidden
+    padding: 0
+    resize: none
+    width: 100%

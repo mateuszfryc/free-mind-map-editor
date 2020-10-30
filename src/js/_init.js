@@ -11,7 +11,7 @@ window.on('load', () => {
     window.on('resize', updateDocumentSize);
 
     // add first top node
-    store.rootThought = new Thought(get.screenCenterCoords(), undefined, 'Map your new idea');
+    store.rootThought = new Thought(get.screenCenterCoords(), undefined, true, 'Map your new idea');
 
     // switching menu selected links logic
     const linkSelected = 'link-selected';

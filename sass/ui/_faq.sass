@@ -1,0 +1,25 @@
+.faq-item
+  position: relative
+
+  &:not(:last-child)
+    border-bottom: 1px solid $gray-light
+    margin-bottom: $margin-normal
+    padding-bottom: $margin-normal
+
+  .faq-question
+    font-size: $font-size-section
+    margin-bottom: $margin-small
+    margin-left: $margin-normal
+
+    &:before
+      content: 'Q:'
+      position: absolute
+      left: 0
+
+  .faq-answer
+    margin-left: $margin-normal
+
+    &:before
+      content: 'A:'
+      position: absolute
+      left: 0

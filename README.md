@@ -1,9 +1,12 @@
 # mind-mapper
 
+Use CLI to run 'compass watch' to start listening for sass changes and get transpiled css on the fly.
+
 ### TO DO:
 - no js message
 - welcome splashscreen (modal)
 - add movement animation
+- responsive menu
 - input
     - view: select type of input
     - touch controlls

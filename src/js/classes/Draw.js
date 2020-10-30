@@ -7,7 +7,7 @@
             this.cameraOffset = new Vector();
         }
     
-        bezierCurve(start, end, p1, p2, color = 'rgb( 255, 0, 0 )') {
+        bezierCurve(start, end, p1, p2, color = '#008fd5') {
             const { context } = this;
             context.beginPath();
             context.strokeStyle = color;
