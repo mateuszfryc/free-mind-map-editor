@@ -5,6 +5,7 @@
         HIGHLIGHTED : 1,
         SELECTED    : 2,
         EDITED      : 3,
+        DRAGGED     : 4,
     }
 
     class Thought {
@@ -45,6 +46,10 @@
 
         isEdited() {
             return this.state === THOUGHT_STATE.EDITED;
+        }
+
+        isBeingDragged() {
+            return this.state === THOUGHT_STATE.DRAGGED;
         }
     
         getBoundingBox() {
@@ -221,8 +226,10 @@
             const myPosition = this.getPosition();
             this.childrenRelativePosition.forEach(position => {
                 if (this.children.length > 0) {
-                    this.children.find(child => child.id === position.id)
-                        .setPosition(myPosition.getCopy().addV(position));
+                    const actionedChild = this.children.find(child => child.id === position.id)
+                    if (actionedChild) {
+                        actionedChild.setPosition(myPosition.getCopy().addV(position));
+                    }
                 }
             });
 
@@ -273,8 +280,8 @@
             return this.children.length > 0;
         }
     
-        getChildren(isReturningSubChildren = false) {
-            if (isReturningSubChildren) {
+        getChildren(includeGrandChildren = false) {
+            if (includeGrandChildren) {
                 return this.children.reduce((acc, val) => {
                     const subChildren = val.getChildren(true);
                     return acc.concat(val, subChildren)
@@ -286,6 +293,19 @@
     
         hasParent() {
             return this.parent !== undefined;
+        }
+
+        isParentOf(unknownChild, includeGrandChildren = false) {
+            if (!unknownChild) return false;
+
+            if (includeGrandChildren) {
+                return this.getChildren(true).some(child => child.id === unknownChild.id);
+            }
+            return this.children.some(child => child.id === unknownChild.id);
+        }
+
+        isChildOf(unknownParent) {
+            return unknownParent && unknownParent.children.some(child => child.id === this.id);
         }
     
         removeSelf() {
@@ -393,6 +413,14 @@
             draw.connectors();
 
             return this;
+        }
+
+        dragg() {
+            this.state = THOUGHT_STATE.DRAGGED;
+        }
+
+        stopDragging() {
+            this.state = THOUGHT_STATE.SELECTED;
         }
     }
 

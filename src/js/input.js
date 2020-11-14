@@ -154,17 +154,24 @@ function onMouseDown(event) {
 function onMouseUp() {
     mouse.isLeftButtonDown = false;
 
-    if (store.highlight) {
+    if (store.highlight && store.highlight.isBeingDragged()) {
         const { closestOverlap, parent } = store.highlight;
-        if (closestOverlap && closestOverlap.id !== parent.id) {
+        if (closestOverlap && !store.highlight.isParentOf(closestOverlap, true) && !closestOverlap.isChildOf(store.highlight)) {
             if (parent) parent.removeChildThought(store.highlight);
             closestOverlap.addChildThought(store.highlight);
             store.highlight.resolveOverlaps('x').restoreChildrenRelativePosition();
             store.highlight.getChildren(true).forEach(child => child.resolveOverlaps());
-            draw.connectors();
         }
-
+        
         store.highlight.element.resetZIndex();
+        store.highlight.stopDragging();
+    }
+    draw.connectors();
+}   
+
+function onMouseDbClick() {
+    if (store.highlight) {
+        store.highlight.edit();
     }
 }
 
@@ -184,6 +191,7 @@ function onMouseMove(event) {
             if (store.highlight.isEdited()) return;
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
+                store.highlight.dragg();
                 store.highlight.element.setOnTop();
                 store.highlight.setPosition(mouse.getPosition().addV(store.highlight.mousePositionDiff));
                 
@@ -244,7 +252,7 @@ function onMouseMove(event) {
 on('mousemove', onMouseMove);
 on('mouseup', onMouseUp);
 on('mousedown', onMouseDown);
-
+on('dblclick', onMouseDbClick);
 // draw.canvas.on('wheel', onMouseScroll);
 
 function isKeyBindToAction(event) {
