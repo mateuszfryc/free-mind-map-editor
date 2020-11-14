@@ -350,11 +350,17 @@
             const parentStyle = parent.getStyle();
             const element = parent.getElement();
             const textarea = document.createElement('textarea');
+            const width = parent.getOuterWidth();
+            const height = parent.getOuterHeight();
             textarea.id = this.id;
             textarea.className = 'thought-textarea';
             textarea.value = parent.getValue();
-            textarea.style.width = `${parent.getWidth() || parentStyle.maxWidth}px`;
-            textarea.style.height = `${parent.getHeight() || parentStyle.lineHeight}px`;
+            textarea.style.width = width
+                ? `${width}px`
+                : parentStyle.maxWidth;
+            textarea.style.height = height
+                ? `${height}px`
+                : parentStyle.lineHeight;
             textarea.getThought = function() {
                 return me;
             }
