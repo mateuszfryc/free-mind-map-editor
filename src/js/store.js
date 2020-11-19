@@ -11,4 +11,5 @@ const store = {
     scale: 1,
     selection: undefined,
     thoughts: [],
+    isGroupDraggOn: true,
 }

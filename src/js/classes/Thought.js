@@ -13,7 +13,7 @@
             position,
             parent        = undefined,
             isRootThought = false,
-            defaultText   = 'Type your idea',
+            defaultText   = '',
         ) {
             const lastThought = store.thoughts[store.thoughts.length - 1];
 
@@ -27,6 +27,7 @@
             this.position = new Vector();
             this.savedSize = new Vector();
             this.state = THOUGHT_STATE.IDLE;
+            this.prevIsParentOnLeft = undefined;
             
             this.setPosition(position);
             store.thoughts.push(this);
@@ -144,19 +145,26 @@
             }
         }
     
-        getConnectorPoints(isRootOnMyLeft) {
+        getConnectorPoints() {
+            const parent = this.getParentThought();
+            const grandParent = parent.getParentThought();
+            const isParentsOnLeft = parent.getPosition().x < this.getPosition().x;
+            const isParentsOutOnLeft = grandParent
+                ? grandParent.getPosition().x < parent.getPosition().x
+                : isParentsOnLeft;
+            
             const myCorners = this.getCorners();
             const parentCorners = this.parent.getCorners();
-    
+
             return {
-                me: isRootOnMyLeft ? myCorners.bottom.left : myCorners.bottom.right,
-                parent: isRootOnMyLeft ? parentCorners.bottom.right : parentCorners.bottom.left,
+                me: isParentsOnLeft ? myCorners.bottom.left : myCorners.bottom.right,
+                parent: isParentsOutOnLeft ? parentCorners.bottom.right : parentCorners.bottom.left,
             }
         }
     
         isParentOnLeft() {
             const { x } = this.getPosition();
-            const { x: a } = this.parent.getPosition();
+            const { x: a } = this.getParentThought().getPosition();
     
             return a < x;
         }
@@ -168,6 +176,7 @@
             const newX = (x - width) * store.scale;
             const newY = (y - height) * store.scale;
             element.setPosition(newX, newY);
+            this.saveMousePositionDiff();
 
             return this;
         }
@@ -196,6 +205,23 @@
                 this.element.getHeight(),
             )
         }
+
+        getParentThought() {
+            return this.parent;
+        }
+
+        getHeadOfTheFamily() {
+            const parent = this.getParentThought();
+            if (!parent || parent.id === store.rootThought.id) return this;
+
+            let headCandidate = parent;
+
+            while(headCandidate.getParentThought().id !== store.rootThought.id) {
+                headCandidate = headCandidate.getParentThought();
+            }
+
+            return headCandidate;
+        }
     
         saveCurrentSize() {
             const { width, height } = this.element.getSize();
@@ -211,6 +237,8 @@
         }
 
         saveChildrenRelativePosition() {
+            if (this.children.length < 1) return this;
+
             const myPosition = this.getPosition();
             this.childrenRelativePosition = this.getChildren(true).map(child => {
                 const position = child.getPosition().subtract(myPosition);
@@ -223,13 +251,14 @@
         }
 
         restoreChildrenRelativePosition() {
+            if (this.children.length < 1) return this;
+
             const myPosition = this.getPosition();
+            const allChildren = this.getChildren(true);
             this.childrenRelativePosition.forEach(position => {
-                if (this.children.length > 0) {
-                    const actionedChild = this.children.find(child => child.id === position.id)
-                    if (actionedChild) {
-                        actionedChild.setPosition(myPosition.getCopy().addV(position));
-                    }
+                const actionedChild = allChildren.find(child => child.id === position.id)
+                if (actionedChild) {
+                    actionedChild.setPosition(myPosition.getCopy().addV(position));
                 }
             });
 
@@ -242,6 +271,7 @@
             const widthHalf = this.element.getOuterWidth() * 0.5;
             const childWidthHalf = newChild.element.getOuterWidth() * 0.5;
             newChild.addPosition(new Vector(widthHalf + childWidthHalf + store.defaultSpawnGap.x, 0));
+            newChild.prevIsParentOnLeft = newChild.isParentOnLeft();
             this.children.push(newChild);
 
             return newChild;
@@ -253,6 +283,7 @@
             const heightHalf = this.element.getOuterHeight() * 0.5;
             const childHeightHalf = newSibling.element.getOuterHeight() * 0.5;
             newSibling.addPosition(new Vector(0, heightHalf + childHeightHalf + store.defaultSpawnGap.y));
+            newSibling.prevIsParentOnLeft = newSibling.isParentOnLeft();
             this.parent.children.push(newSibling);
 
             return newSibling;
@@ -281,6 +312,8 @@
         }
     
         getChildren(includeGrandChildren = false) {
+            if (this.children.length < 1 ) return [];
+
             if (includeGrandChildren) {
                 return this.children.reduce((acc, val) => {
                     const subChildren = val.getChildren(true);
@@ -310,11 +343,11 @@
     
         removeSelf() {
             const me = this;
-            this.children.forEach(function(child){
+            this.children.forEach(child => {
                 child.removeSelf();
             });
             this.getElement().remove();
-            store.thoughts = store.thoughts.filter(function(thought) {
+            store.thoughts = store.thoughts.filter(thought => {
                 return thought.id !== me.id;
             })
             if (this.parent) {
@@ -356,10 +389,14 @@
             textarea.className = 'thought-textarea';
             textarea.value = parent.getValue();
             textarea.style.width = width
-                ? `${width}px`
+                ? width < 120
+                    ? `${120}px`
+                    : `${width}px`
                 : parentStyle.maxWidth;
             textarea.style.height = height
-                ? `${height}px`
+                ? height < 20
+                    ? `${20}px`
+                    : `${height}px`
                 : parentStyle.lineHeight;
             textarea.getThought = function() {
                 return me;
@@ -412,6 +449,10 @@
     
         stopEditing() {
             const value = this.element.getValue();
+            if (value === '') {
+                this.removeSelf();
+                return false;
+            }
             const element = this.getElement();
             element.innerHTML = value;
             element.style.height = '';

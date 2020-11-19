@@ -47,6 +47,7 @@ function onPressKey(event) {
     }
 
     KEYS[SHIFT].isPressed = shiftKey;
+    store.isGroupDraggOn = !KEYS[SHIFT].isPressed;
 
     if (KEYS[ENTER].isPressed && store.selection || KEYS[TAB].isPressed) {
         event.preventDefault();
@@ -73,7 +74,11 @@ function onPressKey(event) {
             }
             else if (selection.isEdited()) {
                 if (actionKeys.exitEditState.isPressed) {
-                    selection.stopEditing();
+                    const hasContent = selection.stopEditing();
+                    if (!hasContent) {
+                        store.highlight = undefined;
+                        store.selection = undefined;
+                    }
                 }
             }
             else {
@@ -101,6 +106,7 @@ function onReleaseKey(event) {
     }
 
     KEYS[SHIFT].isPressed = shiftKey;
+    store.isGroupDraggOn = !KEYS[SHIFT].isPressed;
 }
 
 on("keydown", onPressKey);
@@ -131,18 +137,13 @@ function onMouseDown(event) {
 
     if (highlight && highlight.id === target.thoughtRef.id) {
         highlight.saveChildrenRelativePosition();
+        highlight.saveMousePositionDiff();
 
-        if (highlight.isIdle()) {
+        if (highlight.isIdle() || !highlight.isSelected()) {
             highlight.select();
         };
 
-        if (highlight && !highlight.isSelected()) {
-            highlight.select();
-        };
-
-        if (KEYS[SHIFT].isPressed) {
-            highlight.getChildren(true).forEach(child => child.saveMousePositionDiff());
-        }
+        highlight.getChildren(true).forEach(child => child.saveMousePositionDiff());
     }
     else {
         if (store.selection && target.id && parseInt(target.id) !== store.selection.id) {
@@ -183,6 +184,8 @@ function onMouseMove(event) {
     const { target } = event;
     const { className } = target;
 
+    // log(mouse.position.x, mouse.position.y);
+
     if (!mouse.isLeftButtonDown) {
         store.highlight = className.includes('thought') ? target.getThought() : undefined;
     }
@@ -197,11 +200,32 @@ function onMouseMove(event) {
                 
                 // check for overlaps and if one exist note it
                 store.highlight.closestOverlap = store.highlight.findClosestOverlap();
-                // if Shift is pressed also drag children
-                if (KEYS[SHIFT].isPressed) {
-                    store.highlight.getChildren(true).forEach(child => {
-                        child.setPosition(mouse.getPosition().addV(child.mousePositionDiff));
+
+                if (store.isGroupDraggOn && store.highlight.getParentThought()) {
+                    const isParentOnLeft = store.highlight.isParentOnLeft();
+                    store.highlight.getChildren(true).forEach(draggable => {
+                        if (
+                            draggable.prevIsParentOnLeft !== undefined
+                            && isParentOnLeft !== store.highlight.prevIsParentOnLeft
+                        ) {
+                            const hasChildren = draggable.hasChildren();
+                            
+                            const draggablePosition = draggable.getPosition();
+                            const draggableParent = draggable.getParentThought();
+                            let draggableParentPosition;
+                            if (draggableParent) {
+                                draggableParentPosition = draggableParent.getPosition();
+                                if (hasChildren) draggable.saveChildrenRelativePosition();
+                                const xDiff = (draggablePosition.x - draggableParentPosition.x) * 2;
+                                draggablePosition.x -= xDiff;
+                                draggable.setPosition(draggablePosition);
+                                if (hasChildren) draggable.restoreChildrenRelativePosition();
+                            }
+                        }
+                        
+                        draggable.setPosition(mouse.getPosition().addV(draggable.mousePositionDiff));
                     });
+                    store.highlight.prevIsParentOnLeft = isParentOnLeft;
                 }
             }
             draw.connectors();

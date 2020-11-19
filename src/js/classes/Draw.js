@@ -1,5 +1,13 @@
 (function() {
 
+    function sleep(milliseconds) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < milliseconds);
+      }
+
     class Draw {
         constructor() {
             this.canvas = get('#canvas');
@@ -31,28 +39,17 @@
     
             const { rootThought } = store;
             if (rootThought) {
-                const rootChildren = rootThought.getChildren();
-                const { x: a } = rootThought.getPosition();
+                const rootChildren = rootThought.getChildren(true);
                 if (rootChildren.length > 0) {
-                    rootChildren.forEach(thought => {
-                        const { x } = thought.getPosition();
-                        const isRootOnTheLeft = a < x;
-                        const { me, parent } = thought.getConnectorPoints(isRootOnTheLeft);
+                    rootChildren.forEach(child => {
+                        const { me, parent } = child.getConnectorPoints();
                         this.bezierCurve(me, parent, me, parent);
-    
-                        const thoughtChildren = thought.getChildren(true);
-                        if (thoughtChildren.length > 0) {
-                            thoughtChildren.forEach(child => {
-                                const { me: childMe, parent: childParent } = child.getConnectorPoints(isRootOnTheLeft);
-                                this.bezierCurve(childMe, childParent, childMe, childParent);
-                            });
-                        }
                     })
                 }
             }
         }
     }
-    
+
     window.draw = new Draw();
 
 })();

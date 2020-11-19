@@ -21,7 +21,7 @@ class ThoughtVisual {
                 enumerable: true,
                 writable: true,
                 value: function remove() {
-                    this.parentNode.removeChild(this);
+                    element.parentNode.removeChild(element);
                 }
             })
         }
