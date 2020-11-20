@@ -148,7 +148,6 @@ function onMouseDown(event) {
     }
     else {
         if (store.selection && target.id && parseInt(target.id) !== store.selection.id) {
-            log(store.selection)
             store.selection.unselect();
         }
     }

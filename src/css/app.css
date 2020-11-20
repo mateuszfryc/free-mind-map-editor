@@ -172,15 +172,6 @@ html, body {
   -ms-user-select: none;
   user-select: none;
   z-index: 2; }
-  /* line 26, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
-  .thought-root {
-    background-color: #008fd5;
-    border: none;
-    color: #ffffff;
-    text-align: center; }
-    /* line 32, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
-    .thought-root > textarea {
-      text-align: center; }
   /* line 35, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
   .thought:hover {
     -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);

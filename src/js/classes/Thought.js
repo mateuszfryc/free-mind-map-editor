@@ -490,6 +490,7 @@
             element.innerHTML = value;
             element.style.height = '';
             this.updatePosition();
+            this.resolveOverlaps();
             draw.connectors();
 
             return this;

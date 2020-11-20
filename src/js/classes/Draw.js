@@ -15,13 +15,20 @@
             this.cameraOffset = new Vector();
         }
     
-        bezierCurve(start, end, p1, p2, color = '#008fd5') {
+        bezierCurve(start, end, controllPointA, controllPointB, color = '#008fd5') {
             const { context } = this;
-            context.beginPath();
             context.strokeStyle = color;
             context.lineWidth = 3;
+            context.beginPath();
             context.moveTo(start.x, start.y);
-            context.bezierCurveTo(p1.x, p1.y, p2.x, p2.y, end.x, end.y);
+            context.bezierCurveTo(
+                start.x + controllPointA.x,
+                start.y + controllPointA.y,
+                end.x + controllPointB.x,
+                end.y + controllPointB.y,
+                end.x,
+                end.y
+            );
             context.stroke();
         }
     
@@ -43,7 +50,19 @@
                 if (rootChildren.length > 0) {
                     rootChildren.forEach(child => {
                         const { me, parent } = child.getConnectorPoints();
-                        this.bezierCurve(me, parent, me, parent);
+                        me.x += 1;
+                        parent.x -= 1;
+                        const { x } = me;
+                        const { x: a } = parent;
+                        const mod = (x - a) / store.connectorsCurveDivider;
+                        const bezierControllPointA = new Vector(-mod, 0);
+                        const bezierControllPointB = new Vector(mod, 0);
+                        this.bezierCurve(
+                            me, 
+                            parent,
+                            bezierControllPointA,
+                            bezierControllPointB
+                        );
                     })
                 }
             }
