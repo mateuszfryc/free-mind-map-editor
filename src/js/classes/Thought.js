@@ -8,12 +8,14 @@
         DRAGGED     : 4,
     }
 
+    const defaultTextTemplate = 'What\'s on your mind?';
+
     class Thought {
         constructor(
             position,
             parent        = undefined,
             isRootThought = false,
-            defaultText   = '',
+            defaultText   = defaultTextTemplate,
         ) {
             const lastThought = store.thoughts[store.thoughts.length - 1];
 
@@ -28,6 +30,7 @@
             this.savedSize = new Vector();
             this.state = THOUGHT_STATE.IDLE;
             this.prevIsParentOnLeft = undefined;
+            this.isMarkedForRemoval = false;
             
             this.setPosition(position);
             store.thoughts.push(this);
@@ -340,8 +343,30 @@
         isChildOf(unknownParent) {
             return unknownParent && unknownParent.children.some(child => child.id === this.id);
         }
+
+        hasValue() {
+            const content = this.element.getValue();
+
+            return content !== '' && content !== defaultTextTemplate;
+        }
+
+        removeSelfIfEmpty() {
+            if (!this.hasValue() && this.id !== store.rootThought.id) {
+                this.removeSelf();
+
+                return true;
+            }
+            return false;
+        }
     
         removeSelf() {
+            this.isMarkedForRemoval = true;
+            if (store.highlight && store.highlight.id === this.id) {
+                store.highlight = undefined;
+            }
+            if (store.selection && store.selection.id === this.id) {
+                store.selection = undefined;
+            }
             const me = this;
             this.children.forEach(child => {
                 child.removeSelf();
@@ -368,6 +393,11 @@
         }
     
         unselect() {
+            if (!this.hasValue() && this.id !== store.rootThought.id) {
+                this.removeSelf();
+
+                return;
+            };
             if (this.isEdited()) this.stopEditing();
             const element = this.getElement();
             element.className = element.className.replace(/\s*selected\s*/g, '');
@@ -432,12 +462,14 @@
             element.innerHTML = '';
             element.appendChild(textarea);
             textarea.focus();
+            textarea.select();
         }
     
         edit() {
-            if (this.isIdle()
-                && store.selection
-                && store.selection.id !== this.id) {
+            if (this.isIdle() && (
+                    !store.selection
+                    || store.selection.id !== this.id
+                )) {
                     this.select();
                 }
             const element = this.getElement();
@@ -448,11 +480,12 @@
         }
     
         stopEditing() {
-            const value = this.element.getValue();
-            if (value === '') {
+            if (!this.hasValue() && this.id !== store.rootThought.id) {
                 this.removeSelf();
-                return false;
-            }
+
+                return;
+            };
+            const value = this.element.getValue();
             const element = this.getElement();
             element.innerHTML = value;
             element.style.height = '';

@@ -1,4 +1,4 @@
-/* line 4, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/app.sass */
+/* line 4, /Users/mateuszfryc/Documents/mindmapper/sass/app.sass */
 html, body {
   background: transparent;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -7,25 +7,25 @@ html, body {
   scroll-behavior: smooth;
   width: 100%; }
 
-/* line 12, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/app.sass */
+/* line 12, /Users/mateuszfryc/Documents/mindmapper/sass/app.sass */
 .main {
   background-color: #ffffff;
   position: absolute;
   width: 100%;
   z-index: 3; }
 
-/* line 18, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/app.sass */
+/* line 18, /Users/mateuszfryc/Documents/mindmapper/sass/app.sass */
 .mindmap {
   height: 100%;
   width: 100%; }
 
-/* line 22, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/app.sass */
+/* line 22, /Users/mateuszfryc/Documents/mindmapper/sass/app.sass */
 .hidden {
   left: -500px;
   position: fixed;
   top: -500px; }
 
-/* line 1, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_canvas.sass */
+/* line 1, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_canvas.sass */
 #canvas {
   background-color: #ffffff;
   background-image: url("../img/chessboard.svg");
@@ -35,34 +35,34 @@ html, body {
   width: 100%;
   z-index: 1; }
 
-/* line 1, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+/* line 1, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
 .faq-item {
   position: relative; }
-  /* line 4, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+  /* line 4, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
   .faq-item:not(:last-child) {
     border-bottom: 1px solid #d1d1d1;
     margin-bottom: 30px;
     padding-bottom: 30px; }
-  /* line 9, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+  /* line 9, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
   .faq-item .faq-question {
     font-size: 20px;
     margin-bottom: 10px;
     margin-left: 30px; }
-    /* line 14, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+    /* line 14, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
     .faq-item .faq-question:before {
       content: "Q:";
       position: absolute;
       left: 0; }
-  /* line 19, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+  /* line 19, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
   .faq-item .faq-answer {
     margin-left: 30px; }
-    /* line 22, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_faq.sass */
+    /* line 22, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_faq.sass */
     .faq-item .faq-answer:before {
       content: "A:";
       position: absolute;
       left: 0; }
 
-/* line 1, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+/* line 1, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
 #menu {
   height: 32px;
   font-size: 0;
@@ -72,7 +72,7 @@ html, body {
   text-align: center;
   top: 0;
   z-index: 4; }
-  /* line 11, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+  /* line 11, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
   #menu > .link-wrapper {
     -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
     -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
@@ -84,7 +84,7 @@ html, body {
     margin: 0 auto;
     padding: 0;
     text-align: center; }
-    /* line 21, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+    /* line 21, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
     #menu > .link-wrapper > .link {
       background-color: #ffffff;
       border-bottom: 1px solid #d1d1d1;
@@ -98,40 +98,40 @@ html, body {
       text-decoration: none;
       transition: color 0.2s ease, background-color 0.2s ease, border 0.2s ease;
       border-left: 1px solid #d1d1d1; }
-      /* line 35, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+      /* line 35, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
       #menu > .link-wrapper > .link:not(.link-selected):hover {
         color: #000000;
         border-bottom: 3px solid #444444; }
-      /* line 39, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+      /* line 39, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
       #menu > .link-wrapper > .link:first-child {
         border-bottom-left-radius: 5px; }
-      /* line 42, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+      /* line 42, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
       #menu > .link-wrapper > .link-selected {
         border-bottom: 3px solid #008fd5; }
-      /* line 45, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+      /* line 45, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
       #menu > .link-wrapper > .link:last-child {
         border-bottom-right-radius: 5px; }
-    /* line 48, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+    /* line 48, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
     #menu > .link-wrapper > .donate {
       background-color: #b71313;
       color: #ffffff !important; }
-      /* line 52, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_menu.sass */
+      /* line 52, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_menu.sass */
       #menu > .link-wrapper > .donate:hover {
         background-color: #33a809; }
 
-/* line 1, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+/* line 1, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
 .section {
   padding: 60px; }
-  /* line 4, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+  /* line 4, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
   .section.dimmed {
     background-color: #f9f9f9; }
-    /* line 7, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+    /* line 7, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
     .section.dimmed .section-header {
       border-bottom-color: #008fd5; }
-  /* line 10, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+  /* line 10, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
   .section .paragraph {
     margin-bottom: 30px; }
-  /* line 13, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+  /* line 13, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
   .section .section-header {
     border-bottom: 3px solid #008fd5;
     display: inline-block;
@@ -139,7 +139,7 @@ html, body {
     line-height: 35px;
     margin-bottom: 30px;
     padding: 0 25px 10px 5px; }
-  /* line 21, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_section.sass */
+  /* line 21, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_section.sass */
   .section .section-content {
     font-size: 15px;
     line-height: 28px;
@@ -147,7 +147,7 @@ html, body {
     max-width: 1100px;
     padding: 30px; }
 
-/* line 1, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_thought.sass */
+/* line 1, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
 .thought {
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
@@ -172,21 +172,26 @@ html, body {
   -ms-user-select: none;
   user-select: none;
   z-index: 2; }
-  /* line 26, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_thought.sass */
+  /* line 26, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
   .thought-root {
     background-color: #008fd5;
-    color: #ffffff; }
-  /* line 30, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_thought.sass */
+    border: none;
+    color: #ffffff;
+    text-align: center; }
+    /* line 32, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
+    .thought-root > textarea {
+      text-align: center; }
+  /* line 35, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
   .thought:hover {
     -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
     -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22); }
-  /* line 33, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_thought.sass */
+  /* line 38, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
   .thought:focus, .thought.selected {
     -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
     -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22);
     box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.22); }
-  /* line 37, /Users/mateuszfryc/Documents/MyProjects/mindmapper/sass/ui/_thought.sass */
+  /* line 42, /Users/mateuszfryc/Documents/mindmapper/sass/ui/_thought.sass */
   .thought-textarea {
     border: none;
     font-family: inherit;

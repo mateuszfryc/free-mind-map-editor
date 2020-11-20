@@ -12,6 +12,7 @@ window.on('load', () => {
 
     // add first top node
     store.rootThought = new Thought(get.screenCenterCoords(), undefined, true, 'What\'s on your mind?');
+    store.rootThought.edit();
 
     // switching menu selected links logic
     const linkSelected = 'link-selected';

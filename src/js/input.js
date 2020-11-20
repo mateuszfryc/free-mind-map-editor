@@ -65,20 +65,21 @@ function onPressKey(event) {
         }
         else {
             if (actionKeys.addChild.isPressed) {
-                selection.createChildThought().resolveOverlaps().edit();
+                const newChild = selection.createChildThought();
+                selection.removeSelfIfEmpty();
+                if (selection.isMarkedForRemoval) return;
+                newChild.resolveOverlaps().edit();
                 draw.connectors();
             }
             else if (actionKeys.addSibling.isPressed && hasParent) {
-                selection.createSiblingThought().resolveOverlaps().edit();
+                const newSibling = selection.createSiblingThought();
+                selection.removeSelfIfEmpty();
+                newSibling.resolveOverlaps().edit();
                 draw.connectors();
             }
             else if (selection.isEdited()) {
                 if (actionKeys.exitEditState.isPressed) {
-                    const hasContent = selection.stopEditing();
-                    if (!hasContent) {
-                        store.highlight = undefined;
-                        store.selection = undefined;
-                    }
+                    selection.stopEditing();
                 }
             }
             else {
@@ -135,7 +136,7 @@ function onMouseDown(event) {
     const { highlight } = store;
     mouse.isLeftButtonDown = true;
 
-    if (highlight && highlight.id === target.thoughtRef.id) {
+    if (highlight && target && target.thoughtRef && highlight.id === target.thoughtRef.id) {
         highlight.saveChildrenRelativePosition();
         highlight.saveMousePositionDiff();
 
@@ -147,6 +148,7 @@ function onMouseDown(event) {
     }
     else {
         if (store.selection && target.id && parseInt(target.id) !== store.selection.id) {
+            log(store.selection)
             store.selection.unselect();
         }
     }
