@@ -3,7 +3,7 @@ const store = {
     defaultSpawnGap: new Vector(25, 10),
     isDebugDrawOn: false,
     scaleStep: 0.1,
-    connectorsCurveDivider: 1.5,
+    connectorsCurveDivider: 2.2,
     
     // state
     animationQueue: [],
