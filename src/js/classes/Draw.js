@@ -7,24 +7,23 @@
             this.thoughtsContainer = get('#thoughts-container');
             this.miniMap = get('#mini-map');
             this.miniMapViewport = get('#mini-map__viewport');
-            this.miniMapMiniatures = [];
         }
         
-        addMiniMapMiniature(thought) {
-            const { x, y } = thought.getPosition();
-            const { xScaled, yScaled } = this.translateCoordinatesToSpace(x, y, 'full');
-            const { x: width, y: height } = thought.getSize();
-            const { scaledWidth, scaledHeight} = translateFullToMiniMapSize(width, height);
-            this.miniMapMiniatures.push({
-                id: thought.id,
-                color: thought.isRootThought
-                    ? 'red'
-                    : 'blue',
-                position: new Vector(xScaled, yScaled),
-                size: new Vector(scaledWidth, scaledHeight)
-            });
+        getMiniMapMiniature(thought) {
+            const position = thought.getPosition();
+            const size = thought.getSize();
+            const positionScaled = this.translateCoordinatesToSpace(position.x, position.y, 'mini');
+            const sizeScaled = this.translateFullToMiniMapSize(size.x, size.y);
+            const windowSize = get.windowInnerSize();
+            const miniMap = get.parsedStyle(this.miniMap, 'width', 'height', 'bottom', 'right');
+            positionScaled.x += windowSize.width - miniMap.width - miniMap.right - (sizeScaled.x * 0.5);
+            positionScaled.y += windowSize.height - miniMap.height - miniMap.bottom - (sizeScaled.y * 0.5);
+
+            const miniature = new BoundingBox(positionScaled.x, positionScaled.y, sizeScaled.x, sizeScaled.y);
+            miniature.id = thought.id;
+            return miniature;
         }
-        
+
         setMiniMapViewportProportionalSize() {
             const {
                 width: windowWidth,
@@ -52,9 +51,9 @@
             let xTemp, yTemp;
             
             if (convertToMiniMapSpace) {
-                const { xScaled, yScaled } = this.translateCoordinatesToSpace(x, y, 'mini');
-                xTemp = xScaled;
-                yTemp = yScaled;
+                const positionScaled = this.translateCoordinatesToSpace(x, y, 'mini');
+                xTemp = positionScaled.x;
+                yTemp = positionScaled.y;
             }
             else {
                 xTemp = clamp(x + left, 0, mapWidth - width);
@@ -73,18 +72,18 @@
         }
         
         getThoughtsContainerSize() {
-            return {
-                width: parseInt(this.thoughtsContainer.style.width, 10),
-                height: parseInt(this.thoughtsContainer.style.height, 10)
-            }            
+            return new Vector(
+                parseInt(this.thoughtsContainer.style.width, 10),
+                parseInt(this.thoughtsContainer.style.height, 10)
+            )
         }
 
         setThoughtsContainerPosition(x = 0, y = 0) {
             const { width: winWidth,
                 height: winHeight } = get.windowInnerSize();
-            const { width, height } = this.getThoughtsContainerSize();
-            const xInRange = clamp(x, winWidth - width, 0);
-            const yInRange = clamp(y, winHeight - height, 0);
+            const containerSize = this.getThoughtsContainerSize();
+            const xInRange = clamp(x, winWidth - containerSize.x, 0);
+            const yInRange = clamp(y, winHeight - containerSize.y, 0);
             this.thoughtsContainer.style.left = `${xInRange}px`;
             this.thoughtsContainer.style.top = `${yInRange}px`;
         }
@@ -100,65 +99,62 @@
         draggMinimapViewport(x = 0, y = 0) {
             this.setMiniMapViepowrtPosition(x, y);
             
-            let { x: left, y: top, } = this.getThoughtsContainerPosition();
+            const containerPosition = this.getThoughtsContainerPosition();
             
-            const { xScaled, yScaled } = this.translateCoordinatesToSpace(x, y, 'full');
-            this.setThoughtsContainerPosition(left - xScaled, top - yScaled);
+            const positionScaled = this.translateCoordinatesToSpace(x, y, 'full');
+            this.setThoughtsContainerPosition(containerPosition.x - positionScaled.x, containerPosition.y - positionScaled.y);
         }
         
         centerMindMap() {
-            const { width: winWidth, height: winHeight } = get.windowInnerSize();
-            const { width, height } = this.getThoughtsContainerSize();
-            this.setMapPosition((-width + winWidth) * 0.5, (-height + winHeight) * 0.5);
+            const windowSize = get.windowInnerSize();
+            const containerSize = this.getThoughtsContainerSize();
+            this.setMapPosition((-containerSize.x + windowSize.width) * 0.5, (-containerSize.y + windowSize.height) * 0.5);
         }
         
         getScaleBySpaceName(spaceName) {
-            const {
-                width: mapWidth,
-                height: mapHeight } = get.parsedStyle(this.miniMap, 'width', 'height');
-            const {
-                width: thoughtsWidth,
-                height: thoughtsHeight } = this.getThoughtsContainerSize();
+            const mapSize = get.parsedStyle(this.miniMap, 'width', 'height');
+            const containerSize = this.getThoughtsContainerSize();
             
             let xScale, yScale;
             
             if (spaceName === 'full') {
-                xScale = thoughtsWidth / mapWidth;
-                yScale = thoughtsHeight / mapHeight;
+                xScale = containerSize.x / mapSize.width;
+                yScale = containerSize.y / mapSize.height;
             }
             else if (spaceName === 'mini') {
-                xScale = mapWidth / thoughtsWidth;
-                yScale = mapHeight / thoughtsHeight;
+                xScale = mapSize.width / containerSize.y;
+                yScale = mapSize.height / containerSize.x;
             }
-            
-            return { xScale, yScale };
+
+            return { x: xScale, y: yScale };
         }
         
         translateFullToMiniMapSize(width, height) {
-            let { xScale, yScale } = this.getScaleBySpaceName('mini');
-            
+            let { x } = this.getScaleBySpaceName('mini');
+
             return {
-                widthScaled: width * xScale,
-                heightScaled: height * yScale
+                x: width * x,
+                y: height * x
             }
         }
         
         translateCoordinatesToSpace(x = 0, y = 0, spaceName) {
-            let { xScale, yScale } = this.getScaleBySpaceName(spaceName);
-            
-            xScale *= x;
-            yScale *= y;
+            const scale = this.getScaleBySpaceName(spaceName);
             
             return {
-                xScaled: xScale,
-                yScaled: yScale,
+                x: scale.x * x,
+                y: scale.y * y,
             }
         }
+
+        getMapCenterCoordinates() {
+            return this.getThoughtsContainerSize().divide(2);
+        }
     
-        bezierCurve(start, end, controllPointA, controllPointB, color = '#008fd5') {
+        bezierCurve(start, end, controllPointA, controllPointB, lineWidth = 3, color = '#008fd5') {
             const { context } = this;
             context.strokeStyle = color;
-            context.lineWidth = 3;
+            context.lineWidth = lineWidth;
             context.beginPath();
             context.moveTo(start.x, start.y);
             context.bezierCurveTo(
@@ -173,48 +169,74 @@
         }
     
         boundingBox(boundingBox) {
-            const { x, y, width, height } = boundingBox;
+            const { position, width, height } = boundingBox;
             const { context } = this;
             context.strokeStyle = 'red';
             context.fillStyle = 'transparent';
             context.lineWidth = 1;
-            context.strokeRect( x, y, width, height )
+            context.strokeRect(position.x, position.y, width, height);
         }
-    
+
         connectors() {
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            
+            if (store.thoughts.length > 0) {
+                const miniatures = [];
+                store.thoughts.forEach(thought => {
+                    const miniature = this.getMiniMapMiniature(thought);
+                    miniatures.push(miniature);
+                    this.boundingBox(miniature);
+                });
+                
+                const { rootThought } = store;
+                if (rootThought) {
+                    const rootChildren = rootThought.getChildren(true);
+                    if (rootChildren.length > 0) {
+                        rootChildren.forEach(child => {
+                            const { me, parent } = child.getConnectorPoints();
+                            const offset = this.getThoughtsContainerPosition();
+                            me.addV(offset);
+                            parent.addV(offset);
+                            me.x += 1;
+                            parent.x -= 1;
+                            const { x } = me;
+                            const { x: a } = parent;
+                            const mod = (x - a) / store.connectorsCurveDivider;
+                            const bezierControllPointA = new Vector(-mod, 0);
+                            const bezierControllPointB = new Vector(mod, 0);
+                            this.bezierCurve(
+                                me, 
+                                parent,
+                                bezierControllPointA,
+                                bezierControllPointB
+                            );
     
-            const { rootThought } = store;
-            if (rootThought) {
-                const rootChildren = rootThought.getChildren(true);
-                if (rootChildren.length > 0) {
-                    rootChildren.forEach(child => {
-                        const { me, parent } = child.getConnectorPoints();
-                        const offset = this.getThoughtsContainerPosition();
-                        me.addV(offset);
-                        parent.addV(offset);
-                        me.x += 1;
-                        parent.x -= 1;
-                        const { x } = me;
-                        const { x: a } = parent;
-                        const mod = (x - a) / store.connectorsCurveDivider;
-                        const bezierControllPointA = new Vector(-mod, 0);
-                        const bezierControllPointB = new Vector(mod, 0);
-                        this.bezierCurve(
-                            me, 
-                            parent,
-                            bezierControllPointA,
-                            bezierControllPointB
-                        );
-                    })
+                            // draw miniatures connectors
+                            const myMiniature = miniatures.filter(mini => mini.id === child.id)[0];
+                            const parentMiniature = miniatures.filter(mini => mini.id === child.parent.id)[0];
+                            const xStart = myMiniature.position.x > parentMiniature.position.x
+                                ? myMiniature.position.x
+                                : myMiniature.position.x + myMiniature.width;
+                            const yStart = myMiniature.position.y + (myMiniature.height * 0.5);
+                            const xEnd = myMiniature.position.x > parentMiniature.position.x
+                                ? parentMiniature.position.x + parentMiniature.width
+                                : parentMiniature.position.x
+                            const yEnd = parentMiniature.position.y + (parentMiniature.height * 0.5);
+                            const miniatureMod = (xStart - xEnd) / store.connectorsCurveDivider;
+                            const miniatureControllPointA = new Vector(-miniatureMod, 0);
+                            const miniatureControllPointB = new Vector(miniatureMod, 0);
+                            this.bezierCurve(
+                                new Vector(xStart, yStart), 
+                                new Vector(xEnd, yEnd),
+                                miniatureControllPointA,
+                                miniatureControllPointB,
+                                1,
+                                'black'
+                            );
+                        });
+                    }
                 }
             }
-        }
-        
-        miniMapMiniatures() {
-            store.thoughts.forEach(thought => {
-                
-            });
         }
     }
 

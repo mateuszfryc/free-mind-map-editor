@@ -17,7 +17,7 @@ window.on('load', () => {
     draw.centerMindMap();
 
     // add first top node
-    store.rootThought = new Thought(new Vector(2000, 2000), undefined, true, 'What\'s on your mind?');
+    store.rootThought = new Thought(draw.getMapCenterCoordinates(), undefined, true, 'What\'s on your mind?');
     store.rootThought.edit();
 
     // switching menu selected links logic

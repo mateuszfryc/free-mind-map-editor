@@ -28,6 +28,13 @@ class Vector {
     
         return this;
     }
+    
+    divide(number) {
+        this.x /= number;
+        this.y /= number;
+
+        return this;
+    }
 
     multiplyV(vector) {
         this.x *= vector.x;
