@@ -22,6 +22,7 @@
             this.children = [];
             this.childrenRelativePosition = [];
             this.closestOverlap = undefined;
+            this.isRootThought = isRootThought;
             this.element = new ThoughtVisual(this, defaultText, isRootThought);
             this.id = lastThought ? lastThought.id + 1 : 0;
             this.mousePositionDiff = new Vector();

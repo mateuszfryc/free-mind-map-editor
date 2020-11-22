@@ -36,6 +36,20 @@ get.windowInnerSize = function() {
                 : document.documentElement.clientHeight
                     || document.getElementsByTagName('body')[0].clientHeight,
     }
+};
+
+get.parsedStyle = function(element, ...valueNames) {
+    const style = window.getComputedStyle(element);
+    let parsed = {}
+    valueNames.forEach(name => {
+       parsed[name] = parseInt(style[name], 10);
+    });
+
+    return parsed;
 }
 
 get.time = typeof performance === 'function' ? performance.now : Date.now;
+
+function clamp(number, min, max) {
+    return Math.min(Math.max(number, min), max);
+};

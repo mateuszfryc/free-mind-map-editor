@@ -122,13 +122,16 @@ const mouse = {
         return this.position.getCopy();
     },
 
-    setPosition: function(newPosition) {
-        this.position.setV(newPosition)
-    },
-
     storeCurrentPosition: function() {
         this.lastPosition = this.getPosition();
     },
+    
+    getCurrentToLastPositionDiff() {
+        return new Vector(
+            this.position.x - this.lastPosition.x,
+            this.position.y - this.lastPosition.y
+        );
+    }
 }
 
 function onMouseDown(event) {
@@ -181,18 +184,26 @@ function onMouseMove(event) {
     mouse.storeCurrentPosition();
     const x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     const y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-    mouse.setPosition({ x, y });
+    mouse.position.set(x, y);
     const { target } = event;
     const { className } = target;
-
-    // log(mouse.position.x, mouse.position.y);
-
+    const { x: xMouseDiff, y: yMouseDiff } = mouse.getCurrentToLastPositionDiff();
+    
     if (!mouse.isLeftButtonDown) {
         store.highlight = className.includes('thought') ? target.getThought() : undefined;
     }
     else {
-        if (store.highlight) {
-            if (store.highlight.isEdited()) return;
+        if (target.id === draw.miniMapViewport.id) {
+            draw.draggMinimapViewport(xMouseDiff, yMouseDiff);
+            draw.connectors();
+            
+            return;
+        }
+        else if (store.highlight) {
+            if (store.highlight.isEdited()) {
+
+                return;
+            };
             // drag thought (node)
             if (store.highlight.savedSize && store.highlight.savedSize.equals(store.highlight.getSize())) {
                 store.highlight.dragg();
@@ -233,12 +244,7 @@ function onMouseMove(event) {
 
             return;
         }
-        // drag view / pan camera by holding mouse left button on background
-        const mouseDiff = mouse.getPosition().subtract(mouse.lastPosition.getCopy());
-        draw.cameraOffset.setV(mouseDiff);
-        store.thoughts.forEach(thought => {
-            thought.addPosition(mouseDiff);
-        })
+        draw.setMapPosition(xMouseDiff, yMouseDiff);
         draw.connectors();
     }
 }

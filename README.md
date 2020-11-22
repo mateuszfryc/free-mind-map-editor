@@ -14,7 +14,6 @@ Use CLI to run 'compass watch' to start listening for sass changes and get trans
 - mirror thoughts when moving from one side of the root thought to the other
 - styles
     - donate links style (same as button?)
-    - curvy connectors
 - settings (in modal)
     - auto alignment on/off
     - background change

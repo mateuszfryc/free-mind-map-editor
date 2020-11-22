@@ -1,17 +1,23 @@
 window.on('load', () => {
-    const canvas = get('#canvas');
+    const { width, height } = get.windowInnerSize();
     function updateDocumentSize() {
-        const { width, height } = get.windowInnerSize();
-        [document.body, canvas, get('#mindmap')].forEach(element => {
+        [document.body, get('#mindmap'), draw.canvas].forEach(element => {
             element.width = width;
             element.height = height;
+            element.style.width = `${width}px`;
+            element.style.height = `${height}px`;
         });
+        draw.setMiniMapViewportProportionalSize();
+        draw.connectors();
     }
     updateDocumentSize();
     window.on('resize', updateDocumentSize);
+    
+    draw.setThoughtsContainerPosition();
+    draw.centerMindMap();
 
     // add first top node
-    store.rootThought = new Thought(get.screenCenterCoords(), undefined, true, 'What\'s on your mind?');
+    store.rootThought = new Thought(new Vector(2000, 2000), undefined, true, 'What\'s on your mind?');
     store.rootThought.edit();
 
     // switching menu selected links logic
@@ -27,6 +33,4 @@ window.on('load', () => {
             }
         });
     });
-
-    animate();
 });

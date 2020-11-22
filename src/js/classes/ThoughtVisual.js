@@ -13,7 +13,7 @@ class ThoughtVisual {
         element.getThought = function() {
             return parent;
         }
-        get('#mindmap').appendChild(element);
+        get('#thoughts-container').appendChild(element);
 
         if (!element.hasOwnProperty('remove')) {
             Object.defineProperty(element, 'remove', {
