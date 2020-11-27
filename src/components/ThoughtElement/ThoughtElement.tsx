@@ -50,7 +50,7 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
             });
             if (store.isGroupDraggOn && thought.hasChildren()) {
                 const isParentOnLeft = thought.isParentOnLeft();
-                if (isParentOnLeft !== thought.prevIsParentOnLeft) {
+                if (!thought.isRootThought && isParentOnLeft !== thought.prevIsParentOnLeft) {
                     thought.childrenRelativePosition.forEach((data: childPositionData, index: number): void => {
                         thought.childrenRelativePosition[index].position.x *= -1; // eslint-disable-line no-param-reassign
                     });
