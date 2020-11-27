@@ -1,0 +1,90 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": [
+        "airbnb",
+        "airbnb/hooks",
+        "plugin:react/recommended",
+        "plugin:prettier/recommended",
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:jest/recommended",
+        "prettier",
+        "prettier/@typescript-eslint",
+        "prettier/react",
+        "plugin:import/errors",
+        "plugin:import/warnings",
+        "plugin:import/typescript",
+        "plugin:jsx-a11y/recommended"
+    ],
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": ["prettier", "react", "@typescript-eslint", "import", "jsx-a11y"],
+    "rules": {
+        "@typescript-eslint/no-use-before-define": ["error"],
+        "class-methods-use-this": ["error", { "exceptMethods": ["isOverlappingWith"] }],
+        "@typescript-eslint/prefer-interface": 0,
+        "@typescript-eslint/camelcase": 0,
+        "@typescript-eslint/no-non-null-assertion": 0,
+        " @typescript-eslint/no-explicit-any": 0,
+        "react/static-property-placement": 0,
+        "function-call-argument-newline": 0,
+        "import/prefer-default-export": 0,
+        "lines-between-class-members": 0,
+        "no-console": "warn",
+        "no-shadow": "error",
+        "no-use-before-define": 0,
+        "prettier/prettier": "warn",
+        "react/display-name": 0,
+        "react/jsx-filename-extension": 0,
+        "react/jsx-props-no-spreading": 0,
+        "react/jsx-first-prop-new-line": [1, "multiline"],
+        "react/jsx-max-props-per-line": [
+            1,
+            {
+                "maximum": 1
+            }
+        ],
+        "react/prop-types": 0,
+        "jsx-a11y/alt-text": [
+            2,
+            {
+                "img": ["ExpertImage"]
+            }
+        ],
+        "import/extensions": [
+            "error",
+            "ignorePackages",
+            {
+                "js": "never",
+                "mjs": "never",
+                "jsx": "never",
+                "ts": "never",
+                "tsx": "never"
+            }
+        ],
+        "import/no-extraneous-dependencies": 0
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        },
+        "import/resolver": {
+            "typescript": {}
+        }
+    }
+}
