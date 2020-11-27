@@ -11,7 +11,7 @@ type ThoughtsContainerProps = {
 export const ThoughtsContainer: FC<ThoughtsContainerProps> = observer(({ store, children }) => {
     const ref = useRef(null);
 
-    const onMouseMove = (event: MouseEvent): void => {
+    const onMouseMove = (): void => {
         if (store.pointer.isLeftButtonDown) {
             if (ref && ref.current) {
                 const safeRef = ref.current! as HTMLElement;

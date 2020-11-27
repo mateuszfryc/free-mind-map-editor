@@ -1,6 +1,5 @@
 import { GlobalStore } from 'stores/globalStore';
-import { Thought } from 'classes/Thought';
-import { THOUGHT_STATE, childPositionData } from 'types/baseTypes';
+import { THOUGHT_STATE } from 'types/baseTypes';
 
 class KeyData {
     code: number;
@@ -155,50 +154,9 @@ export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
 }
 
 export function onMouseMoveHandler(event: MouseEvent, store: GlobalStore): void {
-    const { pointer /* , highlight, selection  */ } = store;
-    const target = event.target as HTMLElement;
-    // const id = parseInt(target.id, 10);
+    const { pointer } = store;
     pointer.lastPosition.x = pointer.position.x;
     pointer.lastPosition.y = pointer.position.y;
     pointer.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
     pointer.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-
-    // if (pointer.isLeftButtonDown && highlight && highlight.id === id && selection && selection.id === id) {
-    // check for overlaps and if one exist note it
-    // store.findClosestOverlapFor(selection);
-
-    // if (store.isGroupDraggOn && selection.hasChildren()) {
-    //     const isParentOnLeft = selection.isParentOnLeft();
-    //     if (isParentOnLeft !== selection.prevIsParentOnLeft) {
-    //         selection.saveChildrenRelativePosition();
-    //         selection.childrenRelativePosition.forEach((data: childPositionData, index: number): void => {
-    //             selection.childrenRelativePosition[index].position.x *= -1; // eslint-disable-line no-param-reassign
-    //         });
-    //     }
-    //     selection.restoreChildrenRelativePosition();
-    //     // selection.getChildren(true).forEach((draggable: Thought) => {
-    //     //     if (
-    //     //         draggable.prevIsParentOnLeft !== undefined &&
-    //     //         isParentOnLeft !== selection.prevIsParentOnLeft
-    //     //     ) {
-    //     //         // const hasChildren = draggable.hasChildren();
-    //     //         // if (hasChildren) draggable.saveChildrenRelativePosition();
-    //     //         // const draggablePosition = draggable.getPosition();
-    //     //         // const xDiff = (draggablePosition.x - draggable.parent!.x) * 2;
-    //     //         // draggablePosition.x -= xDiff;
-    //     //         // draggable.setPosition(draggablePosition);
-    //     //         // store.savePointerPositionDiff(draggable);
-    //     //         // if (hasChildren) draggable.restoreChildrenRelativePosition();
-    //     //     }
-    //     //     else {
-    //     //         draggable.setPosition({
-    //     //             x: pointer.position.x + draggable.pointerPositionDiff.x,
-    //     //             y: pointer.position.y + draggable.pointerPositionDiff.y,
-    //     //         });
-    //     //     }
-    //     // });
-    //     selection.setPrevIsParentOnLeft(isParentOnLeft);
-    //     store.draw();
-    // }
-    // }
 }
