@@ -1,7 +1,6 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 export const MindMap = styled.div`
-    background-color: transparent;
     height: 100%;
     overflow: hidden;
     position: relative;

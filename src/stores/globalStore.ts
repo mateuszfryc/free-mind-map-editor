@@ -412,6 +412,7 @@ export class GlobalStore {
 
     draw(): void {
         if (this.view && this.view.canvas && !this.isDrawingLocked) {
+            this.view.context.translate(0.5, 0.5);
             this.view.context.clearRect(0, 0, this.view.canvas.width, this.view.canvas.height);
 
             if (this.thoughts.length > 0) {
@@ -433,9 +434,9 @@ export class GlobalStore {
                             const { me, parent } = child.getConnectorPoints();
                             const offset: Vector = this.view!.getThoughtsContainerPosition();
                             me.x += offset.x;
-                            me.y += offset.y - 0.3;
+                            me.y += offset.y - 1;
                             parent.x += offset.x;
-                            parent.y += offset.y - 0.3;
+                            parent.y += offset.y - 1;
                             me.x += 1;
                             parent.x -= 1;
                             const { x } = me;
@@ -478,6 +479,7 @@ export class GlobalStore {
                     }
                 }
             }
+            this.view.context.translate(-0.5, -0.5);
         }
     }
 }

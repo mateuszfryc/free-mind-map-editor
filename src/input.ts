@@ -147,13 +147,13 @@ export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
         highlight.setState(THOUGHT_STATE.SELECTED);
         if (!pointer.wasShiftPressedOnDown) highlight.restoreChildrenRelativePosition();
     }
-    store.draw();
 
     pointer.clearDraggedId();
     if (selection) selection.resetZIndex();
     setTimeout(() => {
         store.saveCurrentMindMapAsJSON();
-    }, 200);
+        store.draw();
+    }, 100);
 }
 
 export function onMouseMoveHandler(event: MouseEvent, store: GlobalStore): void {

@@ -14,9 +14,8 @@ export const GlobalStyles = createGlobalStyle`
     figure, figcaption, footer, header, hgroup, 
     menu, nav, output, ruby, section, summary,
     time, mark, audio, video, button {
-        background: none;
+        background-color: transparent;
         border: 0;
-        font-size: 100%;
         font-size: 100%;
         font: inherit;
         margin: 0;

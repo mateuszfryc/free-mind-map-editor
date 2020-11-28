@@ -8,17 +8,18 @@ type ThoughtStyleType = {
 };
 
 export const Thought = styled.div<ThoughtStyleType>`
-    ${({ maxWidth, isEdited, zIndex, theme }) => css`
-        background-color: #fff;
-        border-bottom: 3px solid ${theme.colors.primary()};
+    ${({ maxWidth, isSelected, isEdited, zIndex, theme }) => css`
+        background-color: transparent;
+        border: none;
+        color: #000;
         cursor: pointer;
         display: inline-block;
         line-height: 20px;
         max-width: ${maxWidth}px;
+        outline: none;
         overflow: visible;
-        padding: 5px;
+        padding: 7px 12px;
         position: absolute;
-        transition: border-color 0.2s ease, width 0.2s ease, height 0.2s ease;
         white-space: pre-wrap;
         z-index: ${zIndex};
         -webkit-touch-callout: none; /* iOS Safari */
@@ -27,6 +28,20 @@ export const Thought = styled.div<ThoughtStyleType>`
         -moz-user-select: none; /* Old versions of Firefox */
         -ms-user-select: none; /* Internet Explorer/Edge */
         user-select: none;
+
+        & .underline {
+            border-color: ${theme.colors.primary()};
+            border-style: solid;
+            border-width: 0 0 3px;
+            bottom: 0;
+            left: 0;
+            height: 12px;
+            position: absolute;
+            transition: border-color 0.2s ease, border-radius 0.2s ease, border-width 0.2s ease, bottom 0.2s ease,
+                margin 0.2s ease, padding 0.2s ease;
+            width: 100%;
+            z-index: -1;
+        }
 
         overflow-wrap: break-word;
         word-wrap: break-word;
@@ -37,27 +52,45 @@ export const Thought = styled.div<ThoughtStyleType>`
         -webkit-hyphens: auto;
         hyphens: auto;
 
-        ${isEdited && 'visibility: hidden'}
+        &:hover .underline {
+            border-width: 0 0 8px 0;
+            bottom: -4px;
+        }
+
+        ${isSelected &&
+        css`
+            & .underline {
+                border-radius: 12px;
+                padding-bottom: 4px;
+                margin-bottom: -3px;
+                border-width: 0 0 5px 0;
+            }
+        `}
+        ${isEdited &&
+        css`
+            visibility: hidden;
+        `}
     `}
 `;
 
 export const Textarea = styled.textarea`
     ${({ theme }) => css`
-        border: none;
-        border-right: 1px solid ${theme.colors.primary()};
-        border-left: 1px solid ${theme.colors.primary()};
-        border-radius: 5px;
-        box-shadow: 0px 0px 25px 0px ${theme.colors.primary(0.12)};
+        background-color: transparent;
+        border-color: ${theme.colors.primary()};
+        border-radius: 12px;
+        border-style: solid;
+        border-width: 0 0 5px 0;
         font-family: inherit;
         font-size: inherit;
-        left: -5px;
+        left: -2px;
         line-height: 20px;
         margin: 0;
+        outline: none;
         overflow: hidden;
-        padding: 12px;
+        padding: 7px 12px;
         position: absolute;
         resize: none;
-        top: -5px;
+        top: 1px;
         visibility: visible;
 
         overflow-wrap: break-word;

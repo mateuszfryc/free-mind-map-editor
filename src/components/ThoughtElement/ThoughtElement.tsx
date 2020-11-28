@@ -105,6 +105,7 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
             ref={wrapper}
             zIndex={thought.zIndex}
         >
+            <div className="underline" id={`${thought.id}`} />
             {thought.content}
             {thought.isEdited() && (
                 <Styled.Textarea onChange={updateContent} ref={contentRef} value={thought.content} />
