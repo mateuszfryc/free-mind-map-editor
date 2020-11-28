@@ -30,3 +30,29 @@ export type childPositionData = {
     position: Vector;
     id: number;
 };
+
+export type IconProps = {
+    color?: string;
+};
+
+export type SavedThoughtStateType = {
+    children: number[];
+    childrenRelativePosition: childPositionData[];
+    closestOverlap: number | undefined;
+    content: string;
+    id: number;
+    isRootThought: boolean;
+    parent: number | undefined;
+    pointerPositionDiff: Vector;
+    prevIsParentOnLeft: boolean;
+    state: number;
+    x: number;
+    y: number;
+};
+
+export type SavedStateType = {
+    thoughts: SavedThoughtStateType[];
+    highlight?: number;
+    rootThought: number;
+    selection?: number;
+};

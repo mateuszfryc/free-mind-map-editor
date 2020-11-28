@@ -1,11 +1,12 @@
 import { createContext } from 'react';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, action } from 'mobx';
 
 import { Thought } from 'classes/Thought';
 import { ViewController } from 'classes/ViewController';
 import { Pointer } from 'classes/Pointer';
-import { Vector, Miniature, THOUGHT_STATE } from 'types/baseTypes';
+import { Vector, Miniature, THOUGHT_STATE, SavedStateType, SavedThoughtStateType } from 'types/baseTypes';
 import { get, getWindowInnerSize, getTwoPointsDistance } from 'utils/get';
+import { theme } from 'styles/themeDefault';
 
 type OverlapResult = {
     other: Thought;
@@ -17,10 +18,12 @@ export class GlobalStore {
     connectorsCurveDividerWidth: number;
     defaultSpawnGap: Vector;
     highlight?: Thought;
+    isDrawingLocked: boolean;
     isGroupDraggOn: boolean;
     initialThoughtWidth: number;
     pointer: Pointer;
     rootThought: Thought;
+    savedMindMap: string;
     scale: number;
     selection?: Thought;
     thoughts: Thought[];
@@ -28,15 +31,21 @@ export class GlobalStore {
 
     constructor() {
         makeObservable(this, {
+            savedMindMap: observable,
             thoughts: observable,
+
+            saveCurrentMindMapAsJSON: action,
+            loadUploadedMindMap: action,
         });
 
         this.connectorsCurveDividerWidth = 2.2;
         this.defaultSpawnGap = { x: 25, y: 10 };
         this.highlight = undefined;
+        this.isDrawingLocked = false;
         this.isGroupDraggOn = true;
         this.initialThoughtWidth = 200;
         this.pointer = new Pointer();
+        this.savedMindMap = '';
         this.scale = 1;
         this.selection = undefined;
         this.thoughts = [];
@@ -46,8 +55,8 @@ export class GlobalStore {
     }
 
     getNewID(): number {
-        if (this.thoughts) {
-            return this.thoughts.length + 1;
+        if (this.thoughts.length > 0) {
+            return this.thoughts[this.thoughts.length - 1].id + 1;
         }
         return 0;
     }
@@ -62,7 +71,7 @@ export class GlobalStore {
         return thought;
     }
 
-    createChildThought(thought: Thought): Thought {
+    createChildThought(thought: Thought): void {
         this.stopEditing();
         const targetPosition: Vector = thought.getPosition();
         targetPosition.x += thought.getOuterWidth() * 0.5 + this.initialThoughtWidth * 0.5 + this.defaultSpawnGap.x;
@@ -73,8 +82,9 @@ export class GlobalStore {
         this.editSelection();
         newChild.refreshPosition();
         this.draw();
-
-        return newChild;
+        setTimeout(() => {
+            this.saveCurrentMindMapAsJSON();
+        }, 200);
     }
 
     createSiblingThought(thought: Thought): void {
@@ -90,6 +100,9 @@ export class GlobalStore {
         this.editSelection();
         newSibling.refreshPosition();
         this.draw();
+        setTimeout(() => {
+            this.saveCurrentMindMapAsJSON();
+        }, 200);
     }
 
     setHighlight(thought: Thought): void {
@@ -131,6 +144,9 @@ export class GlobalStore {
             this.resolveOverlaps(this.selection);
             this.selection.refreshPosition();
             this.draw();
+            setTimeout(() => {
+                this.saveCurrentMindMapAsJSON();
+            }, 200);
         }
     }
 
@@ -156,6 +172,9 @@ export class GlobalStore {
             thought.parent!.removeChildThought(thought);
         }
         this.draw();
+        setTimeout(() => {
+            this.saveCurrentMindMapAsJSON();
+        }, 200);
     }
 
     removeIfEmpty(thought: Thought): void {
@@ -274,8 +293,125 @@ export class GlobalStore {
         }
     }
 
+    getCurrentMindMapState(): SavedStateType {
+        return {
+            thoughts: this.thoughts.map(
+                (t: Thought): SavedThoughtStateType => {
+                    const {
+                        childrenRelativePosition,
+                        content,
+                        id,
+                        isRootThought,
+                        pointerPositionDiff,
+                        prevIsParentOnLeft,
+                        state,
+                        x,
+                        y,
+                    } = t;
+                    return {
+                        children: t.children.map((child) => child.id),
+                        childrenRelativePosition,
+                        closestOverlap: t.closestOverlap ? t.closestOverlap.id : undefined,
+                        content,
+                        id,
+                        isRootThought,
+                        parent: t.parent ? t.parent.id : undefined,
+                        pointerPositionDiff,
+                        prevIsParentOnLeft,
+                        state,
+                        x,
+                        y,
+                    };
+                }
+            ),
+            rootThought: this.rootThought.id,
+            highlight: this.highlight ? this.highlight.id : undefined,
+            selection: this.selection ? this.selection.id : undefined,
+        };
+    }
+
+    saveCurrentMindMapAsJSON(): void {
+        const data = JSON.stringify(this.getCurrentMindMapState());
+        this.savedMindMap = `text/json;charset=utf-8,${encodeURIComponent(data)}`;
+    }
+
+    loadUploadedMindMap(saved: SavedStateType): void {
+        this.clearHighlight();
+        this.clearSelection();
+
+        const uploadedThoughts: Thought[] = saved.thoughts.map(
+            (item: SavedThoughtStateType): Thought => {
+                const { id, x, y, isRootThought, content } = item;
+                const thought = new Thought(id, { x, y }, undefined, isRootThought, content);
+
+                return thought;
+            }
+        );
+
+        this.thoughts = uploadedThoughts.map(
+            (thought: Thought): Thought => {
+                const t = thought;
+                const savedThought = saved.thoughts.find((savedT) => savedT.id === t.id);
+                if (savedThought) {
+                    const parentId = savedThought.parent;
+                    if (parentId !== undefined) {
+                        const parent = uploadedThoughts.find((potentialParent) => {
+                            return potentialParent.id === parentId;
+                        });
+                        if (parent) {
+                            t.parent = parent;
+                        }
+                    }
+                    if (savedThought.children.length > 0) {
+                        savedThought.children.forEach((childId: number): void => {
+                            const child = uploadedThoughts.find((potentialChild) => potentialChild.id === childId);
+                            if (child) {
+                                t.children.push(child);
+                            }
+                        });
+                    }
+                    t.childrenRelativePosition = savedThought.childrenRelativePosition;
+                    if (savedThought.closestOverlap !== undefined) {
+                        const closest = uploadedThoughts.find(
+                            (potentialOverlap) => potentialOverlap.id === savedThought.closestOverlap
+                        );
+                        if (closest) {
+                            t.closestOverlap = closest;
+                        }
+                    }
+                    t.pointerPositionDiff = savedThought.pointerPositionDiff;
+                    t.prevIsParentOnLeft = savedThought.prevIsParentOnLeft;
+                    t.state = savedThought.state;
+
+                    const isSelected = t.state === THOUGHT_STATE.SELECTED;
+                    const isEdited = t.state === THOUGHT_STATE.EDITED;
+                    const isDragged = t.state === THOUGHT_STATE.DRAGGED;
+                    if (isSelected || isEdited) {
+                        this.setSelection(t);
+                    }
+                    if (isEdited) {
+                        this.editSelection();
+                    }
+                    if (isDragged) {
+                        t.state = THOUGHT_STATE.IDLE;
+                    }
+                    if (t.isRootThought) this.rootThought = t;
+                }
+
+                return t;
+            }
+        );
+
+        this.thoughts.forEach((t: Thought) => {
+            t.refreshPosition();
+        });
+        this.isDrawingLocked = false;
+        this.draw();
+        this.saveCurrentMindMapAsJSON();
+    }
+
     draw(): void {
-        if (this.view && this.view.canvas) {
+        if (this.view && this.view.canvas && !this.isDrawingLocked) {
             this.view.context.clearRect(0, 0, this.view.canvas.width, this.view.canvas.height);
 
             if (this.thoughts.length > 0) {
@@ -307,7 +443,14 @@ export class GlobalStore {
                             const mod = (x - a) / this.connectorsCurveDividerWidth;
                             const bezierControllPointA = { x: -mod, y: 0 };
                             const bezierControllPointB = { x: mod, y: 0 };
-                            this.view!.drawBezierCurve(me, parent, bezierControllPointA, bezierControllPointB);
+                            this.view!.drawBezierCurve(
+                                me,
+                                parent,
+                                bezierControllPointA,
+                                bezierControllPointB,
+                                theme.connectorsWidth,
+                                theme.colors.connectors()
+                            );
 
                             // draw miniatures connectors
                             const myMiniature = miniatures.filter((mini) => mini.id === child.id)[0];
@@ -329,7 +472,7 @@ export class GlobalStore {
                                 miniatureControllPointA,
                                 miniatureControllPointB,
                                 1,
-                                'black'
+                                theme.colors.mianitureConnector()
                             );
                         });
                     }

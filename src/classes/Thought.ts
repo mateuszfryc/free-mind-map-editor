@@ -25,7 +25,7 @@ export class Thought {
     isRootThought: boolean;
     parent?: Thought;
     pointerPositionDiff: Vector;
-    prevIsParentOnLeft?: boolean;
+    prevIsParentOnLeft: boolean;
     state: number;
     x: number;
     y: number;
@@ -59,7 +59,7 @@ export class Thought {
         this.isRootThought = isRootThought;
         this.parent = parent;
         this.pointerPositionDiff = { x: 0, y: 0 };
-        this.prevIsParentOnLeft = undefined;
+        this.prevIsParentOnLeft = true;
         this.state = THOUGHT_STATE.EDITED;
         this.x = initialPosition.x;
         this.y = initialPosition.y;
@@ -130,11 +130,9 @@ export class Thought {
     }
 
     getConnectorPoints(): ObjectOfVectors {
-        const grandParent = this.parent?.parent;
-        const isParentsOnLeft = this.parent!.getPosition().x < this.getPosition().x;
-        const isParentsOutOnLeft = grandParent
-            ? grandParent.getPosition().x < this.parent!.getPosition().x
-            : isParentsOnLeft;
+        const isParentsOnLeft = this.parent ? this.parent.x < this.x : false;
+        const grandParent = this.parent!.parent;
+        const isParentsOutOnLeft = grandParent ? grandParent.x < this.parent!.x : isParentsOnLeft;
 
         const myCorners = this.getCorners();
         const parentCorners = this.parent!.getCorners();

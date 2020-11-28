@@ -8,9 +8,9 @@ type ThoughtStyleType = {
 };
 
 export const Thought = styled.div<ThoughtStyleType>`
-    ${({ maxWidth, isEdited, zIndex }) => css`
+    ${({ maxWidth, isEdited, zIndex, theme }) => css`
         background-color: #fff;
-        border-bottom: 3px solid #008fd5;
+        border-bottom: 3px solid ${theme.colors.primary()};
         cursor: pointer;
         display: inline-block;
         line-height: 20px;
@@ -42,29 +42,31 @@ export const Thought = styled.div<ThoughtStyleType>`
 `;
 
 export const Textarea = styled.textarea`
-    border: none;
-    border-right: 1px solid #008fd5;
-    border-left: 1px solid #008fd5;
-    border-radius: 5px;
-    box-shadow: 0px 0px 25px 0px rgba(0, 0, 255, 0.1);
-    font-family: inherit;
-    font-size: inherit;
-    left: -5px;
-    line-height: 20px;
-    margin: 0;
-    overflow: hidden;
-    padding: 12px;
-    position: absolute;
-    resize: none;
-    top: -5px;
-    visibility: visible;
+    ${({ theme }) => css`
+        border: none;
+        border-right: 1px solid ${theme.colors.primary()};
+        border-left: 1px solid ${theme.colors.primary()};
+        border-radius: 5px;
+        box-shadow: 0px 0px 25px 0px ${theme.colors.primary(0.12)};
+        font-family: inherit;
+        font-size: inherit;
+        left: -5px;
+        line-height: 20px;
+        margin: 0;
+        overflow: hidden;
+        padding: 12px;
+        position: absolute;
+        resize: none;
+        top: -5px;
+        visibility: visible;
 
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    -ms-word-break: break-word;
-    word-break: break-word;
-    -ms-hyphens: auto;
-    -moz-hyphens: auto;
-    -webkit-hyphens: auto;
-    hyphens: auto;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        -ms-word-break: break-word;
+        word-break: break-word;
+        -ms-hyphens: auto;
+        -moz-hyphens: auto;
+        -webkit-hyphens: auto;
+        hyphens: auto;
+    `}
 `;

@@ -13,13 +13,14 @@ export const GlobalStyles = createGlobalStyle`
     article, aside, canvas, details, embed, 
     figure, figcaption, footer, header, hgroup, 
     menu, nav, output, ruby, section, summary,
-    time, mark, audio, video {
-        font-size: 100%;
-        margin: 0;
-        padding: 0;
+    time, mark, audio, video, button {
+        background: none;
         border: 0;
         font-size: 100%;
+        font-size: 100%;
         font: inherit;
+        margin: 0;
+        padding: 0;
         vertical-align: baseline;
     }
     /* HTML5 display-role reset for older browsers */

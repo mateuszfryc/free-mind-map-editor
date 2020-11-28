@@ -86,7 +86,7 @@ export function onPressKeyHandler(event: KeyboardEvent, store: GlobalStore): voi
             if (KEYS_BINDINGS.exitEditState.isPressed) {
                 store.stopEditing();
             }
-        } else if (KEYS_BINDINGS.deleteSelected.isPressed) {
+        } else if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
             store.removeThought(selection);
         } else if (KEYS_BINDINGS.edit.isPressed) {
             store.editSelection();
@@ -151,6 +151,9 @@ export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
 
     pointer.clearDraggedId();
     if (selection) selection.resetZIndex();
+    setTimeout(() => {
+        store.saveCurrentMindMapAsJSON();
+    }, 200);
 }
 
 export function onMouseMoveHandler(event: MouseEvent, store: GlobalStore): void {

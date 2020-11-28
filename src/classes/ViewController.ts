@@ -1,6 +1,7 @@
 import { Vector, Miniature } from 'types/baseTypes';
 import { get, getWindowInnerSize, getParsedStyle } from 'utils/get';
 import { clamp } from 'utils/math';
+import { colors } from 'styles/themeDefault';
 
 export class ViewController {
     canvas: HTMLCanvasElement;
@@ -179,7 +180,7 @@ export class ViewController {
         controllPointA: Vector,
         controllPointB: Vector,
         lineWidth = 3,
-        color = '#008fd5'
+        color = colors.defaultBezerCurve()
     ): void {
         const { context } = this;
         context.strokeStyle = color;
@@ -200,7 +201,7 @@ export class ViewController {
     drawMiniature(miniature: Miniature): void {
         const { x, y, width, height } = miniature;
         const { context } = this;
-        context.strokeStyle = 'red';
+        context.strokeStyle = colors.miniMapMiniature();
         context.fillStyle = 'transparent';
         context.lineWidth = 1;
         context.strokeRect(x, y, width, height);
