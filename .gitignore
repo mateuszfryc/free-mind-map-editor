@@ -7,10 +7,10 @@
 
 # temporary files
 tmp/
-.eslintcache
-.cache
-.temp-eslintcache
-.sass-cache
+.eslintcache/
+.cache/
+.temp-eslintcache/
+.sass-cache/
 
 # undesired config files
 .sublimelinterrc
