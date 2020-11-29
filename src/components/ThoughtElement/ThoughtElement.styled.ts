@@ -54,7 +54,7 @@ export const Thought = styled.div<ThoughtStyleType>`
 
         &:hover .underline {
             border-width: 0 0 8px 0;
-            bottom: -4px;
+            bottom: -6px;
         }
 
         ${isSelected &&
