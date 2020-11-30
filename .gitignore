@@ -8,8 +8,12 @@
 # temporary files
 tmp/
 .eslintcache/
+.eslintcache
 .cache/
+.cache
+.temp-eslintcache
 .temp-eslintcache/
+.sass-cache
 .sass-cache/
 
 # undesired config files
