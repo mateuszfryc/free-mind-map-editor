@@ -44,7 +44,7 @@ export const MindMap: React.FC = observer(() => {
     });
 
     return (
-        <Styled.MindMap id="mindmap">
+        <Styled.MindMap id='mindmap'>
             <Styled.Canvas />
             <ThoughtsContainer store={store}>
                 {store.thoughts.map((thought) => (

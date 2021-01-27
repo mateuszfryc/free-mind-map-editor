@@ -28,17 +28,17 @@ export const Navigation: React.FC = observer(() => {
 
     return (
         <Styled.Navigation>
-            <Styled.Link download="MindMap.json" href={`data: ${store.savedMindMap}`}>
+            <Styled.Link download='MindMap.json' href={`data: ${store.savedMindMap}`}>
                 Save
             </Styled.Link>
 
-            <Styled.Link padding="0">
+            <Styled.Link padding='0'>
                 <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
             </Styled.Link>
 
-            <Styled.Link>How To</Styled.Link>
+            <Styled.Link href='#howto'>How To</Styled.Link>
 
-            <Styled.Link>Settings</Styled.Link>
+            {/* <Styled.Link>Settings</Styled.Link> */}
         </Styled.Navigation>
     );
 });
