@@ -48,10 +48,12 @@ export const GlobalStyles = createGlobalStyle`
 
     html,
     body {
-        height: 100%;
-        min-height: 100vh;
         font-family: Arial, Helvetica, sans-serif;
+        font-size: 16px;
         font-weight: normal;
+        height: 100%;
+        line-height: 24px;
+        min-height: 100vh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }

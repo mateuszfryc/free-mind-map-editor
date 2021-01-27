@@ -1,18 +1,29 @@
-import React, { useEffect, useContext, ChangeEvent } from 'react';
+import React, { useState, useEffect, useContext, ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 
 import storeContext from 'stores/globalStore';
-import { ThoughtElement } from 'components/ThoughtElement';
-import { MiniMap } from 'components/MiniMap';
-import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
+import { HelpModal } from 'components/HelpModal';
 import { IconDownload } from 'components/Icons/IconDownload';
+import { IconHelp } from 'components/Icons/IconHelp';
+import { MiniMap } from 'components/MiniMap';
 import { SavedStateType } from 'types/baseTypes';
+import { ThoughtElement } from 'components/ThoughtElement';
+import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import * as Input from 'input';
 import * as Styled from './MindMap.styled';
 
 export const MindMap: React.FC = observer(() => {
+    const [isHelpOpen, setIsHelpOpen] = useState(true);
     const store = useContext(storeContext);
+
+    const toggleHelpModal = (): void => {
+        setIsHelpOpen(!isHelpOpen);
+    };
+
+    const closeHelpHandler = (): void => {
+        setIsHelpOpen(false);
+    };
 
     const onMouseDown = (event: MouseEvent): void => {
         Input.onMouseDownHandler(event, store);
@@ -70,7 +81,11 @@ export const MindMap: React.FC = observer(() => {
                     <IconDownload />
                 </Styled.Button>
                 <ButtonUploadFIle onChange={uploadSavedMindMap} />
+                <Styled.Button onClick={toggleHelpModal}>
+                    <IconHelp />
+                </Styled.Button>
             </Styled.Tools>
+            {isHelpOpen && <HelpModal closeHelp={closeHelpHandler} />}
             <Styled.Canvas />
             <ThoughtsContainer store={store}>
                 {store.thoughts.map((thought) => (
