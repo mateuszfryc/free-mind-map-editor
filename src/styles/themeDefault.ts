@@ -10,18 +10,20 @@ export const breakpoints: ObjectOfStrings = {
 };
 
 const white = '255, 255, 255';
-const grayBlueDark = '84, 112, 125';
 const red = '255, 0, 0';
-const blue = '80, 180, 230';
 const blueDarker = '40, 90, 115';
-const lightBlue = '245, 253, 255';
 
-const dominantColor = blue;
+const darkGray = '20, 20, 20';
+const gray = '110, 110, 110';
+
+const dominantColor = darkGray;
 
 export const colors = {
-    white: setColorGetter(white),
-
     primary: setColorGetter(dominantColor),
+    secondary: setColorGetter(white),
+    shade: setColorGetter(gray),
+
+    white: setColorGetter(white),
     primaryDarker: setColorGetter(blueDarker),
     connectors: setColorGetter(dominantColor),
     baseMiniMap: setColorGetter(dominantColor, 0.6),
