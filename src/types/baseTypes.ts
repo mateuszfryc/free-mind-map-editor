@@ -47,7 +47,6 @@ export type SavedThoughtStateType = {
     id: number;
     isRootThought: boolean;
     parent: number | undefined;
-    pointerPositionDiff: Vector;
     prevIsParentOnLeft: boolean;
     state: number;
     x: number;

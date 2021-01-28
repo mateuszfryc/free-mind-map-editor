@@ -1,0 +1,30 @@
+{
+    "thoughts": [
+        {
+            "children": [1],
+            "childrenRelativePosition": [{ "position": { "x": 260, "y": -122 }, "id": 1 }],
+            "content": "asdf",
+            "id": 0,
+            "isRootThought": true,
+            "prevIsParentOnLeft": false,
+            "state": 1,
+            "x": 1992,
+            "y": 2004
+        },
+        {
+            "children": [],
+            "childrenRelativePosition": [],
+            "content": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+            "id": 1,
+            "isRootThought": false,
+            "parent": 0,
+            "prevIsParentOnLeft": true,
+            "state": 0,
+            "x": 2252,
+            "y": 1882
+        }
+    ],
+    "rootThought": 0,
+    "highlight": 0,
+    "selection": 0
+}

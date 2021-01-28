@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { makeObservable, observable, action } from 'mobx';
+import { requestAnimationFrame } from 'request-animation-frame-polyfill';
 
 import { Thought } from 'classes/Thought';
 import { ViewController } from 'classes/ViewController';
@@ -20,6 +21,7 @@ export class GlobalStore {
     highlight?: Thought;
     isDrawingLocked: boolean;
     isGroupDraggOn: boolean;
+    isInitialized: boolean;
     initialThoughtWidth: number;
     pointer: Pointer;
     rootThought: Thought;
@@ -34,8 +36,9 @@ export class GlobalStore {
             savedMindMap: observable,
             thoughts: observable,
 
-            saveCurrentMindMapAsJSON: action,
+            addThought: action,
             loadUploadedMindMap: action,
+            saveCurrentMindMapAsJSON: action,
         });
 
         this.connectorsCurveDividerWidth = 2.2;
@@ -43,6 +46,7 @@ export class GlobalStore {
         this.highlight = undefined;
         this.isDrawingLocked = false;
         this.isGroupDraggOn = true;
+        this.isInitialized = false;
         this.initialThoughtWidth = 200;
         this.pointer = new Pointer();
         this.savedMindMap = '';
@@ -52,6 +56,34 @@ export class GlobalStore {
         this.view = undefined;
         this.rootThought = this.addThought({ x: 0, y: 0 }, true, undefined, "What's on your mind?");
         this.setSelection(this.rootThought);
+
+        this.initializeOnce();
+    }
+
+    initializeOnce(): void {
+        if (!this.isInitialized) {
+            window.addEventListener('load', () => {
+                const canvas = get<HTMLCanvasElement>('canvas');
+                if (canvas) {
+                    this.view = new ViewController(canvas);
+                    this.updateDocumentSize();
+                    window.addEventListener('resize', this.updateDocumentSize);
+                    this.view.setThoughtsContainerPosition();
+                    this.view.centerMindMap();
+                    this.rootThought.setPositionAsync(this.view.getMapCenterCoordinates());
+                    this.editSelection();
+
+                    const drawLoop = (): void => {
+                        this.draw();
+                        requestAnimationFrame(drawLoop);
+                    };
+
+                    drawLoop();
+                }
+            });
+
+            this.isInitialized = true;
+        }
     }
 
     getNewID(): number {
@@ -73,7 +105,7 @@ export class GlobalStore {
 
     createChildThought(thought: Thought): void {
         this.stopEditing();
-        const targetPosition: Vector = thought.getPosition();
+        const targetPosition: Vector = thought.position;
         targetPosition.x += thought.getOuterWidth() * 0.5 + this.initialThoughtWidth * 0.5 + this.defaultSpawnGap.x;
         const newChild: Thought = this.addThought(targetPosition, false, thought);
         thought.children.push(newChild);
@@ -81,7 +113,7 @@ export class GlobalStore {
         this.resolveOverlaps(newChild);
         this.editSelection();
         newChild.refreshPosition();
-        this.draw();
+        thought.saveChildrenRelativePosition();
         setTimeout(() => {
             this.saveCurrentMindMapAsJSON();
         }, 200);
@@ -90,7 +122,7 @@ export class GlobalStore {
     createSiblingThought(thought: Thought): void {
         this.stopEditing();
         if (!this.selection) return;
-        const targetPosition: Vector = thought.getPosition();
+        const targetPosition: Vector = thought.position;
         targetPosition.y += thought.getOuterHeight() * 0.5 + 30 + this.defaultSpawnGap.y;
         const newSibling: Thought = this.addThought(targetPosition, false, thought.parent);
         if (thought.parent) thought.parent.addChildThought(newSibling);
@@ -99,7 +131,7 @@ export class GlobalStore {
         this.resolveOverlaps(newSibling);
         this.editSelection();
         newSibling.refreshPosition();
-        this.draw();
+        if (thought.parent) thought.parent.saveChildrenRelativePosition();
         setTimeout(() => {
             this.saveCurrentMindMapAsJSON();
         }, 200);
@@ -130,7 +162,6 @@ export class GlobalStore {
             }
             this.selection.setState(THOUGHT_STATE.IDLE);
             this.selection = undefined;
-            this.draw();
         }
     }
 
@@ -143,7 +174,6 @@ export class GlobalStore {
             this.selection.setState(THOUGHT_STATE.SELECTED);
             this.resolveOverlaps(this.selection);
             this.selection.refreshPosition();
-            this.draw();
             setTimeout(() => {
                 this.saveCurrentMindMapAsJSON();
             }, 200);
@@ -171,7 +201,6 @@ export class GlobalStore {
         if (thought.hasParent()) {
             thought.parent!.removeChildThought(thought);
         }
-        this.draw();
         setTimeout(() => {
             this.saveCurrentMindMapAsJSON();
         }, 200);
@@ -235,7 +264,7 @@ export class GlobalStore {
         if (overlaps.length > 0) {
             const { amount } = overlaps[0];
             if (amount.x > 0 || amount.y > 0) {
-                const targetPosition: Vector = thought.getPosition();
+                const targetPosition: Vector = thought.position;
                 if (axis === 'y') {
                     targetPosition.x += amount[axis] + Math.sign(amount[axis]) * this.defaultSpawnGap[axis];
                 } else if (axis === 'x') {
@@ -250,13 +279,13 @@ export class GlobalStore {
     }
 
     findClosestOverlapFor(thought: Thought): void {
-        const myPosition = thought.getPosition();
+        const myPosition = thought.position;
         const overlaps: OverlapResult[] = this.findOverlapsFor(thought);
         let closestIndex = 0;
         let closestDistance = 0;
         if (overlaps.length > 0) {
             overlaps.forEach((overlap: OverlapResult, index: number) => {
-                const distance = getTwoPointsDistance(myPosition, overlap.other.getPosition());
+                const distance = getTwoPointsDistance(myPosition, overlap.other.position);
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     closestIndex = index;
@@ -268,12 +297,6 @@ export class GlobalStore {
         }
 
         thought.clearClosestOverlap();
-    }
-
-    savePointerPositionDiff(thought: Thought): Thought {
-        thought.setPointerPositionDiff(thought.x - this.pointer.position.x, thought.y - this.pointer.position.y);
-
-        return thought;
     }
 
     updateDocumentSize(): void {
@@ -289,7 +312,6 @@ export class GlobalStore {
                 element.setAttribute('style', `width: ${x}px; height: ${y}px`);
             });
             this.view.setMiniMapViewportProportionalSize();
-            this.draw();
         }
     }
 
@@ -297,17 +319,8 @@ export class GlobalStore {
         return {
             thoughts: this.thoughts.map(
                 (t: Thought): SavedThoughtStateType => {
-                    const {
-                        childrenRelativePosition,
-                        content,
-                        id,
-                        isRootThought,
-                        pointerPositionDiff,
-                        prevIsParentOnLeft,
-                        state,
-                        x,
-                        y,
-                    } = t;
+                    const { childrenRelativePosition, content, id, isRootThought, prevIsParentOnLeft, state, x, y } = t;
+
                     return {
                         children: t.children.map((child) => child.id),
                         childrenRelativePosition,
@@ -316,7 +329,6 @@ export class GlobalStore {
                         id,
                         isRootThought,
                         parent: t.parent ? t.parent.id : undefined,
-                        pointerPositionDiff,
                         prevIsParentOnLeft,
                         state,
                         x,
@@ -338,13 +350,15 @@ export class GlobalStore {
     loadUploadedMindMap(saved: SavedStateType): void {
         this.clearHighlight();
         this.clearSelection();
+        this.thoughts = [];
 
         const uploadedThoughts: Thought[] = saved.thoughts.map(
-            (item: SavedThoughtStateType): Thought => {
-                const { id, x, y, isRootThought, content } = item;
-                const thought = new Thought(id, { x, y }, undefined, isRootThought, content);
+            (t: SavedThoughtStateType): Thought => {
+                const { id, x, y, isRootThought, content } = t;
+                const restored: Thought = this.addThought({ x, y }, isRootThought, undefined, content);
+                restored.id = id;
 
-                return thought;
+                return restored;
             }
         );
 
@@ -359,14 +373,14 @@ export class GlobalStore {
                             return potentialParent.id === parentId;
                         });
                         if (parent) {
-                            t.parent = parent;
+                            t.setParent(parent);
                         }
                     }
                     if (savedThought.children.length > 0) {
                         savedThought.children.forEach((childId: number): void => {
                             const child = uploadedThoughts.find((potentialChild) => potentialChild.id === childId);
                             if (child) {
-                                t.children.push(child);
+                                t.addChildThought(child);
                             }
                         });
                     }
@@ -379,7 +393,6 @@ export class GlobalStore {
                             t.closestOverlap = closest;
                         }
                     }
-                    t.pointerPositionDiff = savedThought.pointerPositionDiff;
                     t.prevIsParentOnLeft = savedThought.prevIsParentOnLeft;
                     t.state = savedThought.state;
 
@@ -395,7 +408,6 @@ export class GlobalStore {
                     if (isDragged) {
                         t.state = THOUGHT_STATE.IDLE;
                     }
-                    if (t.isRootThought) this.rootThought = t;
                 }
 
                 return t;
@@ -404,9 +416,11 @@ export class GlobalStore {
 
         this.thoughts.forEach((t: Thought) => {
             t.refreshPosition();
+            if (t.isRootThought) {
+                this.rootThought = t;
+            }
         });
         this.isDrawingLocked = false;
-        this.draw();
         this.saveCurrentMindMapAsJSON();
     }
 
@@ -418,21 +432,17 @@ export class GlobalStore {
             if (this.thoughts.length > 0) {
                 const miniatures: Miniature[] = [];
                 this.thoughts.forEach((thought) => {
-                    const miniature = this.view!.getMiniMapMiniature(
-                        thought.getPosition(),
-                        thought.getSize(),
-                        thought.id
-                    );
+                    const miniature = this.view!.getMiniMapMiniature(thought.position, thought.getSize(), thought.id);
                     miniatures.push(miniature);
                     this.view!.drawMiniature(miniature);
                 });
 
                 if (this.rootThought) {
                     const rootChildren: Thought[] = this.rootThought.getChildren(true);
+                    const offset: Vector = this.view!.getThoughtsContainerPosition();
                     if (rootChildren.length > 0) {
                         rootChildren.forEach((child: Thought) => {
                             const { me, parent } = child.getConnectorPoints();
-                            const offset: Vector = this.view!.getThoughtsContainerPosition();
                             me.x += offset.x;
                             me.y += offset.y - 1;
                             parent.x += offset.x;
@@ -485,21 +495,5 @@ export class GlobalStore {
 }
 
 const store = new GlobalStore();
-
-window.addEventListener('load', () => {
-    const canvas = get<HTMLCanvasElement>('canvas');
-    if (canvas) {
-        store.view = new ViewController(canvas);
-        store.updateDocumentSize();
-        window.addEventListener('resize', store.updateDocumentSize);
-        store.view.setThoughtsContainerPosition();
-        store.view.centerMindMap();
-        store.rootThought.setPositionAsync(store.view.getMapCenterCoordinates(), (): void => {
-            store.draw();
-        });
-        store.editSelection();
-        store.draw();
-    }
-});
 
 export default createContext(store);

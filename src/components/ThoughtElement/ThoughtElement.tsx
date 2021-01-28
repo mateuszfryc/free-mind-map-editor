@@ -33,7 +33,6 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
                 textareaSafeRef.style.height = `${thought.getHeight()}px`;
                 textareaSafeRef.style.overflow = 'visible';
                 thought.refreshPosition();
-                store.draw();
             }, 5);
         }
     };
@@ -41,12 +40,13 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
     const onMouseMove = (): void => {
         const safeRef = getSafeRef(wrapper);
         if (store.view && safeRef && safeRef.id === store.pointer.draggedItemId && store.pointer.isLeftButtonDown) {
+            const { x, y } = store.pointer.position;
             store.findClosestOverlapFor(thought);
             thought.setState(THOUGHT_STATE.DRAGGED);
             thought.setOnTop();
             thought.setPosition({
-                x: store.pointer.position.x + thought.pointerPositionDiff.x,
-                y: store.pointer.position.y + thought.pointerPositionDiff.y,
+                x: x + thought.diffX,
+                y: y + thought.diffY,
             });
             if (store.isGroupDraggOn && thought.hasChildren()) {
                 const isParentOnLeft = thought.isParentOnLeft();
@@ -58,7 +58,6 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
                 thought.restoreChildrenRelativePosition();
                 thought.setPrevIsParentOnLeft(isParentOnLeft);
             }
-            store.draw();
         }
     };
 
@@ -105,7 +104,7 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
             ref={wrapper}
             zIndex={thought.zIndex}
         >
-            <div className="underline" id={`${thought.id}`} />
+            <div className='underline' id={`${thought.id}`} />
             {thought.content}
             {thought.isEdited() && (
                 <Styled.Textarea onChange={updateContent} ref={contentRef} value={thought.content} />

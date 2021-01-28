@@ -38,7 +38,7 @@ export const Navigation: React.FC = observer(() => {
 
             <Styled.Link href='#howto'>How To</Styled.Link>
 
-            {/* <Styled.Link>Settings</Styled.Link> */}
+            {/* To do:  <Styled.Link>Settings</Styled.Link> */}
         </Styled.Navigation>
     );
 });

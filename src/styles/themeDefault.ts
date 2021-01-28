@@ -10,6 +10,7 @@ export const breakpoints: ObjectOfStrings = {
 };
 
 const white = '255, 255, 255';
+const lightBlue = '0, 190, 250';
 const red = '255, 0, 0';
 const blueDarker = '40, 90, 115';
 
@@ -22,6 +23,7 @@ export const colors = {
     primary: setColorGetter(dominantColor),
     secondary: setColorGetter(white),
     shade: setColorGetter(gray),
+    contrast: setColorGetter(lightBlue),
 
     white: setColorGetter(white),
     primaryDarker: setColorGetter(blueDarker),

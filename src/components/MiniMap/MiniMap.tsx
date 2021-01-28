@@ -21,7 +21,6 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
             if (store.view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
                 const { x, y } = store.pointer.getCurrentToLastPositionDiff();
                 store.view.draggMinimapViewport(x, y);
-                store.draw();
             }
         }
     };
@@ -48,8 +47,8 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
     });
 
     return (
-        <Styled.MiniMap id="mini-map" ref={miniMapRef}>
-            <Styled.MiniMapViewport id="mini-map__viewport" ref={viewportRef} />
+        <Styled.MiniMap id='mini-map' ref={miniMapRef}>
+            <Styled.MiniMapViewport id='mini-map__viewport' ref={viewportRef} />
         </Styled.MiniMap>
     );
 });

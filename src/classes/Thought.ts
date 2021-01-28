@@ -1,4 +1,4 @@
-import { action, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable, computed } from 'mobx';
 
 import { THOUGHT_STATE, ObjectOfVectors, Vector, childPositionData } from 'types/baseTypes';
 import { getParsedStyle } from 'utils/get';
@@ -20,11 +20,13 @@ export class Thought {
     childrenRelativePosition: childPositionData[];
     closestOverlap?: Thought;
     content: string;
+    diffX: number;
+    diffY: number;
     id: number;
     isMarkedForRemoval: boolean;
     isRootThought: boolean;
     parent?: Thought;
-    pointerPositionDiff: Vector;
+    // pointerPositionDiff: Vector;
     prevIsParentOnLeft: boolean;
     state: number;
     x: number;
@@ -40,12 +42,19 @@ export class Thought {
     ) {
         makeObservable(this, {
             content: observable,
+            children: observable,
             id: observable,
+            diffX: observable,
+            diffY: observable,
+            parent: observable,
             state: observable,
             zIndex: observable,
 
+            position: computed,
+
             resetZIndex: action,
             setOnTop: action,
+            setParent: action,
             setState: action,
             updateContent: action,
         });
@@ -54,11 +63,13 @@ export class Thought {
         this.childrenRelativePosition = [];
         this.closestOverlap = undefined;
         this.content = defaultText;
+        this.diffX = 0;
+        this.diffY = 0;
         this.id = id;
         this.isMarkedForRemoval = false;
         this.isRootThought = isRootThought;
         this.parent = parent;
-        this.pointerPositionDiff = { x: 0, y: 0 };
+        // this.pointerPositionDiff = { x: 0, y: 0 };
         this.prevIsParentOnLeft = true;
         this.state = THOUGHT_STATE.EDITED;
         this.x = initialPosition.x;
@@ -98,7 +109,7 @@ export class Thought {
 
     getBoundingBox(): BoundingBox {
         const size = this.getOuterSize();
-        const { x, y } = this.getPosition();
+        const { x, y } = this.position;
 
         return {
             height: size.y,
@@ -115,7 +126,7 @@ export class Thought {
     } {
         const width: number = this.getOuterWidth() * 0.5;
         const height: number = this.getOuterHeight() * 0.5;
-        const { x, y } = this.getPosition();
+        const { x, y } = this.position;
 
         return {
             top: {
@@ -163,7 +174,7 @@ export class Thought {
         return this;
     }
 
-    getPosition(): Vector {
+    get position(): Vector {
         return {
             x: this.x,
             y: this.y,
@@ -282,14 +293,14 @@ export class Thought {
     saveChildrenRelativePosition(): Thought {
         if (this.children.length < 1) return this;
 
-        const myPosition = this.getPosition();
+        const myPosition = this.position;
         this.childrenRelativePosition = this.getChildren(true).map(
             (child: Thought): childPositionData => {
-                const position = child.getPosition();
-                position.x -= myPosition.x;
-                position.y -= myPosition.y;
+                let { x, y } = child.position;
+                x -= myPosition.x;
+                y -= myPosition.y;
 
-                return { position, id: child.id };
+                return { position: { x, y }, id: child.id };
             }
         );
 
@@ -299,7 +310,7 @@ export class Thought {
     restoreChildrenRelativePosition(): Thought {
         if (this.children.length < 1) return this;
 
-        const myPosition = this.getPosition();
+        const myPosition = this.position;
         const allChildren = this.getChildren(true);
         this.childrenRelativePosition.forEach((positionData): void => {
             const actionedChild = allChildren.find((child) => child.id === positionData.id);
@@ -403,7 +414,7 @@ export class Thought {
     }
 
     setPointerPositionDiff(x: number, y: number): void {
-        this.pointerPositionDiff.x = x;
-        this.pointerPositionDiff.y = y;
+        this.diffX = this.x - x;
+        this.diffY = this.y - y;
     }
 }

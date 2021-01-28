@@ -118,14 +118,16 @@ export function onMouseDownHandler(event: MouseEvent, store: GlobalStore): void 
     pointer.setWasShiftPressedOnDown(KEYS[SHIFT].isPressed);
 
     if (highlight && target && highlight.id === id) {
-        store.savePointerPositionDiff(highlight);
+        highlight.setPointerPositionDiff(pointer.position.x, pointer.position.y);
         highlight.saveChildrenRelativePosition();
 
         if (highlight.isIdle() || (selection && selection.id !== highlight.id)) {
             store.setSelection(highlight);
         }
 
-        highlight.getChildren(true).forEach((child) => store.savePointerPositionDiff(child));
+        highlight
+            .getChildren(true)
+            .forEach((child) => child.setPointerPositionDiff(pointer.position.x, pointer.position.y));
     } else if (selection && target.id && parseInt(target.id, 10) !== selection.id) {
         store.clearSelection();
     }
@@ -152,7 +154,6 @@ export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
     if (selection) selection.resetZIndex();
     setTimeout(() => {
         store.saveCurrentMindMapAsJSON();
-        store.draw();
     }, 100);
 }
 
