@@ -80,15 +80,22 @@ export const SingleAction = styled(Flex)(
         },
     }) => css`
         align-items: center;
+        background-color: transparent;
         justify-content: space-between;
-        margin: 0 0 30px;
         max-width: 1000px;
-        padding: 0 0 30px;
+        padding: 30px;
         position: relative;
+        transition: background-color 1s ease;
         width: 100%;
 
         &:not(:last-child) {
             border-bottom: 1px solid ${colors.shade()};
+        }
+
+        
+        &.fading-highlight {
+            transition: none;
+            background-color: ${colors.contrast(0.4)};
         }
     `  
 );

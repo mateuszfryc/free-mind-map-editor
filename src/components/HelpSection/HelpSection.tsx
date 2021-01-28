@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent as ReactMouseEvent, useRef, MutableRefObject } from 'react';
 
 import { TutorialItems, TutorialItemType } from './TutorialItems';
 import {
@@ -15,6 +15,25 @@ import {
 } from './HelpSection.styled';
 
 export const HelpSection: React.FC = () => {
+    const actionsRefs: { [key: string]: MutableRefObject<null> } = {};
+    TutorialItems.forEach((item: TutorialItemType): void => {
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        actionsRefs[item.title] = useRef(null);
+    });
+
+    const setHighlight = (id: string): void => {
+        const fadeBackgroundClass = 'fading-highlight';
+
+        const ref: HTMLLinkElement | null = actionsRefs[id].current;
+        if (ref !== null) {
+            ref!.className += ` ${fadeBackgroundClass} `;
+
+            setTimeout(() => {
+                ref!.className = ref!.className.replace(new RegExp(String.raw`\s?${fadeBackgroundClass}\s?`), '');
+            }, 300);
+        }
+    };
+
     return (
         <SectionContainer id='howto'>
             <StickyMenu>
@@ -24,14 +43,14 @@ export const HelpSection: React.FC = () => {
                 </Paragraph>
 
                 {TutorialItems.map((item: TutorialItemType) => (
-                    <Link href={`#${item.title}`} key={item.title}>
+                    <Link href={`#${item.title}`} key={item.title} onClick={() => setHighlight(item.title)}>
                         {item.title}
                     </Link>
                 ))}
             </StickyMenu>
             <Actions>
                 {TutorialItems.map((item: TutorialItemType) => (
-                    <SingleAction key={item.title}>
+                    <SingleAction key={item.title} ref={actionsRefs[item.title]}>
                         <Anchor id={item.title} />
                         <Flex padding='30px' column>
                             <Title size='paragraph'>{item.title}</Title>
