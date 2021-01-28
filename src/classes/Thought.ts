@@ -1,4 +1,4 @@
-import { action, makeObservable, observable, computed } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { THOUGHT_STATE, ObjectOfVectors, Vector, childPositionData } from 'types/baseTypes';
 import { getParsedStyle } from 'utils/get';
@@ -26,7 +26,6 @@ export class Thought {
     isMarkedForRemoval: boolean;
     isRootThought: boolean;
     parent?: Thought;
-    // pointerPositionDiff: Vector;
     prevIsParentOnLeft: boolean;
     state: number;
     x: number;
@@ -44,13 +43,9 @@ export class Thought {
             content: observable,
             children: observable,
             id: observable,
-            diffX: observable,
-            diffY: observable,
             parent: observable,
             state: observable,
             zIndex: observable,
-
-            position: computed,
 
             resetZIndex: action,
             setOnTop: action,

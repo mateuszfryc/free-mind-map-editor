@@ -392,11 +392,16 @@ export class GlobalStore {
         this.thoughts.forEach((t: Thought) => {
             t.refreshPosition();
             if (t.isRootThought) {
-                this.rootThought = t;
+                const root = this.rootThought;
+
+                root.updateContent(t.content);
+                root.id = t.id;
+                root.setPositionAsync({ x: t.x, y: t.y }, () => {
+                    this.isDrawingLocked = false;
+                    this.saveCurrentMindMapAsJSON();
+                });
             }
         });
-        this.isDrawingLocked = false;
-        this.saveCurrentMindMapAsJSON();
     }
 
     draw(): void {

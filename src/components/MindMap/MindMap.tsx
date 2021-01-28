@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 
 import storeContext from 'stores/globalStore';
 import { MiniMap } from 'components/MiniMap';
-import { ThoughtElement } from 'components/ThoughtElement';
+import { SingleThought } from 'components/SingleThought';
 import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import * as Input from 'input';
 import * as Styled from './MindMap.styled';
@@ -48,7 +48,7 @@ export const MindMap: React.FC = observer(() => {
             <Styled.Canvas />
             <ThoughtsContainer store={store}>
                 {store.thoughts.map((thought) => (
-                    <ThoughtElement key={thought.id} thought={thought} />
+                    <SingleThought key={thought.id} thought={thought} />
                 ))}
             </ThoughtsContainer>
             <MiniMap store={store} />

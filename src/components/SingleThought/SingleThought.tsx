@@ -5,13 +5,13 @@ import storeContext from 'stores/globalStore';
 import { Thought } from 'classes/Thought';
 import { THOUGHT_STATE, childPositionData } from 'types/baseTypes';
 import { getSafeRef } from 'utils/get';
-import * as Styled from './ThoughtElement.styled';
+import * as Styled from './SingleThought.styled';
 
 type ThoughtProps = {
     thought: Thought;
 };
 
-export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => {
+export const SingleThought: React.FC<ThoughtProps> = observer(({ thought }) => {
     const store = useContext(storeContext);
     const wrapper = useRef(null);
     const contentRef = useRef(null);
@@ -39,24 +39,31 @@ export const ThoughtElement: React.FC<ThoughtProps> = observer(({ thought }) => 
 
     const onMouseMove = (): void => {
         const safeRef = getSafeRef(wrapper);
-        if (store.view && safeRef && safeRef.id === store.pointer.draggedItemId && store.pointer.isLeftButtonDown) {
+        const { selection } = store;
+        if (
+            store.pointer.isLeftButtonDown &&
+            store.view &&
+            selection &&
+            safeRef &&
+            safeRef.id === store.pointer.draggedItemId
+        ) {
             const { x, y } = store.pointer.position;
-            store.findClosestOverlapFor(thought);
-            thought.setState(THOUGHT_STATE.DRAGGED);
-            thought.setOnTop();
-            thought.setPosition({
-                x: x + thought.diffX,
-                y: y + thought.diffY,
+            store.findClosestOverlapFor(selection);
+            selection.setState(THOUGHT_STATE.DRAGGED);
+            selection.setOnTop();
+            selection.setPosition({
+                x: x + selection.diffX,
+                y: y + selection.diffY,
             });
             if (store.isGroupDraggOn && thought.hasChildren()) {
                 const isParentOnLeft = thought.isParentOnLeft();
-                if (!thought.isRootThought && isParentOnLeft !== thought.prevIsParentOnLeft) {
-                    thought.childrenRelativePosition.forEach((data: childPositionData, index: number): void => {
-                        thought.childrenRelativePosition[index].position.x *= -1; // eslint-disable-line no-param-reassign
+                if (!selection.isRootThought && isParentOnLeft !== selection.prevIsParentOnLeft) {
+                    selection.childrenRelativePosition.forEach((data: childPositionData, index: number): void => {
+                        selection.childrenRelativePosition[index].position.x *= -1; // eslint-disable-line no-param-reassign
                     });
                 }
-                thought.restoreChildrenRelativePosition();
-                thought.setPrevIsParentOnLeft(isParentOnLeft);
+                selection.restoreChildrenRelativePosition();
+                selection.setPrevIsParentOnLeft(isParentOnLeft);
             }
         }
     };
