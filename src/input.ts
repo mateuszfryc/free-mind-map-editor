@@ -118,8 +118,8 @@ export function onMouseDownHandler(event: MouseEvent, store: GlobalStore): void 
     pointer.setWasShiftPressedOnDown(KEYS[SHIFT].isPressed);
 
     if (highlight && target && highlight.id === id) {
-        highlight.setPointerPositionDiff(pointer.position.x, pointer.position.y);
         highlight.saveChildrenRelativePosition();
+        highlight.setPointerPositionDiff(pointer.position.x, pointer.position.y);
 
         if (highlight.isIdle() || (selection && selection.id !== highlight.id)) {
             store.setSelection(highlight);
