@@ -11,28 +11,10 @@ export const Navigation = styled.header`
     z-index: 10;
 `;
 
-export const Link = styled.a<{ padding?: string }>(
-    ({ padding = '8px 15px', theme: { colors } }) => css`
-        align-items: center;
-        background-color: ${colors.primary()};
-        color: ${colors.secondary()};
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        padding: ${padding};
-        text-decoration: none;
-        transition: background-color 0.3s ease;
-
-        &:hover,
-        &:focus {
-            background-color: ${colors.shade()};
-        }
-    `
-);
-
 export const LinksContainer = styled.div<{ isOpen: boolean }>(
     ({ isOpen, theme: { colors } }) => css`
         align-items: flex-start;
+        border: 2px solid ${colors.shade()};
         background-color: ${colors.primary()};
         color: ${colors.secondary()};
         display: flex;
@@ -49,8 +31,39 @@ export const LinksContainer = styled.div<{ isOpen: boolean }>(
 
         ${isOpen && css`
             height: initial;
-            padding: 20px;
+            padding: 15px;
             width: max-content;
+        `}
+    `
+);
+
+export const Link = styled.a<{ margin?: string, padding?: string, subLink?: boolean }>(
+    ({
+        margin = '0',
+        subLink = false,
+        padding = '4px 15px',
+        theme: {
+            colors
+        },
+    }) => css`
+        align-items: center;
+        background-color: ${colors.primary()};
+        color: ${colors.secondary()};
+        cursor: pointer;
+        display: flex;
+        justify-content: flex-start;
+        margin: ${margin};
+        padding: ${padding};
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+
+        &:hover,
+        &:focus {
+            background-color: ${colors.shade()};
+        }
+
+        ${subLink && css`
+            margin-left: 30px !important;
         `}
     `
 );

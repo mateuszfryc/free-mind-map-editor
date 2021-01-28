@@ -48,15 +48,24 @@ export const Navigation: React.FC = observer(() => {
             </Styled.MenuButton>
 
             <Styled.LinksContainer isOpen={isMenuOpen} ref={stickyMenuRef}>
-                <Styled.Link onClick={handleCloseMenu} download='MindMap.json' href={`data: ${store.savedMindMap}`}>
+                <Styled.Link onClick={handleCloseMenu} href='#mindmap'>
+                    Editor
+                </Styled.Link>
+
+                <Styled.Link
+                    subLink
+                    onClick={handleCloseMenu}
+                    download='MindMap.json'
+                    href={`data: ${store.savedMindMap}`}
+                >
                     Save
                 </Styled.Link>
 
-                <Styled.Link onClick={handleCloseMenu} padding='0'>
+                <Styled.Link subLink onClick={handleCloseMenu} padding='0'>
                     <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
                 </Styled.Link>
 
-                <Styled.Link onClick={handleCloseMenu} href='#howto'>
+                <Styled.Link onClick={handleCloseMenu} href='#howto' margin='20px 0 0'>
                     How To
                 </Styled.Link>
             </Styled.LinksContainer>
