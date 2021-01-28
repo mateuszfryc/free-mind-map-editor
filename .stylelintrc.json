@@ -1,6 +1,6 @@
 {
     "processors": ["stylelint-processor-styled-components"],
-    "extends": ["stylelint-config-standard", "stylelint-config-styled-components"],
+    "extends": ["stylelint-config-standard", "stylelint-config-styled-components", "stylelint-config-prettier"],
     "syntax": "scss",
     "rules": {
         "indentation": [4, { "baseIndentLevel": 1 }],
@@ -11,7 +11,7 @@
                 "ignore": ["after-comment"]
             }
         ],
-        "declaration-colon-newline-after": null,
+        "declaration-colon-newline-after": "always-multi-line",
         "declaration-colon-space-after": "always-single-line"
     }
 }

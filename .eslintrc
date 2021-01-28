@@ -35,6 +35,7 @@
     },
     "plugins": ["prettier", "react", "@typescript-eslint", "import", "jsx-a11y"],
     "rules": {
+        "arrow-body-style": 0,
         "@typescript-eslint/camelcase": 0,
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/no-non-null-assertion": 0,

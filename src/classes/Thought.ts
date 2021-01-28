@@ -158,6 +158,7 @@ export class Thought {
         if (this.parent) {
             return this.parent.x < this.x;
         }
+
         return false;
     }
 
@@ -343,9 +344,7 @@ export class Thought {
     }
 
     removeChildThought(childToBeRemoved: Thought): Thought {
-        this.children = this.children.filter((child) => {
-            return child.id !== childToBeRemoved.id;
-        });
+        this.children = this.children.filter((child) => child.id !== childToBeRemoved.id);
         childToBeRemoved.clearParent();
 
         return this;
@@ -361,6 +360,7 @@ export class Thought {
         if (includeGrandChildren) {
             return this.children.reduce((acc: Thought[], val: Thought) => {
                 acc.push(val);
+
                 return acc.concat(val.getChildren(true));
             }, []);
         }
@@ -374,6 +374,7 @@ export class Thought {
         if (includeGrandChildren) {
             return this.getChildren(true).some((child) => child.id === unknownChild.id);
         }
+
         return this.children.some((child) => child.id === unknownChild.id);
     }
 

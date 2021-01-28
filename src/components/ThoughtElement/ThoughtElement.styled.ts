@@ -7,8 +7,8 @@ type ThoughtStyleType = {
     zIndex: number;
 };
 
-export const Thought = styled.div<ThoughtStyleType>`
-    ${({ maxWidth, isSelected, isEdited, zIndex, theme }) => css`
+export const Thought = styled.div<ThoughtStyleType>(
+    ({ maxWidth, isSelected, isEdited, zIndex, theme: { colors } }) => css`
         background-color: transparent;
         border: none;
         color: #000;
@@ -22,15 +22,10 @@ export const Thought = styled.div<ThoughtStyleType>`
         position: absolute;
         white-space: pre-wrap;
         z-index: ${zIndex};
-        -webkit-touch-callout: none; /* iOS Safari */
-        -webkit-user-select: none; /* Safari */
-        -khtml-user-select: none; /* Konqueror HTML */
-        -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
         user-select: none;
 
         & .underline {
-            border-color: ${theme.colors.primary()};
+            border-color: ${colors.primary()};
             border-style: solid;
             border-width: 0 0 3px;
             bottom: 0;
@@ -47,9 +42,6 @@ export const Thought = styled.div<ThoughtStyleType>`
         word-wrap: break-word;
         -ms-word-break: break-word;
         word-break: break-word;
-        -ms-hyphens: auto;
-        -moz-hyphens: auto;
-        -webkit-hyphens: auto;
         hyphens: auto;
 
         &:hover .underline {
@@ -70,8 +62,8 @@ export const Thought = styled.div<ThoughtStyleType>`
         css`
             visibility: hidden;
         `}
-    `}
-`;
+    `
+);
 
 export const Textarea = styled.textarea`
     ${({ theme }) => css`
