@@ -94,8 +94,8 @@ export class GlobalStore {
         return 0;
     }
 
-    addThought(position: Vector, isRoot?: boolean, parent?: Thought, initText?: string): Thought {
-        const thought = new Thought(this.getNewID(), position, parent, isRoot, initText);
+    addThought(position: Vector, isRoot?: boolean, parent?: Thought, initText?: string, id?: number): Thought {
+        const thought = new Thought(id || this.getNewID(), position, parent, isRoot, initText);
         this.thoughts.push(thought);
         if (isRoot) {
             this.rootThought = thought;
@@ -322,26 +322,20 @@ export class GlobalStore {
         return {
             thoughts: this.thoughts.map(
                 (t: Thought): SavedThoughtStateType => {
-                    const { childrenRelativePosition, content, id, isRootThought, prevIsParentOnLeft, state, x, y } = t;
+                    const { content, id, isRootThought, prevIsParentOnLeft, x, y } = t;
 
                     return {
                         children: t.children.map((child) => child.id),
-                        childrenRelativePosition,
-                        closestOverlap: t.closestOverlap ? t.closestOverlap.id : undefined,
                         content,
                         id,
                         isRootThought,
                         parent: t.parent ? t.parent.id : undefined,
                         prevIsParentOnLeft,
-                        state,
                         x,
                         y,
                     };
                 }
             ),
-            rootThought: this.rootThought.id,
-            highlight: this.highlight ? this.highlight.id : undefined,
-            selection: this.selection ? this.selection.id : undefined,
         };
     }
 
@@ -358,8 +352,7 @@ export class GlobalStore {
         const uploadedThoughts: Thought[] = saved.thoughts.map(
             (t: SavedThoughtStateType): Thought => {
                 const { id, x, y, isRootThought, content } = t;
-                const restored: Thought = this.addThought({ x, y }, isRootThought, undefined, content);
-                restored.id = id;
+                const restored: Thought = this.addThought({ x, y }, isRootThought, undefined, content, id);
 
                 return restored;
             }
@@ -387,30 +380,9 @@ export class GlobalStore {
                             }
                         });
                     }
-                    t.childrenRelativePosition = savedThought.childrenRelativePosition;
-                    if (savedThought.closestOverlap !== undefined) {
-                        const closest = uploadedThoughts.find(
-                            (potentialOverlap) => potentialOverlap.id === savedThought.closestOverlap
-                        );
-                        if (closest) {
-                            t.closestOverlap = closest;
-                        }
-                    }
+                    t.saveChildrenRelativePosition();
                     t.prevIsParentOnLeft = savedThought.prevIsParentOnLeft;
-                    t.state = savedThought.state;
-
-                    const isSelected = t.state === THOUGHT_STATE.SELECTED;
-                    const isEdited = t.state === THOUGHT_STATE.EDITED;
-                    const isDragged = t.state === THOUGHT_STATE.DRAGGED;
-                    if (isSelected || isEdited) {
-                        this.setSelection(t);
-                    }
-                    if (isEdited) {
-                        this.editSelection();
-                    }
-                    if (isDragged) {
-                        t.state = THOUGHT_STATE.IDLE;
-                    }
+                    t.state = 0;
                 }
 
                 return t;

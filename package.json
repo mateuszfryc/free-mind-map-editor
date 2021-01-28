@@ -2,7 +2,7 @@
     "name": "mindmapper",
     "version": "0.1.0",
     "private": true,
-    "homepage": "/apps/mindmapper/",
+    "homepage": "/",
     "dependencies": {
         "mobx": "^6.0.4",
         "mobx-react": "^7.0.5",
@@ -78,12 +78,9 @@
         }
     },
     "lint-staged": {
-        "*.{js,jsx,ts,tsx,json}": "pretty-quick --staged",
-        "*.{js,jsx,ts,tsx}": [
+        "*.{ts,tsx,json}": "pretty-quick --staged",
+        "*.{ts,tsx}": [
             "eslint --ext ts,tsx src/"
-        ],
-        "*.scss": [
-            "stylelint --fix"
         ]
     },
     "config": {
