@@ -1,13 +1,28 @@
-import React, { ChangeEvent, useContext } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useState, useRef } from 'react';
 import { observer } from 'mobx-react';
 
 import storeContext from 'stores/globalStore';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
 import { SavedStateType } from 'types/baseTypes';
+import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import * as Styled from './Navigation.styled';
 
 export const Navigation: React.FC = observer(() => {
     const store = useContext(storeContext);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const stickyMenuRef = useRef(null);
+
+    const toggleMobileMenu = useCallback(() => {
+        setIsMenuOpen(!isMenuOpen);
+    }, [isMenuOpen]);
+
+    const handleCloseMenu = () => {
+        if (isMenuOpen) {
+            setIsMenuOpen(false);
+        }
+    };
+
+    useOnClickOutside(stickyMenuRef, handleCloseMenu);
 
     const uploadSavedMindMap = (event: ChangeEvent): void => {
         const target = event.target as HTMLInputElement;
@@ -28,17 +43,23 @@ export const Navigation: React.FC = observer(() => {
 
     return (
         <Styled.Navigation>
-            <Styled.Link download='MindMap.json' href={`data: ${store.savedMindMap}`}>
-                Save
-            </Styled.Link>
+            <Styled.MenuButton type='button' onClick={toggleMobileMenu}>
+                <Styled.BurgerIcon isActive={isMenuOpen} />
+            </Styled.MenuButton>
 
-            <Styled.Link padding='0'>
-                <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
-            </Styled.Link>
+            <Styled.LinksContainer isOpen={isMenuOpen} ref={stickyMenuRef}>
+                <Styled.Link onClick={handleCloseMenu} download='MindMap.json' href={`data: ${store.savedMindMap}`}>
+                    Save
+                </Styled.Link>
 
-            <Styled.Link href='#howto'>How To</Styled.Link>
+                <Styled.Link onClick={handleCloseMenu} padding='0'>
+                    <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
+                </Styled.Link>
 
-            {/* To do:  <Styled.Link>Settings</Styled.Link> */}
+                <Styled.Link onClick={handleCloseMenu} href='#howto'>
+                    How To
+                </Styled.Link>
+            </Styled.LinksContainer>
         </Styled.Navigation>
     );
 });

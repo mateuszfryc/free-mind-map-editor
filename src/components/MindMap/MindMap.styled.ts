@@ -8,7 +8,6 @@ export const MindMap = styled.div`
 `;
 
 export const Canvas = styled.canvas`
-    background-color: transparent;
     height: 100%;
     position: absolute;
     width: 100%;

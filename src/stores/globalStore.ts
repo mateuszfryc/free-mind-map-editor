@@ -90,6 +90,7 @@ export class GlobalStore {
         if (this.thoughts.length > 0) {
             return this.thoughts[this.thoughts.length - 1].id + 1;
         }
+
         return 0;
     }
 
@@ -155,6 +156,7 @@ export class GlobalStore {
         if (this.selection) {
             if (!this.selection.hasValue() && !this.selection.isRootThought) {
                 this.removeThought(this.selection);
+
                 return;
             }
             if (this.selection.isEdited()) {
@@ -169,6 +171,7 @@ export class GlobalStore {
         if (this.selection) {
             if (!this.selection.hasValue() && this.selection.id !== this.rootThought.id) {
                 this.removeThought(this.selection);
+
                 return;
             }
             this.selection.setState(THOUGHT_STATE.SELECTED);

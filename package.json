@@ -19,6 +19,7 @@
         "@types/node": "^14.14.10",
         "@types/react": "^17.0.0",
         "@types/react-dom": "^17.0.0",
+        "@types/react-router": "^5.1.11",
         "@types/react-router-dom": "^5.1.5",
         "@types/styled-components": "^5.1.1",
         "commitizen": "^4.0.3",

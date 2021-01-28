@@ -69,7 +69,6 @@ export class Thought {
         this.isMarkedForRemoval = false;
         this.isRootThought = isRootThought;
         this.parent = parent;
-        // this.pointerPositionDiff = { x: 0, y: 0 };
         this.prevIsParentOnLeft = true;
         this.state = THOUGHT_STATE.EDITED;
         this.x = initialPosition.x;

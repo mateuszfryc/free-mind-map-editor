@@ -49,7 +49,7 @@ export const SectionContainer = styled(Flex)(
         color: ${colors.secondary()};
         justify-content: space-between;
         padding: 100px;
-        width: calc(100vw - 200px);
+        width: calc(100vw - 220px);
     `
 );
 

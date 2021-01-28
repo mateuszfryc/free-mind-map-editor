@@ -6,6 +6,7 @@ export const get = <T = HTMLElement>(query: string, element = document): T | und
     if (searched) {
         return searched as T;
     }
+
     return undefined;
 };
 
@@ -35,6 +36,7 @@ export const getScreenCenterCoords = (): Vector => {
 export const getTwoPointsDistance = (p1: Vector, p2: Vector): number => {
     const a = p1.x - p2.x;
     const b = p1.y - p2.y;
+
     return Math.sqrt(a * a + b * b);
 };
 

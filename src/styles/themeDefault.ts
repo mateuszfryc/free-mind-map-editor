@@ -1,5 +1,6 @@
 import { setColorGetter } from 'utils/styles';
 import { ObjectOfNumbers, ObjectOfStrings } from 'types/baseTypes';
+import { css, FlattenSimpleInterpolation } from 'styled-components';
 
 export const breakpoints: ObjectOfStrings = {
     phone: '576',
@@ -51,7 +52,25 @@ const setFontSize = (size: string): string => {
     `;
 };
 
+export const chessboardBackground = (
+    size: number,
+    darkColor: string,
+    brightColor: string
+): FlattenSimpleInterpolation => {
+    const halfSize = size * 0.5;
+
+    return css`
+        background-image: linear-gradient(45deg, ${darkColor} 25%, ${brightColor} 25%),
+            linear-gradient(-45deg, ${darkColor} 25%, ${brightColor} 25%),
+            linear-gradient(45deg, ${brightColor} 75%, ${darkColor} 75%),
+            linear-gradient(-45deg, ${brightColor} 75%, ${darkColor} 75%);
+        background-size: ${size}px ${size}px;
+        background-position: 0 0, 0 ${halfSize}px, ${halfSize}px -${halfSize}px, -${halfSize}px 0;
+    `;
+};
+
 export const theme = {
+    chessboardBackground,
     colors,
     connectorsWidth: 3,
     fontSizes,
