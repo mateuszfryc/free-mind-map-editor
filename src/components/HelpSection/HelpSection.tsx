@@ -34,7 +34,7 @@ export const HelpSection: React.FC = () => {
                     <SingleAction key={item.title}>
                         <Anchor id={item.title} />
                         <Flex padding='30px' column>
-                            <Title size='title'>{item.title}</Title>
+                            <Title size='paragraph'>{item.title}</Title>
                             {item.description}
                         </Flex>
                         <TutorialGif src={item.src} alt={`How to: ${item.title}`} />

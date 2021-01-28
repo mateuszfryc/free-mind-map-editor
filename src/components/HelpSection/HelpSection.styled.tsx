@@ -49,6 +49,7 @@ export const SectionContainer = styled(Flex)(
         color: ${colors.secondary()};
         justify-content: space-between;
         padding: 100px;
+        width: calc(100vw - 200px);
     `
 );
 
@@ -62,7 +63,9 @@ export const StickyMenu = styled(Flex)`
 export const Actions = styled(Flex)`
     flex-direction: column;
     margin: 0;
-    max-width: 840px;
+    justify-content: center;
+    max-width: 1200px;
+    width: 100%;
 `;
 
 export const Anchor = styled.div`
@@ -70,10 +73,25 @@ export const Anchor = styled.div`
     top: -100px;
 `;
 
-export const SingleAction = styled(Flex)`
-    margin: 0 0 30px;
-    position: relative;
-`;
+export const SingleAction = styled(Flex)(
+    ({
+        theme: {
+            colors
+        },
+    }) => css`
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 30px;
+        max-width: 1000px;
+        padding: 0 0 30px;
+        position: relative;
+        width: 100%;
+
+        &:not(:last-child) {
+            border-bottom: 1px solid ${colors.shade()};
+        }
+    `  
+);
 
 export const Link = styled.a(
     ({

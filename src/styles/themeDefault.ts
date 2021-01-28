@@ -38,8 +38,8 @@ export const colors = {
 
 const fontSizes: ObjectOfNumbers = {
     sectionTitle: 4,
-    title: 2,
-    paragraph: 1.6,
+    title: 2.4,
+    paragraph: 1.8,
 };
 
 const setFontSize = (size: string): string => {
