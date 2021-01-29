@@ -1,5 +1,6 @@
-import React, { MouseEvent as ReactMouseEvent, useRef, MutableRefObject } from 'react';
+import React, { useRef, MutableRefObject } from 'react';
 
+import { addClass, removeClass } from 'utils/dom';
 import { TutorialItems, TutorialItemType } from './TutorialItems';
 import {
     Actions,
@@ -26,10 +27,10 @@ export const HelpSection: React.FC = () => {
 
         const ref: HTMLLinkElement | null = actionsRefs[id].current;
         if (ref !== null) {
-            ref!.className += ` ${fadeBackgroundClass} `;
+            addClass(ref, fadeBackgroundClass);
 
             setTimeout(() => {
-                ref!.className = ref!.className.replace(new RegExp(String.raw`\s?${fadeBackgroundClass}\s?`), '');
+                removeClass(ref, fadeBackgroundClass);
             }, 300);
         }
     };

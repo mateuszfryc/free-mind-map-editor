@@ -16,8 +16,7 @@ export const GlobalStyles = createGlobalStyle`
     time, mark, audio, video, button {
         background-color: transparent;
         border: 0;
-        font-size: 100%;
-        font: inherit;
+        font: inherit inherit inherit 100% inherit;
         margin: 0;
         padding: 0;
         vertical-align: baseline;

@@ -6,9 +6,11 @@
 -   [ ] load mind map by url data
 -   [ ] general purpose modal
 -   [ ] splash screen welcome modal
--   [ ] how to modal/page/view that explains how to create & manage mind map
--   [ ] zoom in/out buttons, touch gesture and UI buttons (next to mini map)
+-   [ ] zoom in/out
+    -   [ ] funcionality (zomm in/out text, nodes and connectors)
+    -   [ ] buttons, touch gesture and UI buttons (next to mini map)
 -   [ ] design & implement logo
+    -   [ ] favicon
 -   [ ] persist current mind map in cokies
 -   [ ] mouse controlls
     -   [ ] open thought menu on right click
@@ -21,9 +23,9 @@
     -   [ ] drag on touch & hold
     -   [ ] open thought menu on longer thouch hold
 -   [ ] burger responsive menu:
-    -   [ ] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
-    -   [ ] save to desktop as JSON
-    -   [ ] load from desktop as JSON
+    -   [x] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
+    -   [x] save to desktop as JSON
+    -   [x] load from desktop as JSON
     -   [ ] generate link with mindmap data
     -   [ ] save as jpg/png
     -   [ ] save as PDF
@@ -47,7 +49,7 @@
     -   [x] SHIFT + TAB to select parent
     -   [x] DELETE to remove thought
 -   [x] configure: eslint, prettier, ts
--   [x] thought react component: base style, highlight style, selected style
+-   [x] single thought react component: base style, highlight style, selected style
 -   [x] edit existing thoughts by dbl click
 -   [x] resize textarea along with changes to thought content dynamically
 -   [x] save & restore child thoughts relative position

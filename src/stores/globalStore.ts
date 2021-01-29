@@ -107,7 +107,9 @@ export class GlobalStore {
     createChildThought(thought: Thought): void {
         this.stopEditing();
         const targetPosition: Vector = thought.position;
-        targetPosition.x += thought.getOuterWidth() * 0.5 + this.initialThoughtWidth * 0.5 + this.defaultSpawnGap.x;
+        const sideMod = thought.hasParent() && !thought.isParentOnLeft() ? -1 : 1;
+        targetPosition.x +=
+            (thought.getOuterWidth() * 0.5 + this.initialThoughtWidth * 0.5 + this.defaultSpawnGap.x) * sideMod;
         const newChild: Thought = this.addThought(targetPosition, false, thought);
         thought.children.push(newChild);
         this.setSelection(newChild);

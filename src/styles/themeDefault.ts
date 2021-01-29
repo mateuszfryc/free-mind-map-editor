@@ -1,4 +1,4 @@
-import { setColorGetter } from 'utils/styles';
+import { setBoxShadow, setColorGetter } from 'utils/styles';
 import { ObjectOfNumbers, ObjectOfStrings } from 'types/baseTypes';
 import { css, FlattenSimpleInterpolation } from 'styled-components';
 
@@ -70,6 +70,7 @@ export const chessboardBackground = (
 };
 
 export const theme = {
+    setBoxShadow,
     chessboardBackground,
     colors,
     connectorsWidth: 3,

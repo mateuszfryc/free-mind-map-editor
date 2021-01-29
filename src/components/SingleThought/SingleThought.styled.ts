@@ -20,9 +20,9 @@ export const Thought = styled.div<ThoughtStyleType>(
         overflow: visible;
         padding: 7px 12px;
         position: absolute;
+        user-select: none;
         white-space: pre-wrap;
         z-index: ${zIndex};
-        user-select: none;
 
         & .underline {
             border-color: ${colors.primary()};
@@ -32,7 +32,11 @@ export const Thought = styled.div<ThoughtStyleType>(
             left: 0;
             height: 12px;
             position: absolute;
-            transition: border-color 0.2s ease, border-radius 0.2s ease, border-width 0.2s ease, bottom 0.2s ease,
+            transition:
+                border-color 0.2s ease,
+                border-radius 0.2s ease,
+                border-width 0.2s ease,
+                bottom 0.2s ease,
                 margin 0.2s ease, padding 0.2s ease;
             width: 100%;
             z-index: -1;
@@ -49,8 +53,7 @@ export const Thought = styled.div<ThoughtStyleType>(
             bottom: -6px;
         }
 
-        ${isSelected &&
-        css`
+        ${isSelected && css`
             & .underline {
                 border-radius: 12px;
                 padding-bottom: 4px;
@@ -58,8 +61,7 @@ export const Thought = styled.div<ThoughtStyleType>(
                 border-width: 0 0 5px 0;
             }
         `}
-        ${isEdited &&
-        css`
+        ${isEdited && css`
             visibility: hidden;
         `}
     `
