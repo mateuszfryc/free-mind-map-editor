@@ -7,7 +7,7 @@ Simple tool do draw mind maps. It's not perfect but I've created it for my self 
 -   React 17+
 -   TypeScript 4+
 -   Styled-Components 5+
--   app state: mobx 6+
+-   MobX 6+
 
 ### Linters
 
