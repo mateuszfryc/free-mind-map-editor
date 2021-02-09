@@ -1,4 +1,4 @@
-# MindMapper
+# Free Mind Map Editor
 
 Simple tool do draw mind maps. Detailed "How To" describing how to use it: [LINK](https://mindmapeditor.dysonspheregames.com/#howto).
 
