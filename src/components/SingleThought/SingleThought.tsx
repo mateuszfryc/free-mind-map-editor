@@ -94,7 +94,6 @@ export const SingleThought: React.FC<ThoughtProps> = observer(({ thought }) => {
     };
 
     const onMouseLeave = (): void => {
-        console.log('why');
         if (!store.pointer.isLeftButtonDown) {
             store.clearHighlight();
         }
