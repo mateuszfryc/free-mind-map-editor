@@ -1,10 +1,10 @@
-import React, { ChangeEvent, useCallback, useContext, useState, useRef } from 'react';
 import { observer } from 'mobx-react';
+import React, { ChangeEvent, useCallback, useContext, useRef, useState } from 'react';
 
-import storeContext from 'stores/globalStore';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
-import { SavedStateType } from 'types/baseTypes';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
+import storeContext from 'stores/globalStore';
+import { SavedStateType } from 'types/baseTypes';
 import * as Styled from './Navigation.styled';
 
 export const Navigation: React.FC = observer(() => {
@@ -13,14 +13,10 @@ export const Navigation: React.FC = observer(() => {
     const stickyMenuRef = useRef(null);
 
     const toggleMobileMenu = useCallback(() => {
-        setIsMenuOpen(!isMenuOpen);
-    }, [isMenuOpen]);
+        setIsMenuOpen((current) => !current);
+    }, []);
 
-    const handleCloseMenu = () => {
-        if (isMenuOpen) {
-            setIsMenuOpen(false);
-        }
-    };
+    const handleCloseMenu = useCallback(() => setIsMenuOpen(false), []);
 
     useOnClickOutside(stickyMenuRef, handleCloseMenu);
 
@@ -42,12 +38,12 @@ export const Navigation: React.FC = observer(() => {
     };
 
     return (
-        <Styled.Navigation>
+        <Styled.Navigation ref={stickyMenuRef}>
             <Styled.MenuButton type='button' onClick={toggleMobileMenu}>
                 <Styled.BurgerIcon isActive={isMenuOpen} />
             </Styled.MenuButton>
 
-            <Styled.LinksContainer isOpen={isMenuOpen} ref={stickyMenuRef}>
+            <Styled.LinksContainer isOpen={isMenuOpen}>
                 <Styled.Link onClick={handleCloseMenu} href='#mindmap'>
                     Editor
                 </Styled.Link>
