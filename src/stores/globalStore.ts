@@ -1,13 +1,13 @@
+import { action, makeObservable, observable } from 'mobx';
 import { createContext } from 'react';
-import { makeObservable, observable, action } from 'mobx';
 import { requestAnimationFrame } from 'request-animation-frame-polyfill';
 
+import { Pointer } from 'classes/Pointer';
 import { Thought } from 'classes/Thought';
 import { ViewController } from 'classes/ViewController';
-import { Pointer } from 'classes/Pointer';
-import { Vector, Miniature, THOUGHT_STATE, SavedStateType, SavedThoughtStateType } from 'types/baseTypes';
-import { get, getWindowInnerSize, getTwoPointsDistance } from 'utils/get';
 import { theme } from 'styles/themeDefault';
+import { Miniature, SavedStateType, SavedThoughtStateType, THOUGHT_STATE, Vector } from 'types/baseTypes';
+import { get, getTwoPointsDistance, getWindowInnerSize } from 'utils/get';
 
 type OverlapResult = {
     other: Thought;
@@ -307,11 +307,8 @@ export class GlobalStore {
     updateDocumentSize(): void {
         if (this.view) {
             const { x, y } = getWindowInnerSize();
-            const body = document.body as HTMLElement;
-            const mindmap = get<HTMLElement>('#mindmap')!;
-            const root = get<HTMLElement>('#root')!;
-            const canvas = this.view.canvas as HTMLElement;
-            const elements: HTMLElement[] = [body, mindmap, root, canvas];
+            const { canvas } = this.view;
+            const elements: HTMLElement[] = [canvas];
             elements.forEach((element: HTMLElement) => {
                 element.setAttribute('width', `${x}`);
                 element.setAttribute('height', `${y}`);
