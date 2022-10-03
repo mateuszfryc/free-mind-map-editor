@@ -49,7 +49,9 @@ export const SectionContainer = styled(Flex)(
         color: ${colors.secondary()};
         justify-content: space-between;
         padding: 100px;
-        width: calc(100vw - 220px);
+        height: 100%;
+        overflow: scroll;
+        width: calc(100% - 200px);
     `
 );
 
@@ -86,18 +88,17 @@ export const SingleAction = styled(Flex)(
         padding: 30px;
         position: relative;
         transition: background-color 1s ease;
-        width: 100%;
 
         &:not(:last-child) {
             border-bottom: 1px solid ${colors.shade()};
         }
 
-        
+
         &.fading-highlight {
             transition: none;
             background-color: ${colors.contrast(0.4)};
         }
-    `  
+    `
 );
 
 export const Link = styled.a(
@@ -116,7 +117,7 @@ export const Link = styled.a(
         &:not(:last-child) {
             margin-bottom: 5px;
         }
-    `    
+    `
 );
 
 export const Title = styled(({ as, children, ...props }) => (
