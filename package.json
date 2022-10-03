@@ -9,7 +9,7 @@
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
         "react-is": "^17.0.1",
-        "react-router-dom": "^5.2.0",
+        "react-router-dom": "^6.4.1",
         "request-animation-frame-polyfill": "^1.0.2",
         "styled-components": "^5.1.1"
     },

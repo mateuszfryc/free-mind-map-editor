@@ -1,10 +1,10 @@
-import React, { ChangeEvent, useCallback, useContext, useState, useRef } from 'react';
 import { observer } from 'mobx-react';
+import React, { ChangeEvent, useCallback, useContext, useRef, useState } from 'react';
 
-import storeContext from 'stores/globalStore';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
-import { SavedStateType } from 'types/baseTypes';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
+import storeContext from 'stores/globalStore';
+import { SavedStateType } from 'types/baseTypes';
 import * as Styled from './Navigation.styled';
 
 export const Navigation: React.FC = observer(() => {
@@ -48,19 +48,25 @@ export const Navigation: React.FC = observer(() => {
             </Styled.MenuButton>
 
             <Styled.LinksContainer isOpen={isMenuOpen}>
-                <Styled.Link onClick={closeMenu} href='#mindmap'>
+                <Styled.Link onClick={closeMenu} to='/'>
                     Editor
                 </Styled.Link>
 
-                <Styled.Link subLink onClick={closeMenu} download='MindMap.json' href={`data: ${store.savedMindMap}`}>
+                <Styled.Link
+                    as='a'
+                    subLink
+                    onClick={closeMenu}
+                    download='MindMap.json'
+                    href={`data: ${store.savedMindMap}`}
+                >
                     Save
                 </Styled.Link>
 
-                <Styled.Link subLink onClick={closeMenu} padding='0'>
+                <Styled.Link as='a' subLink onClick={closeMenu} padding='0'>
                     <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
                 </Styled.Link>
 
-                <Styled.Link onClick={closeMenu} href='#howto' margin='20px 0 0'>
+                <Styled.Link onClick={closeMenu} to='help' margin='20px 0 0'>
                     How To
                 </Styled.Link>
             </Styled.LinksContainer>

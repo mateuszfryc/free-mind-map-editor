@@ -309,8 +309,9 @@ export class GlobalStore {
             const { x, y } = getWindowInnerSize();
             const body = document.body as HTMLElement;
             const mindmap = get<HTMLElement>('#mindmap')!;
+            const root = get<HTMLElement>('#root')!;
             const canvas = this.view.canvas as HTMLElement;
-            const elements: HTMLElement[] = [body, mindmap, canvas];
+            const elements: HTMLElement[] = [body, mindmap, root, canvas];
             elements.forEach((element: HTMLElement) => {
                 element.setAttribute('width', `${x}`);
                 element.setAttribute('height', `${y}`);
