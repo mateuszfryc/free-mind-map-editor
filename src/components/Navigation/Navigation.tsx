@@ -16,9 +16,9 @@ export const Navigation: React.FC = observer(() => {
         setIsMenuOpen((current) => !current);
     }, []);
 
-    const handleCloseMenu = useCallback(() => setIsMenuOpen(false), []);
+    const closeMenu = useCallback(() => setIsMenuOpen(false), []);
 
-    useOnClickOutside(stickyMenuRef, handleCloseMenu);
+    useOnClickOutside(stickyMenuRef, closeMenu);
 
     const uploadSavedMindMap = (event: ChangeEvent): void => {
         const target = event.target as HTMLInputElement;
@@ -44,24 +44,23 @@ export const Navigation: React.FC = observer(() => {
             </Styled.MenuButton>
 
             <Styled.LinksContainer isOpen={isMenuOpen}>
-                <Styled.Link onClick={handleCloseMenu} href='#mindmap'>
+                <Styled.Link onClick={closeMenu} href='#mindmap'>
                     Editor
                 </Styled.Link>
 
-                <Styled.Link
-                    subLink
-                    onClick={handleCloseMenu}
-                    download='MindMap.json'
-                    href={`data: ${store.savedMindMap}`}
-                >
+                <Styled.Link subLink onClick={closeMenu}>
+                    New
+                </Styled.Link>
+
+                <Styled.Link subLink onClick={closeMenu} download='MindMap.json' href={`data: ${store.savedMindMap}`}>
                     Save
                 </Styled.Link>
 
-                <Styled.Link subLink onClick={handleCloseMenu} padding='0'>
+                <Styled.Link subLink onClick={closeMenu} padding='0'>
                     <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
                 </Styled.Link>
 
-                <Styled.Link onClick={handleCloseMenu} href='#howto' margin='20px 0 0'>
+                <Styled.Link onClick={closeMenu} href='#howto' margin='20px 0 0'>
                     How To
                 </Styled.Link>
             </Styled.LinksContainer>

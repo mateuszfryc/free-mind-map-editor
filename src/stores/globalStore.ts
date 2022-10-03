@@ -8,6 +8,7 @@ import { Pointer } from 'classes/Pointer';
 import { Vector, Miniature, THOUGHT_STATE, SavedStateType, SavedThoughtStateType } from 'types/baseTypes';
 import { get, getWindowInnerSize, getTwoPointsDistance } from 'utils/get';
 import { theme } from 'styles/themeDefault';
+import console from 'console';
 
 type OverlapResult = {
     other: Thought;
@@ -61,6 +62,7 @@ export class GlobalStore {
     }
 
     initializeOnce(): void {
+        console.log('shit');
         if (!this.isInitialized) {
             window.addEventListener('load', () => {
                 const canvas = get<HTMLCanvasElement>('canvas');
@@ -307,10 +309,11 @@ export class GlobalStore {
     updateDocumentSize(): void {
         if (this.view) {
             const { x, y } = getWindowInnerSize();
-            const body = document.body as HTMLElement;
-            const mindmap = get<HTMLElement>('#mindmap')!;
-            const canvas = this.view.canvas as HTMLElement;
-            const elements: HTMLElement[] = [body, mindmap, canvas];
+            const { body } = document;
+            const mindmap = get<HTMLDivElement>('#mindmap')!;
+            const root = get<HTMLDivElement>('#root')!;
+            const canvas = this.view.canvas as HTMLCanvasElement;
+            const elements: HTMLElement[] = [body, mindmap, canvas, root];
             elements.forEach((element: HTMLElement) => {
                 element.setAttribute('width', `${x}`);
                 element.setAttribute('height', `${y}`);
