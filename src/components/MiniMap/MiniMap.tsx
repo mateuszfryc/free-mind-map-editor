@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
 import { observer } from 'mobx-react';
+import React, { useEffect, useRef } from 'react';
 
 import { GlobalStore } from 'stores/globalStore';
 import { getSafeRef } from 'utils/get';
@@ -20,7 +20,7 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
         if (store.pointer.isLeftButtonDown && target && miniMapRef && safeRefView) {
             if (store.view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
                 const { x, y } = store.pointer.getCurrentToLastPositionDiff();
-                store.view.draggMinimapViewport(x, y);
+                store.view.dragMinimapViewport(x, y);
             }
         }
     };
@@ -31,7 +31,7 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
         const safeRefView = getSafeRef(viewportRef);
         if (target && miniMapRef && safeRefView) {
             if (store.view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
-                store.view.setMiniMapViepowrtToPointerPosition(store.pointer.position);
+                store.view.setMiniMapViewportToPointerPosition(store.pointer.position);
             }
         }
     };

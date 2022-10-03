@@ -1,7 +1,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
-import { THOUGHT_STATE, ObjectOfVectors, Vector, childPositionData } from 'types/baseTypes';
-import { getParsedStyle } from 'utils/get';
+import { childPositionData, ObjectOfVectors, THOUGHT_STATE, Vector } from 'types/baseTypes';
+import { getParsedStyle, getWindowInnerSize } from 'utils/get';
 
 const defaultTextTemplate = "What's on your mind?";
 
@@ -411,5 +411,55 @@ export class Thought {
     setPointerPositionDiff(x: number, y: number): void {
         this.diffX = this.x - x;
         this.diffY = this.y - y;
+    }
+
+    isFullyWithinViewport(): boolean {
+        const element = this.getElement();
+
+        if (!element) {
+            window.console.log('nope');
+
+            return false;
+        }
+
+        const { x, y } = element.getBoundingClientRect();
+        const size = getWindowInnerSize();
+
+        return x >= 0 && y >= 0 && x < size.x - element.clientWidth && y < size.y - element.clientHeight;
+    }
+
+    /*
+        Return offset of the given thought in relation to viewport.
+        If position is outside of left or top the axis value will be below 0.
+        If position is outside of right or bottom it will be higher than zero.
+        If thought element is fully inside viewport axis value will be 0.
+    */
+    getViewportOffset(): Vector {
+        const element = this.getElement();
+
+        if (!element) {
+            window.console.log('nope');
+
+            return { x: 0, y: 0 };
+        }
+
+        const position = element.getBoundingClientRect();
+        const size = getWindowInnerSize();
+        const right = size.x - element.clientWidth;
+        const bottom = size.y - element.clientHeight;
+
+        let x = 0;
+        let y = 0;
+
+        if (position.x < 0) x = position.x;
+        else if (position.x > right) x = position.x - right;
+
+        if (position.y < 0) y = position.y;
+        else if (position.y > bottom) y = position.y - bottom;
+
+        return {
+            x,
+            y,
+        };
     }
 }

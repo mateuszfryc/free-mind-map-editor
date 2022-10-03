@@ -78,17 +78,32 @@ export function onPressKeyHandler(event: KeyboardEvent, store: GlobalStore): voi
             if (KEYS[TAB].isPressed && hasParent) {
                 store.setSelection(selection.parent!);
             }
-        } else if (KEYS_BINDINGS.addChild.isPressed) {
+
+            return;
+        }
+        if (KEYS_BINDINGS.addChild.isPressed) {
             store.createChildThought(selection);
-        } else if (KEYS_BINDINGS.addSibling.isPressed && hasParent) {
+
+            return;
+        }
+        if (KEYS_BINDINGS.addSibling.isPressed && hasParent) {
             store.createSiblingThought(selection);
-        } else if (selection.isEdited()) {
+
+            return;
+        }
+        if (selection.isEdited()) {
             if (KEYS_BINDINGS.exitEditState.isPressed) {
                 store.stopEditing();
             }
-        } else if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
+
+            return;
+        }
+        if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
             store.removeThought(selection);
-        } else if (KEYS_BINDINGS.edit.isPressed) {
+
+            return;
+        }
+        if (KEYS_BINDINGS.edit.isPressed) {
             store.editSelection();
         }
     }

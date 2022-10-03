@@ -66,8 +66,8 @@ export class GlobalStore {
                 const canvas = get<HTMLCanvasElement>('canvas');
                 if (canvas) {
                     this.view = new ViewController(canvas);
-                    this.updateDocumentSize();
-                    window.addEventListener('resize', this.updateDocumentSize);
+                    this.updateWorkspaceSize();
+                    window.addEventListener('resize', this.updateWorkspaceSize);
                     this.view.setThoughtsContainerPosition();
                     this.view.centerMindMap();
                     this.rootThought.setPositionAsync(this.view.getMapCenterCoordinates());
@@ -104,6 +104,15 @@ export class GlobalStore {
         return thought;
     }
 
+    postNewThoughActions(newSibling: Thought): void {
+        if (!newSibling.isFullyWithinViewport()) {
+            const offset = newSibling.getViewportOffset();
+            this.view?.setMapPosition(-offset.x + Math.sign(-offset.x) * 20, -offset.y + Math.sign(-offset.y) * 20);
+        }
+        this.editSelection();
+        this.saveCurrentMindMapAsJSON();
+    }
+
     createChildThought(thought: Thought): void {
         this.stopEditing();
         const targetPosition: Vector = thought.position;
@@ -117,9 +126,10 @@ export class GlobalStore {
         this.editSelection();
         newChild.refreshPosition();
         thought.saveChildrenRelativePosition();
+        const postActions = this.postNewThoughActions.bind(this);
         setTimeout(() => {
-            this.saveCurrentMindMapAsJSON();
-        }, 200);
+            postActions(newChild);
+        }, 100);
     }
 
     createSiblingThought(thought: Thought): void {
@@ -132,12 +142,12 @@ export class GlobalStore {
         if (this.selection) this.removeIfEmpty(this.selection);
         this.setSelection(newSibling);
         this.resolveOverlaps(newSibling);
-        this.editSelection();
         newSibling.refreshPosition();
         if (thought.parent) thought.parent.saveChildrenRelativePosition();
+        const postActions = this.postNewThoughActions.bind(this);
         setTimeout(() => {
-            this.saveCurrentMindMapAsJSON();
-        }, 200);
+            postActions(newSibling);
+        }, 100);
     }
 
     setHighlight(thought: Thought): void {
@@ -304,16 +314,12 @@ export class GlobalStore {
         thought.clearClosestOverlap();
     }
 
-    updateDocumentSize(): void {
+    updateWorkspaceSize(): void {
         if (this.view) {
             const { x, y } = getWindowInnerSize();
             const { canvas } = this.view;
-            const elements: HTMLElement[] = [canvas];
-            elements.forEach((element: HTMLElement) => {
-                element.setAttribute('width', `${x}`);
-                element.setAttribute('height', `${y}`);
-                element.setAttribute('style', `width: ${x}px; height: ${y}px`);
-            });
+            canvas.setAttribute('width', `${x}`);
+            canvas.setAttribute('height', `${y}`);
             this.view.setMiniMapViewportProportionalSize();
         }
     }

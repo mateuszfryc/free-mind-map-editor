@@ -1,7 +1,7 @@
-import { Vector, Miniature } from 'types/baseTypes';
-import { get, getWindowInnerSize, getParsedStyle } from 'utils/get';
-import { clamp } from 'utils/math';
 import { colors } from 'styles/themeDefault';
+import { Miniature, Vector } from 'types/baseTypes';
+import { get, getParsedStyle, getWindowInnerSize } from 'utils/get';
+import { clamp } from 'utils/math';
 
 export class ViewController {
     canvas: HTMLCanvasElement;
@@ -50,21 +50,21 @@ export class ViewController {
         this.miniMapViewport.style.height = `${(size.y * minimapHeight) / thoughtsHeight}px`;
     }
 
-    setMiniMapViepowrtPosition(x = 0, y = 0): void {
+    setMiniMapViewportPosition(x = 0, y = 0): void {
         this.miniMapViewport.style.left = `${x}px`;
         this.miniMapViewport.style.top = `${y}px`;
     }
 
-    addMiniMapViepowrtPosition(x = 0, y = 0): void {
+    addMiniMapViewportPosition(x = 0, y = 0): void {
         const mapSize = getParsedStyle(this.miniMap, 'width', 'height');
         const { left, top, width, height } = getParsedStyle(this.miniMapViewport, 'left', 'top', 'width', 'height');
-        this.setMiniMapViepowrtPosition(
+        this.setMiniMapViewportPosition(
             clamp(x + left, 0, mapSize.width - width),
             clamp(y + top, 0, mapSize.height - height)
         );
     }
 
-    setMiniMapViepowrtToPointerPosition(pointerPosition: Vector): void {
+    setMiniMapViewportToPointerPosition(pointerPosition: Vector): void {
         const mapStyle = getParsedStyle(this.miniMap, 'width', 'height', 'right', 'bottom');
         const viewportStyle = getParsedStyle(this.miniMapViewport, 'left', 'top', 'width', 'height');
         const size = getWindowInnerSize();
@@ -72,7 +72,7 @@ export class ViewController {
             pointerPosition.x - (size.x - mapStyle.right - mapStyle.width) - viewportStyle.width * 0.5;
         const pointerInMapY =
             pointerPosition.y - (size.y - mapStyle.bottom - mapStyle.height) - viewportStyle.height * 0.5;
-        this.setMiniMapViepowrtPosition(
+        this.setMiniMapViewportPosition(
             clamp(pointerInMapX, 0, mapStyle.width - viewportStyle.width),
             clamp(pointerInMapY, 0, mapStyle.height - viewportStyle.height)
         );
@@ -109,11 +109,11 @@ export class ViewController {
         const yMap = y + top;
         this.setThoughtsContainerPosition(xMap, yMap);
         const positionScaled = this.translateCoordinatesToSpace(-xMap, -yMap, 'mini');
-        this.setMiniMapViepowrtPosition(positionScaled.x, positionScaled.y);
+        this.setMiniMapViewportPosition(positionScaled.x, positionScaled.y);
     }
 
-    draggMinimapViewport(x = 0, y = 0): void {
-        this.addMiniMapViepowrtPosition(x, y);
+    dragMinimapViewport(x = 0, y = 0): void {
+        this.addMiniMapViewportPosition(x, y);
         // reflect move of the viewport on the full sized mind map
         const positionScaled = this.translateCoordinatesToSpace(x, y, 'full');
         const containerPosition = this.getThoughtsContainerPosition();
@@ -136,12 +136,17 @@ export class ViewController {
         let xScale = 1;
         let yScale = 1;
 
-        if (spaceName === 'full') {
-            xScale = containerSize.x / mapSize.width;
-            yScale = containerSize.y / mapSize.height;
-        } else if (spaceName === 'mini') {
-            xScale = mapSize.width / containerSize.y;
-            yScale = mapSize.height / containerSize.x;
+        switch (spaceName) {
+            case 'full':
+                xScale = containerSize.x / mapSize.width;
+                yScale = containerSize.y / mapSize.height;
+                break;
+            case 'mini':
+                xScale = mapSize.width / containerSize.y;
+                yScale = mapSize.height / containerSize.x;
+                break;
+            default:
+                break;
         }
 
         return { x: xScale, y: yScale };
@@ -177,8 +182,8 @@ export class ViewController {
     drawBezierCurve(
         start: Vector,
         end: Vector,
-        controllPointA: Vector,
-        controllPointB: Vector,
+        controlPointA: Vector,
+        controlPointB: Vector,
         lineWidth = 3,
         color = colors.defaultBezerCurve()
     ): void {
@@ -188,10 +193,10 @@ export class ViewController {
         context.beginPath();
         context.moveTo(start.x, start.y);
         context.bezierCurveTo(
-            start.x + controllPointA.x,
-            start.y + controllPointA.y,
-            end.x + controllPointB.x,
-            end.y + controllPointB.y,
+            start.x + controlPointA.x,
+            start.y + controlPointA.y,
+            end.x + controlPointB.x,
+            end.y + controlPointB.y,
             end.x,
             end.y
         );
