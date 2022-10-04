@@ -1,5 +1,5 @@
-import { GlobalStore } from 'stores/globalStore';
 import { THOUGHT_STATE } from 'types/baseTypes';
+import { useStore } from './stores/store';
 
 class KeyData {
     code: number;
@@ -51,7 +51,8 @@ const KEYS_BINDINGS: bindingsInterface = {
     exitEditState: KEYS[ESCAPE],
 };
 
-export function onPressKeyHandler(event: KeyboardEvent, store: GlobalStore): void {
+export function onPressKeyHandler(event: KeyboardEvent): void {
+    const store = useStore.getState();
     const { selection } = store;
     const { key, keyCode, shiftKey } = event;
 
@@ -64,7 +65,7 @@ export function onPressKeyHandler(event: KeyboardEvent, store: GlobalStore): voi
     }
 
     KEYS[SHIFT].isPressed = shiftKey;
-    store.setIsGroupDraggOn(!KEYS[SHIFT].isPressed);
+    store.setIsGroupDragOn(!KEYS[SHIFT].isPressed);
 
     if ((KEYS[ENTER].isPressed && selection !== undefined) || KEYS[TAB].isPressed) {
         event.preventDefault();
@@ -109,7 +110,7 @@ export function onPressKeyHandler(event: KeyboardEvent, store: GlobalStore): voi
     }
 }
 
-export function onReleaseKeyHandler(event: KeyboardEvent, store: GlobalStore): void {
+export function onReleaseKeyHandler(event: KeyboardEvent): void {
     const { key, keyCode, shiftKey } = event;
 
     if (key) {
@@ -121,14 +122,16 @@ export function onReleaseKeyHandler(event: KeyboardEvent, store: GlobalStore): v
     }
 
     KEYS[SHIFT].isPressed = shiftKey;
-    store.setIsGroupDraggOn(!KEYS[SHIFT].isPressed);
+    useStore.getState().setIsGroupDragOn(!KEYS[SHIFT].isPressed);
 }
 
-export function onMouseDownHandler(event: MouseEvent, store: GlobalStore): void {
+export function onMouseDownHandler(event: MouseEvent): void {
+    const store = useStore.getState();
     const { pointer, highlight, selection } = store;
     const target = event.target as HTMLElement;
     pointer.setDraggedId(target.id);
     const id = parseInt(target.id, 10);
+
     pointer.setIsLeftButtonDown(true);
     pointer.setWasShiftPressedOnDown(KEYS[SHIFT].isPressed);
 
@@ -136,9 +139,10 @@ export function onMouseDownHandler(event: MouseEvent, store: GlobalStore): void 
         highlight.saveChildrenRelativePosition();
         highlight.setPointerPositionDiff(pointer.position.x, pointer.position.y);
 
-        if (highlight.isIdle() || (selection && selection.id !== highlight.id)) {
-            store.setSelection(highlight);
-        }
+        // if (highlight.isIdle() || (selection && selection.id !== highlight.id)) {
+        //     store.setSelection(highlight);
+        //     window.console.log('onMouseDownHandler', highlight.id);
+        // }
 
         highlight
             .getChildren(true)
@@ -148,7 +152,8 @@ export function onMouseDownHandler(event: MouseEvent, store: GlobalStore): void 
     }
 }
 
-export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
+export function onMouseUpHandler(): void {
+    const store = useStore.getState();
     const { pointer, highlight, selection } = store;
     pointer.setIsLeftButtonDown(false);
 
@@ -172,10 +177,10 @@ export function onMouseUpHandler(event: MouseEvent, store: GlobalStore): void {
     }, 100);
 }
 
-export function onMouseMoveHandler(event: MouseEvent, store: GlobalStore): void {
-    const { pointer } = store;
-    pointer.lastPosition.x = pointer.position.x;
-    pointer.lastPosition.y = pointer.position.y;
-    pointer.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-    pointer.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-}
+// export function onMouseMoveHandler(event: MouseEvent): void {
+//     const { pointer } = useStore.getState();
+//     pointer.lastPosition.x = pointer.position.x;
+//     pointer.lastPosition.y = pointer.position.y;
+//     pointer.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+//     pointer.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+// }

@@ -1,24 +1,24 @@
-import React, { FC, useEffect, useRef, ReactNode } from 'react';
-import { observer } from 'mobx-react';
+import React, { FC, ReactNode, useEffect, useRef } from 'react';
+import { useStore, pointerSelector, viewSelector } from '../../stores/store';
 
-import { GlobalStore } from 'stores/globalStore';
 import * as Styled from './ThoughtsContainer.styled';
 
 type ThoughtsContainerProps = {
     children: ReactNode;
-    store: GlobalStore;
 };
 
-export const ThoughtsContainer: FC<ThoughtsContainerProps> = observer(({ store, children }) => {
+export const ThoughtsContainer: FC<ThoughtsContainerProps> = ({ children }) => {
+    const pointer = useStore(pointerSelector);
+    const view = useStore(viewSelector);
     const ref = useRef(null);
 
     const onMouseMove = (): void => {
-        if (store.pointer.isLeftButtonDown) {
+        if (pointer.isLeftButtonDown) {
             if (ref && ref.current) {
                 const safeRef = ref.current! as HTMLElement;
-                if (store.view && ref.current && safeRef.id === store.pointer.draggedItemId) {
-                    const { x, y } = store.pointer.getCurrentToLastPositionDiff();
-                    store.view.setMapPosition(x, y);
+                if (view && ref.current && safeRef.id === pointer.draggedItemId) {
+                    const { x, y } = pointer.getCurrentToLastPositionDiff();
+                    view.setMapPosition(x, y);
                 }
             }
         }
@@ -37,4 +37,4 @@ export const ThoughtsContainer: FC<ThoughtsContainerProps> = observer(({ store, 
             {children}
         </Styled.ThoughtsContainer>
     );
-});
+};

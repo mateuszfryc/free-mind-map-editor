@@ -1,6 +1,6 @@
-import { setBoxShadow, setColorGetter } from 'utils/styles';
-import { ObjectOfNumbers, ObjectOfStrings } from 'types/baseTypes';
 import { css, FlattenSimpleInterpolation } from 'styled-components';
+import { ObjectOfNumbers, ObjectOfStrings } from 'types/baseTypes';
+import { setBoxShadow, setColorGetter } from 'utils/styles';
 
 export const breakpoints: ObjectOfStrings = {
     phone: '576',
@@ -31,7 +31,7 @@ export const colors = {
     connectors: setColorGetter(dominantColor),
     baseMiniMap: setColorGetter(dominantColor, 0.6),
     miniMapMiniature: setColorGetter(dominantColor),
-    mianitureConnector: setColorGetter(red, 0.5),
+    miniatureConnector: setColorGetter(red, 0.5),
 
     defaultBezerCurve: setColorGetter(dominantColor),
     defaultIcon: setColorGetter(dominantColor),

@@ -1,14 +1,15 @@
-import { observer } from 'mobx-react';
-import React, { ChangeEvent, useCallback, useContext, useRef, useState } from 'react';
+import React, { ChangeEvent, useCallback, useRef, useState } from 'react';
 
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
-import storeContext from 'stores/globalStore';
 import { SavedStateType } from 'types/baseTypes';
 import * as Styled from './Navigation.styled';
+import { useStore, savedMindMapSelector, setDrawLockSelector, loadUploadedMindMapSelector } from '../../stores/store';
 
-export const Navigation: React.FC = observer(() => {
-    const store = useContext(storeContext);
+export const Navigation: React.FC = () => {
+    const savedMindMap = useStore(savedMindMapSelector);
+    const setDrawLock = useStore(setDrawLockSelector);
+    const loadUploadedMindMap = useStore(loadUploadedMindMapSelector);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const stickyMenuRef = useRef(null);
 
@@ -32,8 +33,8 @@ export const Navigation: React.FC = observer(() => {
                 const payload = reader.result as string;
                 if (payload && typeof payload === 'string') {
                     const result: SavedStateType = JSON.parse(payload);
-                    store.isDrawingLocked = true;
-                    store.loadUploadedMindMap(result);
+                    setDrawLock(true);
+                    loadUploadedMindMap(result);
                 }
             });
 
@@ -52,13 +53,7 @@ export const Navigation: React.FC = observer(() => {
                     Editor
                 </Styled.Link>
 
-                <Styled.Link
-                    as='a'
-                    subLink
-                    onClick={closeMenu}
-                    download='MindMap.json'
-                    href={`data: ${store.savedMindMap}`}
-                >
+                <Styled.Link as='a' subLink onClick={closeMenu} download='MindMap.json' href={`data: ${savedMindMap}`}>
                     Save
                 </Styled.Link>
 
@@ -72,4 +67,4 @@ export const Navigation: React.FC = observer(() => {
             </Styled.LinksContainer>
         </Styled.Navigation>
     );
-});
+};

@@ -1,32 +1,41 @@
-import React, { ChangeEvent, useContext, useEffect, useRef } from 'react';
-import { observer } from 'mobx-react';
+import React, { ChangeEvent, useCallback, useEffect, useRef } from 'react';
 
-import storeContext from 'stores/globalStore';
 import { Thought } from 'classes/Thought';
-import { THOUGHT_STATE, childPositionData } from 'types/baseTypes';
 import { getSafeRef } from 'utils/get';
 import * as Styled from './SingleThought.styled';
+import {
+    useStore,
+    pointerSelector,
+    useSelection,
+    updateSelectionContentSelector,
+    setHighlightSelector,
+    clearHighlightSelector,
+    initialThoughtWidthSelector,
+} from '../../stores/store';
 
 type ThoughtProps = {
     thought: Thought;
 };
 
-export const SingleThought: React.FC<ThoughtProps> = observer(({ thought }) => {
-    const store = useContext(storeContext);
+export const SingleThought: React.FC<ThoughtProps> = ({ thought }) => {
+    const pointer = useStore(pointerSelector);
+    const [selection, setSelection, editSelection] = useSelection();
+    const updateSelectionContent = useStore(updateSelectionContentSelector);
+    const setHighlight = useStore(setHighlightSelector);
+    const clearHighlight = useStore(clearHighlightSelector);
+    const initialThoughtWidth = useStore(initialThoughtWidthSelector);
+
     const wrapper = useRef(null);
     const contentRef = useRef(null);
     const isSelected = !thought.isIdle();
     const isEdited = thought.isEdited();
-    const startEditing = (): void => {
-        store.editSelection();
-    };
 
     const updateContent = (event: ChangeEvent): void => {
         const textareaSafeRef = getSafeRef(contentRef);
         if (textareaSafeRef) {
             textareaSafeRef.style.overflow = 'hidden';
             const { value } = event.target as HTMLTextAreaElement;
-            store.updateSelectionContent(value);
+            updateSelectionContent(value);
 
             window.setTimeout(() => {
                 textareaSafeRef.style.width = `${thought.getWidth()}px`;
@@ -36,45 +45,6 @@ export const SingleThought: React.FC<ThoughtProps> = observer(({ thought }) => {
             }, 5);
         }
     };
-
-    const onMouseMove = (): void => {
-        const safeRef = getSafeRef(wrapper);
-        const { selection } = store;
-        if (
-            store.pointer.isLeftButtonDown &&
-            store.view &&
-            selection &&
-            safeRef &&
-            safeRef.id === store.pointer.draggedItemId
-        ) {
-            const { x, y } = store.pointer.position;
-            store.findClosestOverlapFor(selection);
-            selection.setState(THOUGHT_STATE.DRAGGED);
-            selection.setOnTop();
-            selection.setPosition({
-                x: x + selection.diffX,
-                y: y + selection.diffY,
-            });
-            if (store.isGroupDraggOn && thought.hasChildren()) {
-                const isParentOnLeft = thought.isParentOnLeft();
-                if (!selection.isRootThought && isParentOnLeft !== selection.prevIsParentOnLeft) {
-                    selection.childrenRelativePosition.forEach((data: childPositionData, index: number): void => {
-                        selection.childrenRelativePosition[index].position.x *= -1; // eslint-disable-line no-param-reassign
-                    });
-                }
-                selection.restoreChildrenRelativePosition();
-                selection.setPrevIsParentOnLeft(isParentOnLeft);
-            }
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener('mousemove', onMouseMove);
-
-        return () => {
-            document.removeEventListener('mousemove', onMouseMove);
-        };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         if (thought.isEdited()) {
@@ -87,35 +57,47 @@ export const SingleThought: React.FC<ThoughtProps> = observer(({ thought }) => {
         }
     }, [thought, thought.state]);
 
-    const onMouseEnter = (): void => {
-        if (!store.pointer.isLeftButtonDown) {
-            store.setHighlight(thought);
+    const onMouseEnter = useCallback((): void => {
+        if (!pointer.isLeftButtonDown) {
+            setHighlight(thought);
         }
-    };
+    }, [pointer.isLeftButtonDown, setHighlight, thought]);
 
-    const onMouseLeave = (): void => {
-        if (!store.pointer.isLeftButtonDown) {
-            store.clearHighlight();
+    const onMouseLeave = useCallback((): void => {
+        if (!pointer.isLeftButtonDown) {
+            clearHighlight();
         }
-    };
+    }, [clearHighlight, pointer.isLeftButtonDown]);
+
+    const onMouseDown = useCallback(() => {
+        if (!selection || selection.id !== thought.id) {
+            setSelection(thought);
+        }
+    }, [selection, setSelection, thought]);
 
     return (
         <Styled.Thought
             id={`${thought.id}`}
             isEdited={isEdited}
             isSelected={isSelected}
-            maxWidth={store.initialThoughtWidth}
-            onDoubleClick={startEditing}
+            maxWidth={initialThoughtWidth}
+            onDoubleClick={editSelection}
             onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onMouseDown={onMouseDown}
             ref={wrapper}
             zIndex={thought.zIndex}
         >
             <div className='underline' id={`${thought.id}`} />
             {thought.content}
             {thought.isEdited() && (
-                <Styled.Textarea onChange={updateContent} ref={contentRef} value={thought.content} />
+                <Styled.Textarea
+                    id={`${thought.id}`}
+                    onChange={updateContent}
+                    ref={contentRef}
+                    value={thought.content}
+                />
             )}
         </Styled.Thought>
     );
-});
+};

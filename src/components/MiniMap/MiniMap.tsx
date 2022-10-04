@@ -1,15 +1,12 @@
-import { observer } from 'mobx-react';
 import React, { useEffect, useRef } from 'react';
 
-import { GlobalStore } from 'stores/globalStore';
 import { getSafeRef } from 'utils/get';
+import { useStore, pointerSelector, viewSelector } from '../../stores/store';
 import * as Styled from './MiniMap.styled';
 
-type MiniMapProps = {
-    store: GlobalStore;
-};
-
-export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
+export const MiniMap: React.FC = () => {
+    const pointer = useStore(pointerSelector);
+    const view = useStore(viewSelector);
     const miniMapRef = useRef(null);
     const viewportRef = useRef(null);
 
@@ -17,10 +14,10 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
         const target = event.target as HTMLElement;
         const safeRefMap = getSafeRef(miniMapRef);
         const safeRefView = getSafeRef(viewportRef);
-        if (store.pointer.isLeftButtonDown && target && miniMapRef && safeRefView) {
-            if (store.view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
-                const { x, y } = store.pointer.getCurrentToLastPositionDiff();
-                store.view.dragMinimapViewport(x, y);
+        if (pointer.isLeftButtonDown && target && miniMapRef && safeRefView) {
+            if (view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
+                const { x, y } = pointer.getCurrentToLastPositionDiff();
+                view.dragMinimapViewport(x, y);
             }
         }
     };
@@ -30,8 +27,8 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
         const safeRefMap = getSafeRef(miniMapRef);
         const safeRefView = getSafeRef(viewportRef);
         if (target && miniMapRef && safeRefView) {
-            if (store.view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
-                store.view.setMiniMapViewportToPointerPosition(store.pointer.position);
+            if (view && (safeRefMap!.id === target.id || safeRefView.id === target.id)) {
+                view.setMiniMapViewportToPointerPosition(pointer.position);
             }
         }
     };
@@ -51,4 +48,4 @@ export const MiniMap: React.FC<MiniMapProps> = observer(({ store }) => {
             <Styled.MiniMapViewport id='mini-map__viewport' ref={viewportRef} />
         </Styled.MiniMap>
     );
-});
+};

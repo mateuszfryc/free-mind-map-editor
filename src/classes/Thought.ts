@@ -1,5 +1,3 @@
-import { action, makeObservable, observable } from 'mobx';
-
 import { childPositionData, ObjectOfVectors, THOUGHT_STATE, Vector } from 'types/baseTypes';
 import { getParsedStyle, getWindowInnerSize } from 'utils/get';
 
@@ -39,21 +37,6 @@ export class Thought {
         isRootThought = false,
         defaultText: string = defaultTextTemplate
     ) {
-        makeObservable(this, {
-            content: observable,
-            children: observable,
-            id: observable,
-            parent: observable,
-            state: observable,
-            zIndex: observable,
-
-            resetZIndex: action,
-            setOnTop: action,
-            setParent: action,
-            setState: action,
-            updateContent: action,
-        });
-
         this.children = [];
         this.childrenRelativePosition = [];
         this.closestOverlap = undefined;
@@ -103,7 +86,7 @@ export class Thought {
 
     getBoundingBox(): BoundingBox {
         const size = this.getOuterSize();
-        const { x, y } = this.position;
+        const { x, y } = this.getPosition();
 
         return {
             height: size.y,
@@ -120,7 +103,7 @@ export class Thought {
     } {
         const width: number = this.getOuterWidth() * 0.5;
         const height: number = this.getOuterHeight() * 0.5;
-        const { x, y } = this.position;
+        const { x, y } = this.getPosition();
 
         return {
             top: {
@@ -169,7 +152,7 @@ export class Thought {
         return this;
     }
 
-    get position(): Vector {
+    getPosition(): Vector {
         return {
             x: this.x,
             y: this.y,
@@ -288,10 +271,10 @@ export class Thought {
     saveChildrenRelativePosition(): Thought {
         if (this.children.length < 1) return this;
 
-        const myPosition = this.position;
+        const myPosition = this.getPosition();
         this.childrenRelativePosition = this.getChildren(true).map(
             (child: Thought): childPositionData => {
-                let { x, y } = child.position;
+                let { x, y } = child.getPosition();
                 x -= myPosition.x;
                 y -= myPosition.y;
 
@@ -305,7 +288,7 @@ export class Thought {
     restoreChildrenRelativePosition(): Thought {
         if (this.children.length < 1) return this;
 
-        const myPosition = this.position;
+        const myPosition = this.getPosition();
         const allChildren = this.getChildren(true);
         this.childrenRelativePosition.forEach((positionData): void => {
             const actionedChild = allChildren.find((child) => child.id === positionData.id);
@@ -392,7 +375,7 @@ export class Thought {
         return this;
     }
 
-    markeForRemoval(): void {
+    markForRemoval(): void {
         this.isMarkedForRemoval = true;
     }
 
