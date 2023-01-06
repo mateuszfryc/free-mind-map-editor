@@ -1,66 +1,66 @@
 ### TODO:
 
--   [ ] small shadow (or other indication) showing which thought will become new parent while dragging
--   [ ] create children and siblings on the left with shift as modifier
--   [ ] generate link with mind map data
--   [ ] load mind map by url data
--   [ ] general purpose modal
--   [ ] splash screen welcome modal
--   [ ] zoom in/out
-    -   [ ] funcionality (zomm in/out text, nodes and connectors)
-    -   [ ] buttons, touch gesture and UI buttons (next to mini map)
--   [ ] design & implement logo
-    -   [ ] favicon
--   [ ] persist current mind map in cokies
--   [ ] mouse controlls
-    -   [ ] open thought menu on right click
-        -   [ ] align children in different ways
-        -   [ ] make child
-        -   [ ] make sibling
-        -   [ ] delete
--   [ ] touch controlls
-    -   [ ] edit on double touch
-    -   [ ] drag on touch & hold
-    -   [ ] open thought menu on longer thouch hold
--   [ ] burger responsive menu:
-    -   [x] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
-    -   [x] save to desktop as JSON
-    -   [x] load from desktop as JSON
-    -   [ ] generate link with mindmap data
-    -   [ ] save as jpg/png
-    -   [ ] save as PDF
-    -   [ ] printint optimisations
-    -   [ ] settings (styles & behavior, dark mode, auto alignmen)
-    -   [ ] how to instructions
-    -   [ ] Q&A
--   [ ] footer
+- [ ] small shadow (or other indication) showing which thought will become new parent while dragging
+- [ ] create children and siblings on the left with shift as modifier
+- [ ] generate link with mind map data
+- [ ] load mind map by url data
+- [ ] general purpose modal
+- [ ] splash screen welcome modal
+- [ ] zoom in/out
+  - [ ] funcionality (zomm in/out text, nodes and connectors)
+  - [ ] buttons, touch gesture and UI buttons (next to mini map)
+- [ ] design & implement logo
+  - [ ] favicon
+- [ ] persist current mind map in cokies
+- [ ] mouse controlls
+  - [ ] open thought menu on right click
+    - [ ] align children in different ways
+    - [ ] make child
+    - [ ] make sibling
+    - [ ] delete
+- [ ] touch controlls
+  - [ ] edit on double touch
+  - [ ] drag on touch & hold
+  - [ ] open thought menu on longer thouch hold
+- [ ] burger responsive menu:
+  - [x] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
+  - [x] save to desktop as JSON
+  - [x] load from desktop as JSON
+  - [ ] generate link with mindmap data
+  - [ ] save as jpg/png
+  - [ ] save as PDF
+  - [ ] printint optimisations
+  - [ ] settings (styles & behavior, dark mode, auto alignmen)
+  - [ ] how to instructions
+  - [ ] Q&A
+- [ ] footer
 
 ### Done:
 
--   [x] mouse controlls
-    -   [x] select tought on mouse click
-    -   [x] edit thought on dbl click
-    -   [x] dragg thought on mouse click & hold
-    -   [x] drag & drop thoughts to change their parent (i.e. move thought above the other thought to change parent)
--   [x] keyboard controlls
-    -   [x] TAB key to make child
-    -   [x] ENTER key to make
-    -   [x] SHIFT key to drag parent without children
-    -   [x] SHIFT + TAB to select parent
-    -   [x] DELETE to remove thought
--   [x] configure: eslint, prettier, ts
--   [x] single thought react component: base style, highlight style, selected style
--   [x] edit existing thoughts by dbl click
--   [x] resize textarea along with changes to thought content dynamically
--   [x] save & restore child thoughts relative position
--   [x] mobox observables for thoughts state
--   [x] mirror children position to the other side when draggin thought from one parent side to the other
--   [x] global store to manage data and state
--   [x] drag existing thoughts
--   [x] create thought
--   [x] create child
--   [x] create sibling
--   [x] save mind map to JSON file & download on dekstop (funcionality, UI)
--   [x] load JSON file from dekstop (funcionality, UI)
--   [x] draggable minimap that will alow for fast navigation of the entire mind map, draw minimap connectors
--   [x] resolve overlaps between overlapping thoughts
+- [x] mouse controlls
+  - [x] select tought on mouse click
+  - [x] edit thought on dbl click
+  - [x] dragg thought on mouse click & hold
+  - [x] drag & drop thoughts to change their parent (i.e. move thought above the other thought to change parent)
+- [x] keyboard controlls
+  - [x] TAB key to make child
+  - [x] ENTER key to make
+  - [x] SHIFT key to drag parent without children
+  - [x] SHIFT + TAB to select parent
+  - [x] DELETE to remove thought
+- [x] configure: eslint, prettier, ts
+- [x] single thought react component: base style, highlight style, selected style
+- [x] edit existing thoughts by dbl click
+- [x] resize textarea along with changes to thought content dynamically
+- [x] save & restore child thoughts relative position
+- [x] mobox observables for thoughts state
+- [x] mirror children position to the other side when draggin thought from one parent side to the other
+- [x] global store to manage data and state
+- [x] drag existing thoughts
+- [x] create thought
+- [x] create child
+- [x] create sibling
+- [x] save mind map to JSON file & download on dekstop (funcionality, UI)
+- [x] load JSON file from dekstop (funcionality, UI)
+- [x] draggable minimap that will alow for fast navigation of the entire mind map, draw minimap connectors
+- [x] resolve overlaps between overlapping thoughts

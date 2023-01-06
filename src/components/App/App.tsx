@@ -1,28 +1,20 @@
-import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-import { HelpSection } from 'components/HelpSection';
-import { MindMap } from 'components/MindMap';
-import { Navigation } from 'components/Navigation';
-import styled from 'styled-components';
+import { HelpSection } from 'pages/Help';
+import { Layout } from 'pages/Layout';
+import { MindMap } from 'pages/MindMap';
+import { NoPage } from 'pages/NoPage';
 
-const AppContainer = styled.div`
-    overflow: hidden;
-    height: 100%;
-    width: 100%;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-        display: none;
-    }
-`;
-
-export const App: React.FC = () => {
-    return (
-        <AppContainer>
-            <Navigation />
-            <MindMap />
-            <HelpSection />
-        </AppContainer>
-    );
-};
+export function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Layout />}>
+          <Route index element={<MindMap />} />
+          <Route path='help' element={<HelpSection />} />
+          <Route path='*' element={<NoPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}

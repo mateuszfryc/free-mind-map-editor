@@ -1,4 +1,3 @@
-import React from 'react';
 import styled, { css } from 'styled-components';
 
 type FlexType = {
@@ -120,10 +119,11 @@ export const Link = styled.a(
     `
 );
 
-export const Title = styled(({ as, children, ...props }) => (
-    <h1 as={as} {...props}>
-        {children}
-    </h1>
+export const Title = styled(({ children, ...props }) => (
+    // eslint-disable-next-line react/jsx-props-no-spreading
+  <h1 {...props}>
+    {children}
+  </h1>
 ))(
     ({
         display = 'block',

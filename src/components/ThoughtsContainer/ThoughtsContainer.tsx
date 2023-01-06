@@ -1,40 +1,39 @@
-import React, { FC, useEffect, useRef, ReactNode } from 'react';
-import { observer } from 'mobx-react';
-
-import { GlobalStore } from 'stores/globalStore';
+import { ReactNode, useEffect, useRef } from 'react';
+import { pointerSelector, useStore, viewSelector } from '../../stores/store';
 import * as Styled from './ThoughtsContainer.styled';
 
 type ThoughtsContainerProps = {
-    children: ReactNode;
-    store: GlobalStore;
+  children: ReactNode;
 };
 
-export const ThoughtsContainer: FC<ThoughtsContainerProps> = observer(({ store, children }) => {
-    const ref = useRef(null);
+export function ThoughtsContainer({ children }: ThoughtsContainerProps) {
+  const pointer = useStore(pointerSelector);
+  const view = useStore(viewSelector);
+  const ref = useRef(null);
 
-    const onMouseMove = (): void => {
-        if (store.pointer.isLeftButtonDown) {
-            if (ref && ref.current) {
-                const safeRef = ref.current! as HTMLElement;
-                if (store.view && ref.current && safeRef.id === store.pointer.draggedItemId) {
-                    const { x, y } = store.pointer.getCurrentToLastPositionDiff();
-                    store.view.setMapPosition(x, y);
-                }
-            }
+  const onMouseMove = (): void => {
+    if (pointer.isLeftButtonDown) {
+      if (ref && ref.current) {
+        const safeRef = ref.current as HTMLElement;
+        if (view && ref.current && safeRef.id === pointer.draggedItemId) {
+          const { x, y } = pointer.getCurrentToLastPositionDiff();
+          view.setMapPosition(x, y);
         }
+      }
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousemove', onMouseMove);
+
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
     };
+  });
 
-    useEffect(() => {
-        document.addEventListener('mousemove', onMouseMove);
-
-        return () => {
-            document.removeEventListener('mousemove', onMouseMove);
-        };
-    });
-
-    return (
-        <Styled.ThoughtsContainer id='thoughts-container' style={{ width: '4000px', height: '4000px' }} ref={ref}>
-            {children}
-        </Styled.ThoughtsContainer>
-    );
-});
+  return (
+    <Styled.ThoughtsContainer id='thoughts-container' style={{ width: '4000px', height: '4000px' }} ref={ref}>
+      {children}
+    </Styled.ThoughtsContainer>
+  );
+}

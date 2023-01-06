@@ -1,3 +1,4 @@
+import { Link as RouterLink } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 
 export const Navigation = styled.header`
@@ -36,7 +37,7 @@ export const LinksContainer = styled.div<{ isOpen: boolean }>(
     `
 );
 
-export const Link = styled.a<{ margin?: string, padding?: string, subLink?: boolean }>(
+export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subLink?: boolean }>(
     ({
         margin = '0',
         subLink = false,

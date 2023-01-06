@@ -1,57 +1,46 @@
-import React, { useEffect, useContext } from 'react';
-import { observer } from 'mobx-react';
+import { useEffect } from 'react';
 
-import storeContext from 'stores/globalStore';
 import { MiniMap } from 'components/MiniMap';
 import { SingleThought } from 'components/SingleThought';
 import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import * as Input from 'input';
+import { initializeSelector, onMouseMoveSelector, thoughtsSelector, useStore } from '../../stores/store';
 import * as Styled from './MindMap.styled';
 
-export const MindMap: React.FC = observer(() => {
-    const store = useContext(storeContext);
+export function MindMap() {
+  const thoughts = useStore(thoughtsSelector);
+  const initialize = useStore(initializeSelector);
+  const onMouseMove = useStore(onMouseMoveSelector);
 
-    const onMouseDown = (event: MouseEvent): void => {
-        Input.onMouseDownHandler(event, store);
-    };
-    const onMouseUp = (event: MouseEvent): void => {
-        Input.onMouseUpHandler(event, store);
-    };
-    const onMouseMove = (event: MouseEvent): void => {
-        Input.onMouseMoveHandler(event, store);
-    };
-    const onPressKey = (event: KeyboardEvent): void => {
-        Input.onPressKeyHandler(event, store);
-    };
-    const onReleaseKey = (event: KeyboardEvent): void => {
-        Input.onReleaseKeyHandler(event, store);
-    };
+  useEffect(() => {
+    initialize();
 
-    useEffect(() => {
-        document.addEventListener('mousedown', onMouseDown);
-        document.addEventListener('mouseup', onMouseUp);
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('keydown', onPressKey);
-        document.addEventListener('keyup', onReleaseKey);
+    document.addEventListener('mousedown', Input.onMouseDownHandler);
+    document.addEventListener('mouseup', Input.onMouseUpHandler);
+    // document.addEventListener('mousemove', Input.onMouseMoveHandler);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('keydown', Input.onPressKeyHandler);
+    document.addEventListener('keyup', Input.onReleaseKeyHandler);
 
-        return () => {
-            document.removeEventListener('mousedown', onMouseDown);
-            document.removeEventListener('mouseup', onMouseUp);
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('keydown', onPressKey);
-            document.removeEventListener('keyup', onReleaseKey);
-        };
-    });
+    return () => {
+      document.removeEventListener('mousedown', Input.onMouseDownHandler);
+      document.removeEventListener('mouseup', Input.onMouseUpHandler);
+      // document.removeEventListener('mousemove', Input.onMouseMoveHandler);
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('keydown', Input.onPressKeyHandler);
+      document.removeEventListener('keyup', Input.onReleaseKeyHandler);
+    };
+  });
 
-    return (
-        <Styled.MindMap id='mindmap'>
-            <Styled.Canvas />
-            <ThoughtsContainer store={store}>
-                {store.thoughts.map((thought) => (
-                    <SingleThought key={thought.id} thought={thought} />
-                ))}
-            </ThoughtsContainer>
-            <MiniMap store={store} />
-        </Styled.MindMap>
-    );
-});
+  return (
+    <Styled.MindMap id='mindmap'>
+      <Styled.Canvas />
+      <ThoughtsContainer>
+        {thoughts.map((thought) => (
+          <SingleThought key={thought.id} thought={thought} />
+        ))}
+      </ThoughtsContainer>
+      <MiniMap />
+    </Styled.MindMap>
+  );
+}

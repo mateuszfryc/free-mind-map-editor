@@ -1,44 +1,44 @@
 import { Vector } from 'types/baseTypes';
 
 export class Pointer {
-    isLeftButtonDown: boolean;
-    wasShiftPressedOnDown: boolean;
-    position: Vector;
-    lastPosition: Vector;
-    draggedItemId: string | undefined;
+  isLeftButtonDown: boolean;
+  wasShiftPressedOnDown: boolean;
+  position: Vector;
+  lastPosition: Vector;
+  draggedItemId: string | undefined;
 
-    constructor() {
-        this.isLeftButtonDown = false;
-        this.wasShiftPressedOnDown = false;
-        this.position = { x: 0, y: 0 };
-        this.lastPosition = { x: 0, y: 0 };
-        this.draggedItemId = undefined;
-    }
+  constructor() {
+    this.isLeftButtonDown = false;
+    this.wasShiftPressedOnDown = false;
+    this.position = { x: 0, y: 0 };
+    this.lastPosition = { x: 0, y: 0 };
+    this.draggedItemId = undefined;
+  }
 
-    getPosition(): Vector {
-        return { x: this.position.x, y: this.position.y };
-    }
+  getPosition(): Vector {
+    return { x: this.position.x, y: this.position.y };
+  }
 
-    setIsLeftButtonDown(isDown: boolean): void {
-        this.isLeftButtonDown = isDown;
-    }
+  setIsLeftButtonDown(isDown: boolean): void {
+    this.isLeftButtonDown = isDown;
+  }
 
-    getCurrentToLastPositionDiff(): Vector {
-        return {
-            x: this.position.x - this.lastPosition.x,
-            y: this.position.y - this.lastPosition.y,
-        };
-    }
+  getCurrentToLastPositionDiff(): Vector {
+    return {
+      x: this.position.x - this.lastPosition.x,
+      y: this.position.y - this.lastPosition.y,
+    };
+  }
 
-    setDraggedId(id: string): void {
-        this.draggedItemId = id;
-    }
+  setDraggedId(id: string): void {
+    this.draggedItemId = id;
+  }
 
-    clearDraggedId(): void {
-        this.draggedItemId = undefined;
-    }
+  clearDraggedId(): void {
+    this.draggedItemId = undefined;
+  }
 
-    setWasShiftPressedOnDown(isShiftPressed: boolean): void {
-        this.wasShiftPressedOnDown = isShiftPressed;
-    }
+  setWasShiftPressedOnDown(isShiftPressed: boolean): void {
+    this.wasShiftPressedOnDown = isShiftPressed;
+  }
 }
