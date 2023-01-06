@@ -91,7 +91,7 @@ export const loadUploadedMindMapSelector = (store: TStore): ((saved: SavedStateT
 
 export const onMouseMoveSelector = (store: TStore): ((event: MouseEvent) => void) => store.onMouseMove;
 
-export const useStore = create<TStore>((set, getStore) => ({
+export const useMindMapStore = create<TStore>((set, getStore) => ({
   connectorsCurveDividerWidth: 2.2,
   defaultSpawnGap: { x: 25, y: 10 },
   isDrawingLocked: false,
@@ -111,27 +111,25 @@ export const useStore = create<TStore>((set, getStore) => ({
     const store = getStore();
     if (store.isInitialized) return;
 
-    window.addEventListener('load', () => {
-      const canvas = get<HTMLCanvasElement>('canvas');
-      if (!canvas) throw new Error('Could not find canvas.');
+    const canvas = get<HTMLCanvasElement>('canvas');
+    if (!canvas) throw new Error('Could not find canvas.');
 
-      const view = new ViewController(canvas);
-      set(() => ({ view }));
+    const view = new ViewController(canvas);
+    set(() => ({ view }));
 
-      store.updateWorkspaceSize();
-      window.addEventListener('resize', store.updateWorkspaceSize);
-      view.setThoughtsContainerPosition();
-      view.centerMindMap();
-      store.rootThought.setPositionAsync(view.getMapCenterCoordinates());
-      store.editSelection();
+    store.updateWorkspaceSize();
+    window.addEventListener('resize', store.updateWorkspaceSize);
+    view.setThoughtsContainerPosition();
+    view.centerMindMap();
+    store.rootThought.setPositionAsync(view.getMapCenterCoordinates());
+    store.editSelection();
 
-      const drawLoop = (): void => {
-        store.draw();
-        requestAnimationFrame(drawLoop);
-      };
+    const drawLoop = (): void => {
+      store.draw();
+      requestAnimationFrame(drawLoop);
+    };
 
-      drawLoop();
-    });
+    drawLoop();
 
     set(() => ({ isInitialized: true }));
     set(() => ({ selection: store.rootThought }));
@@ -602,4 +600,4 @@ export const useStore = create<TStore>((set, getStore) => ({
 }));
 
 export const useSelection = (): [Thought | undefined, (thought: Thought) => void, () => void] =>
-  useStore((state) => [state.selection, state.setSelection, state.editSelection], shallow);
+  useMindMapStore((state) => [state.selection, state.setSelection, state.editSelection], shallow);

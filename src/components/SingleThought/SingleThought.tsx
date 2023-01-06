@@ -9,7 +9,7 @@ import {
   setHighlightSelector,
   updateSelectionContentSelector,
   useSelection,
-  useStore,
+  useMindMapStore,
 } from '../../stores/store';
 import * as Styled from './SingleThought.styled';
 
@@ -18,12 +18,12 @@ type ThoughtProps = {
 };
 
 export function SingleThought({ thought }: ThoughtProps) {
-  const pointer = useStore(pointerSelector);
+  const pointer = useMindMapStore(pointerSelector);
   const [selection, setSelection, editSelection] = useSelection();
-  const updateSelectionContent = useStore(updateSelectionContentSelector);
-  const setHighlight = useStore(setHighlightSelector);
-  const clearHighlight = useStore(clearHighlightSelector);
-  const initialThoughtWidth = useStore(initialThoughtWidthSelector);
+  const updateSelectionContent = useMindMapStore(updateSelectionContentSelector);
+  const setHighlight = useMindMapStore(setHighlightSelector);
+  const clearHighlight = useMindMapStore(clearHighlightSelector);
+  const initialThoughtWidth = useMindMapStore(initialThoughtWidthSelector);
 
   const wrapper = useRef(null);
   const contentRef = useRef(null);

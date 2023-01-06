@@ -4,13 +4,13 @@ import { MiniMap } from 'components/MiniMap';
 import { SingleThought } from 'components/SingleThought';
 import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import * as Input from 'input';
-import { initializeSelector, onMouseMoveSelector, thoughtsSelector, useStore } from '../../stores/store';
+import { initializeSelector, onMouseMoveSelector, thoughtsSelector, useMindMapStore } from '../../stores/store';
 import * as Styled from './MindMap.styled';
 
 export function MindMap() {
-  const thoughts = useStore(thoughtsSelector);
-  const initialize = useStore(initializeSelector);
-  const onMouseMove = useStore(onMouseMoveSelector);
+  const thoughts = useMindMapStore(thoughtsSelector);
+  const initialize = useMindMapStore(initializeSelector);
+  const onMouseMove = useMindMapStore(onMouseMoveSelector);
 
   useEffect(() => {
     initialize();
@@ -30,7 +30,8 @@ export function MindMap() {
       document.removeEventListener('keydown', Input.onPressKeyHandler);
       document.removeEventListener('keyup', Input.onReleaseKeyHandler);
     };
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Styled.MindMap id='mindmap'>

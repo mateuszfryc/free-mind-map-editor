@@ -1,5 +1,5 @@
 import { THOUGHT_STATE } from 'types/baseTypes';
-import { useStore } from './stores/store';
+import { useMindMapStore } from './stores/store';
 
 export class KeyData {
   code: number;
@@ -52,7 +52,7 @@ const KEYS_BINDINGS: BindingsInterface = {
 };
 
 export function onPressKeyHandler(event: KeyboardEvent): void {
-  const store = useStore.getState();
+  const store = useMindMapStore.getState();
   const { selection } = store;
   const { key, keyCode, shiftKey } = event;
 
@@ -126,11 +126,11 @@ export function onReleaseKeyHandler(event: KeyboardEvent): void {
   }
 
   KEYS[SHIFT].isPressed = shiftKey;
-  useStore.getState().setIsGroupDragOn(!KEYS[SHIFT].isPressed);
+  useMindMapStore.getState().setIsGroupDragOn(!KEYS[SHIFT].isPressed);
 }
 
 export function onMouseDownHandler(event: MouseEvent): void {
-  const store = useStore.getState();
+  const store = useMindMapStore.getState();
   const { pointer, highlight, selection } = store;
   const target = event.target as HTMLElement;
   pointer.setDraggedId(target.id);
@@ -157,7 +157,7 @@ export function onMouseDownHandler(event: MouseEvent): void {
 }
 
 export function onMouseUpHandler(): void {
-  const store = useStore.getState();
+  const store = useMindMapStore.getState();
   const { pointer, highlight, selection } = store;
   pointer.setIsLeftButtonDown(false);
 

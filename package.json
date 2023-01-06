@@ -34,7 +34,7 @@
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.2",
+    "husky": "^8.0.0",
     "lint-staged": "^13.0.4",
     "prettier": "^2.8.0",
     "prettier-eslint": "^15.0.1",
@@ -57,7 +57,8 @@
     "release": "standard-version",
     "lint": "eslint --ext ts,tsx src/ && stylelint **/*.styled.{ts,tsx}",
     "lint-single": "eslint --ext ts,tsx",
-    "type-check": "tsc-files --noEmit --pretty"
+    "type-check": "tsc-files --noEmit --pretty",
+    "prepare": "husky install"
   },
   "eslintConfig": {
     "extends": "react-app"

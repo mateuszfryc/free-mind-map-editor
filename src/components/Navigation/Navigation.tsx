@@ -3,13 +3,18 @@ import { ChangeEvent, useCallback, useRef, useState } from 'react';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import { SavedStateType } from 'types/baseTypes';
-import { loadUploadedMindMapSelector, savedMindMapSelector, setDrawLockSelector, useStore } from '../../stores/store';
+import {
+  loadUploadedMindMapSelector,
+  savedMindMapSelector,
+  setDrawLockSelector,
+  useMindMapStore,
+} from '../../stores/store';
 import * as Styled from './Navigation.styled';
 
 export function Navigation() {
-  const savedMindMap = useStore(savedMindMapSelector);
-  const setDrawLock = useStore(setDrawLockSelector);
-  const loadUploadedMindMap = useStore(loadUploadedMindMapSelector);
+  const savedMindMap = useMindMapStore(savedMindMapSelector);
+  const setDrawLock = useMindMapStore(setDrawLockSelector);
+  const loadUploadedMindMap = useMindMapStore(loadUploadedMindMapSelector);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const stickyMenuRef = useRef(null);
 
