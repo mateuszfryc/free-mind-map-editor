@@ -48,7 +48,7 @@ export type TStore = {
   clearHighlight(): void;
   setSelection(thought: Thought): void;
   clearSelection(): void;
-  stopEditing(): void;
+  stopEditing(checkDefaultValue?: boolean): void;
   setIsGroupDragOn(isOn: boolean): void;
   removeThought(thought: Thought): void;
   removeIfEmpty(thought: Thought): void;
@@ -164,23 +164,27 @@ export const useMindMapStore = create<TStore>((set, getStore) => ({
     }
     store.editSelection();
     store.saveCurrentMindMapAsJSON();
-    window.console.log(newItem);
   },
 
   createChildThought(parent: Thought): void {
     const store = getStore();
-
     store.stopEditing();
+
+    if (!store.selection) return;
+
     const targetPosition: Vector = parent.getPosition();
     const sideMod = parent.hasParent() && !parent.isParentOnLeft() ? -1 : 1;
     targetPosition.x +=
       (parent.getOuterWidth() * 0.5 + store.initialThoughtWidth * 0.5 + store.defaultSpawnGap.x) * sideMod;
+
     const newChild: Thought = store.addThought(targetPosition, false, parent);
     parent.children.push(newChild);
+
     store.setSelection(newChild);
     store.resolveOverlaps(newChild);
     newChild.refreshPosition();
     parent.saveChildrenRelativePosition();
+
     setTimeout(() => {
       store.postNewThoughActions(newChild);
     }, 100);
@@ -188,18 +192,22 @@ export const useMindMapStore = create<TStore>((set, getStore) => ({
 
   createSiblingThought(sibling: Thought): void {
     const store = getStore();
-
     store.stopEditing();
+
     if (!store.selection) return;
+
     const targetPosition: Vector = sibling.getPosition();
     targetPosition.y += sibling.getOuterHeight() * 0.5 + 30 + store.defaultSpawnGap.y;
     const newSibling: Thought = store.addThought(targetPosition, false, sibling.parent);
+
     if (sibling.parent) sibling.parent.addChildThought(newSibling);
-    if (store.selection) store.removeIfEmpty(store.selection);
+
     store.setSelection(newSibling);
     store.resolveOverlaps(newSibling);
     newSibling.refreshPosition();
+
     if (sibling.parent) sibling.parent.saveChildrenRelativePosition();
+
     setTimeout(() => {
       store.postNewThoughActions(newSibling);
     }, 100);
@@ -229,7 +237,7 @@ export const useMindMapStore = create<TStore>((set, getStore) => ({
     const store = getStore();
     if (!store.selection) return;
 
-    if (!store.selection.hasValue() && !store.selection.isRootThought) {
+    if (!store.selection.hasValue() && !store.selection.hasDefaultValue() && !store.selection.isRootThought) {
       store.removeThought(store.selection);
 
       return;
@@ -239,19 +247,24 @@ export const useMindMapStore = create<TStore>((set, getStore) => ({
     set(() => ({ selection: undefined }));
   },
 
-  stopEditing(): void {
+  stopEditing(checkDefaultValue = false): void {
     const store = getStore();
     if (!store.selection) return;
 
-    if (!store.selection.hasValue() && store.selection.id !== store.rootThought.id) {
+    const isEmpty = !store.selection.hasValue();
+    const isntRootThought = store.selection.id !== store.rootThought.id;
+    const hasDefaultValue = checkDefaultValue && !store.selection.hasDefaultValue();
+    if ((isEmpty && isntRootThought) || hasDefaultValue) {
       store.removeThought(store.selection);
 
       return;
     }
+
     store.selection.setState(THOUGHT_STATE.SELECTED);
     store.updateSingleItem(store.selection);
     store.resolveOverlaps(store.selection);
     store.selection.refreshPosition();
+
     setTimeout(() => {
       store.saveCurrentMindMapAsJSON();
     }, 200);
@@ -285,12 +298,17 @@ export const useMindMapStore = create<TStore>((set, getStore) => ({
     }, 200);
   },
 
-  removeIfEmpty(thought: Thought): void {
+  /* Remove thought and return true if was removed and false if it wasn't. */
+  removeIfEmpty(thought: Thought): boolean {
     const store = getStore();
 
-    if (!thought.hasValue()) {
+    if (!thought.hasValue() && !thought.hasDefaultValue()) {
       store.removeThought(thought);
+
+      return true;
     }
+
+    return false;
   },
 
   editSelection(): void {

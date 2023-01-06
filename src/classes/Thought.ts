@@ -358,7 +358,11 @@ export class Thought {
   }
 
   hasValue(): boolean {
-    return this.content !== '' && this.content !== defaultTextTemplate;
+    return this.content !== '';
+  }
+
+  hasDefaultValue(): boolean {
+    return this.content !== defaultTextTemplate;
   }
 
   setOnTop(): Thought {

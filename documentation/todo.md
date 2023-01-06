@@ -1,5 +1,6 @@
 ### TODO:
 
+- [ ] bug: after comming back from other routs the state is not restored (or maybe even not saved before changing route)
 - [ ] small shadow (or other indication) showing which thought will become new parent while dragging
 - [ ] create children and siblings on the left with shift as modifier
 - [ ] generate link with mind map data
@@ -64,3 +65,4 @@
 - [x] load JSON file from dekstop (funcionality, UI)
 - [x] draggable minimap that will alow for fast navigation of the entire mind map, draw minimap connectors
 - [x] resolve overlaps between overlapping thoughts
+- [x] bug: hiting Enter key after selecting newly created child node brakes thoughts tree

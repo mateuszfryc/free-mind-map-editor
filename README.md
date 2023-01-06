@@ -7,10 +7,14 @@ Currently deployed at:
 
 ### Tech-stack
 
-- React 17+
+- React 18+
 - TypeScript 4+
 - Styled-Components 5+
-- MobX 6+
+- Zustand 4+
+
+### Local development environmnent installation
+
+- ...
 
 ### Linters
 
@@ -19,13 +23,6 @@ It's recommended to configure the below as environment plugins (e.g. VS Code or 
 - ESLint
 - StyleLint
 - Prettier
-
-### How To
-
-- React 17+
-- TypeScript 4+
-- Styled-Components 5+
-- MobX 6+
 
 ### TO DO
 

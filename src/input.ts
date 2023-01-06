@@ -73,42 +73,47 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
     event.preventDefault();
   }
 
-  if (selection !== undefined) {
-    const hasParent = selection.hasParent();
+  if (!selection) return;
 
-    // allow to navigate back to parent (select parent) by pressing shift + tab
-    if (KEYS[SHIFT].isPressed) {
-      if (KEYS[TAB].isPressed && selection.parent) {
-        store.setSelection(selection.parent);
-      }
+  const hasParent = selection.hasParent();
 
-      return;
+  // allow to navigate back to parent (select parent) by pressing shift + tab
+  if (KEYS[SHIFT].isPressed) {
+    if (KEYS[TAB].isPressed && selection.parent) {
+      store.setSelection(selection.parent);
     }
-    if (KEYS_BINDINGS.addChild.isPressed) {
-      store.createChildThought(selection);
 
-      return;
-    }
-    if (KEYS_BINDINGS.addSibling.isPressed && hasParent) {
-      store.createSiblingThought(selection);
+    return;
+  }
 
-      return;
-    }
-    if (selection.isEdited()) {
-      if (KEYS_BINDINGS.exitEditState.isPressed) {
-        store.stopEditing();
-      }
+  if (KEYS_BINDINGS.addChild.isPressed) {
+    store.createChildThought(selection);
 
-      return;
-    }
-    if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
-      store.removeThought(selection);
+    return;
+  }
 
-      return;
+  if (KEYS_BINDINGS.addSibling.isPressed && hasParent) {
+    store.createSiblingThought(selection);
+
+    return;
+  }
+
+  if (selection.isEdited()) {
+    if (KEYS_BINDINGS.exitEditState.isPressed) {
+      store.stopEditing(true);
     }
-    if (KEYS_BINDINGS.edit.isPressed) {
-      store.editSelection();
-    }
+
+    return;
+  }
+
+  if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
+    store.removeThought(selection);
+
+    return;
+  }
+
+  if (KEYS_BINDINGS.edit.isPressed) {
+    store.editSelection();
   }
 }
 
