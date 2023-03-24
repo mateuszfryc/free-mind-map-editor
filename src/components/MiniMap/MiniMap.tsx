@@ -1,12 +1,13 @@
 import { useEffect, useRef } from 'react';
 
 import { getSafeRef } from 'utils/get';
-import { pointerSelector, useMindMapStore, viewSelector } from '../../stores/store';
+import { useMindMapStore } from '../../stores/mind-map-store';
+import { pointerSelector } from '../../stores/selectors';
+import { view } from '../../stores/view';
 import * as Styled from './MiniMap.styled';
 
 export function MiniMap() {
   const pointer = useMindMapStore(pointerSelector);
-  const view = useMindMapStore(viewSelector);
   const miniMapRef = useRef(null);
   const viewportRef = useRef(null);
 

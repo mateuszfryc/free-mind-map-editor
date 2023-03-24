@@ -16,7 +16,7 @@ export interface ObjectOfVectors {
 }
 
 export type Miniature = {
-  id: number;
+  id: string;
   x: number;
   y: number;
   height: number;
@@ -32,7 +32,7 @@ export const THOUGHT_STATE: ObjectOfNumbers = {
 
 export type ChildPositionData = {
   position: Vector;
-  id: number;
+  id: string;
 };
 
 export type IconProps = {
@@ -40,11 +40,11 @@ export type IconProps = {
 };
 
 export type SavedThoughtStateType = {
-  children: number[];
+  children: string[];
   content: string;
-  id: number;
+  id: string;
   isRootThought: boolean;
-  parent: number | undefined;
+  parentId: string | undefined;
   prevIsParentOnLeft: boolean;
   x: number;
   y: number;

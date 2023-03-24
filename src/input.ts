@@ -1,5 +1,5 @@
 import { THOUGHT_STATE } from 'types/baseTypes';
-import { useMindMapStore } from './stores/store';
+import { useMindMapStore } from './stores/mind-map-store';
 
 export class KeyData {
   code: number;
@@ -53,7 +53,7 @@ const KEYS_BINDINGS: BindingsInterface = {
 
 export function onPressKeyHandler(event: KeyboardEvent): void {
   const store = useMindMapStore.getState();
-  const { selection } = store;
+  const selection = store.getSelectedThought();
   const { key, keyCode, shiftKey } = event;
 
   if (key) {
@@ -79,8 +79,11 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
 
   // allow to navigate back to parent (select parent) by pressing shift + tab
   if (KEYS[SHIFT].isPressed) {
-    if (KEYS[TAB].isPressed && selection.parent) {
-      store.setSelection(selection.parent);
+    if (KEYS[TAB].isPressed && selection.parentId !== undefined) {
+      const parent = store.getThoughtById(selection.parentId);
+      if (parent) {
+        store.setSelection(parent);
+      }
     }
 
     return;
@@ -136,47 +139,55 @@ export function onReleaseKeyHandler(event: KeyboardEvent): void {
 
 export function onMouseDownHandler(event: MouseEvent): void {
   const store = useMindMapStore.getState();
-  const { pointer, highlight, selection } = store;
+  const { pointer } = store;
+  const highlight = store.getHighlightedThought();
+  const selection = store.getSelectedThought();
   const target = event.target as HTMLElement;
   pointer.setDraggedId(target.id);
-  const id = parseInt(target.id, 10);
+  const { id } = target;
 
   pointer.setIsLeftButtonDown(true);
   pointer.setWasShiftPressedOnDown(KEYS[SHIFT].isPressed);
 
   if (highlight && target && highlight.id === id) {
-    highlight.saveChildrenRelativePosition();
+    store.saveChildrenRelativePosition(highlight.id);
     highlight.setPointerPositionDiff(pointer.position.x, pointer.position.y);
 
-    // if (highlight.isIdle() || (selection && selection.id !== highlight.id)) {
-    //     store.setSelection(highlight);
-    //     window.console.log('onMouseDownHandler', highlight.id);
-    // }
-
-    highlight
-      .getChildren(true)
+    store
+      .getChildren(highlight.id, true)
       .forEach((child) => child.setPointerPositionDiff(pointer.position.x, pointer.position.y));
-  } else if (selection && target.id && parseInt(target.id, 10) !== selection.id) {
+
+    return;
+  }
+
+  if (selection && target.id && id !== selection.id) {
     store.clearSelection();
   }
 }
 
 export function onMouseUpHandler(): void {
   const store = useMindMapStore.getState();
-  const { pointer, highlight, selection } = store;
+  const { pointer } = store;
+  const highlight = store.getHighlightedThought();
+  const selection = store.getSelectedThought();
   pointer.setIsLeftButtonDown(false);
 
   if (highlight && highlight.isBeingDragged()) {
-    const { closestOverlap, parent } = highlight;
-    if (closestOverlap && !highlight.isParentOf(closestOverlap, true) && !closestOverlap.isChildOf(highlight)) {
-      if (parent) parent.removeChildThought(highlight);
-      closestOverlap.addChildThought(highlight);
-      store.resolveOverlaps(highlight, 'x').restoreChildrenRelativePosition();
-      highlight.getChildren(true).forEach((child) => store.resolveOverlaps(child));
+    const { closestOverlapId, parentId } = highlight;
+    if (
+      closestOverlapId &&
+      !store.isParentOf(highlight.id, closestOverlapId, true) &&
+      !store.isChildOf(closestOverlapId, highlight.id)
+    ) {
+      if (parentId) store.removeChildThought(parentId, highlight.id);
+      store.addChildThought(closestOverlapId, highlight.id);
+      store.resolveOverlaps(highlight, 'x');
+      store.restoreChildrenRelativePosition(highlight.id);
+      store.getChildren(highlight.id, true).forEach((child) => store.resolveOverlaps(child));
     }
 
     highlight.setState(THOUGHT_STATE.SELECTED);
-    if (!pointer.wasShiftPressedOnDown) highlight.restoreChildrenRelativePosition();
+    if (!pointer.wasShiftPressedOnDown) store.restoreChildrenRelativePosition(highlight.id);
   }
 
   pointer.clearDraggedId();

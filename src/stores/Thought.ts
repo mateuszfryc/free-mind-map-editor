@@ -14,16 +14,16 @@ type BoundingBox = {
 /** Thought represents data structure and methods for single mind map item - a single thought. */
 
 export class Thought {
-  children: Thought[];
+  id: string;
+  children: string[];
   childrenRelativePosition: ChildPositionData[];
-  closestOverlap?: Thought;
+  closestOverlapId?: string;
   content: string;
   diffX: number;
   diffY: number;
-  id: number;
   isMarkedForRemoval: boolean;
   isRootThought: boolean;
-  parent?: Thought;
+  parentId?: string;
   prevIsParentOnLeft: boolean;
   state: number;
   x: number;
@@ -31,29 +31,27 @@ export class Thought {
   zIndex: number;
 
   constructor(
-    id: number,
+    id: string,
     initialPosition: Vector,
-    parent?: Thought,
+    parentId?: string,
     isRootThought = false,
     defaultText: string = defaultTextTemplate,
   ) {
     this.children = [];
     this.childrenRelativePosition = [];
-    this.closestOverlap = undefined;
+    this.closestOverlapId = undefined;
     this.content = defaultText;
     this.diffX = 0;
     this.diffY = 0;
     this.id = id;
     this.isMarkedForRemoval = false;
     this.isRootThought = isRootThought;
-    this.parent = parent;
+    this.parentId = parentId;
     this.prevIsParentOnLeft = true;
     this.state = THOUGHT_STATE.EDITED;
     this.x = initialPosition.x;
     this.y = initialPosition.y;
     this.zIndex = 2;
-
-    this.setPositionAsync(initialPosition);
   }
 
   updateContent(value: string): void {
@@ -61,7 +59,7 @@ export class Thought {
   }
 
   hasParent(): boolean {
-    return this.parent !== undefined;
+    return this.parentId !== undefined;
   }
 
   getElement(): HTMLElement | null {
@@ -117,28 +115,6 @@ export class Thought {
     };
   }
 
-  getConnectorPoints(): ObjectOfVectors {
-    const isParentsOnLeft = this.parent ? this.parent.x < this.x : false;
-    const grandParent = this.parent?.parent;
-    const isParentsOutOnLeft = this.parent && grandParent ? grandParent.x < this.parent.x : isParentsOnLeft;
-
-    const myCorners = this.getCorners();
-    const parentCorners = this.parent?.getCorners() ?? myCorners;
-
-    return {
-      me: isParentsOnLeft ? myCorners.bottom.left : myCorners.bottom.right,
-      parent: isParentsOutOnLeft ? parentCorners.bottom.right : parentCorners.bottom.left,
-    };
-  }
-
-  isParentOnLeft(): boolean {
-    if (this.parent) {
-      return this.parent.x < this.x;
-    }
-
-    return false;
-  }
-
   addPosition(positionToAdd: Vector): Thought {
     this.x += positionToAdd.x;
     this.y += positionToAdd.y;
@@ -179,20 +155,6 @@ export class Thought {
     }
 
     return this;
-  }
-
-  setPositionAsync(newPosition: Vector, callback?: () => void): void {
-    setTimeout(() => {
-      if (this.getElement()) {
-        this.setPosition(newPosition);
-        if (this.parent) this.prevIsParentOnLeft = this.isParentOnLeft();
-        if (callback) {
-          callback();
-        }
-      } else {
-        setTimeout(() => this.setPositionAsync(newPosition), 20);
-      }
-    }, 20);
   }
 
   getWidth(): number {
@@ -268,93 +230,16 @@ export class Thought {
     };
   }
 
-  saveChildrenRelativePosition(): Thought {
-    if (this.children.length < 1) return this;
-
-    const myPosition = this.getPosition();
-    this.childrenRelativePosition = this.getChildren(true).map((child: Thought): ChildPositionData => {
-      let { x, y } = child.getPosition();
-      x -= myPosition.x;
-      y -= myPosition.y;
-
-      return { position: { x, y }, id: child.id };
-    });
-
-    return this;
-  }
-
-  restoreChildrenRelativePosition(): Thought {
-    if (this.children.length < 1) return this;
-
-    const myPosition = this.getPosition();
-    const allChildren = this.getChildren(true);
-    this.childrenRelativePosition.forEach((positionData): void => {
-      const actionedChild = allChildren.find((child) => child.id === positionData.id);
-      if (actionedChild) {
-        actionedChild.setPosition({
-          x: myPosition.x + positionData.position.x,
-          y: myPosition.y + positionData.position.y,
-        });
-      }
-    });
-
-    return this;
-  }
-
-  addChildThought(child: Thought): Thought {
-    if (this.children.every((myChild) => myChild.id !== child.id)) {
-      this.children.push(child);
-      child.setParent(this);
-    }
-
-    return this;
-  }
-
-  setParent(newParent: Thought): void {
-    this.parent = newParent;
+  setParent(newParentId: string): void {
+    this.parentId = newParentId;
   }
 
   clearParent(): void {
-    this.parent = undefined;
-  }
-
-  removeChildThought(childToBeRemoved: Thought): Thought {
-    this.children = this.children.filter((child) => child.id !== childToBeRemoved.id);
-    childToBeRemoved.clearParent();
-
-    return this;
+    this.parentId = undefined;
   }
 
   hasChildren(): boolean {
     return this.children.length > 0;
-  }
-
-  getChildren(includeGrandChildren = false): Thought[] {
-    if (this.children.length < 1) return [];
-
-    if (includeGrandChildren) {
-      return this.children.reduce((acc: Thought[], val: Thought) => {
-        acc.push(val);
-
-        return acc.concat(val.getChildren(true));
-      }, []);
-    }
-
-    return this.children;
-  }
-
-  isParentOf(unknownChild: Thought, includeGrandChildren = false): boolean {
-    if (!unknownChild) return false;
-
-    if (includeGrandChildren) {
-      return this.getChildren(true).some((child) => child.id === unknownChild.id);
-    }
-
-    return this.children.some((child) => child.id === unknownChild.id);
-  }
-
-  isChildOf(unknownParent: Thought): boolean {
-    return unknownParent && unknownParent.children.some((child) => child.id === this.id);
   }
 
   hasValue(): boolean {
@@ -385,12 +270,12 @@ export class Thought {
     this.prevIsParentOnLeft = isOnTheLeft;
   }
 
-  setClosestOverlap(thought: Thought): void {
-    this.closestOverlap = thought;
+  setClosestOverlap(thoughtId: string): void {
+    this.closestOverlapId = thoughtId;
   }
 
   clearClosestOverlap(): void {
-    this.closestOverlap = undefined;
+    this.closestOverlapId = undefined;
   }
 
   setPointerPositionDiff(x: number, y: number): void {
@@ -402,9 +287,7 @@ export class Thought {
     const element = this.getElement();
 
     if (!element) {
-      window.console.log('nope');
-
-      return false;
+      throw new Error('Could not get reference to item element');
     }
 
     const { x, y } = element.getBoundingClientRect();
@@ -414,11 +297,11 @@ export class Thought {
   }
 
   /*
-        Return offset of the given thought in relation to viewport.
-        If position is outside of left or top the axis value will be below 0.
-        If position is outside of right or bottom it will be higher than zero.
-        If thought element is fully inside viewport axis value will be 0.
-    */
+    Return offset of the given thought in relation to viewport.
+    If position is outside of left or top the axis value will be below 0.
+    If position is outside of right or bottom it will be higher than zero.
+    If thought element is fully inside viewport axis value will be 0.
+  */
   getViewportOffset(): Vector {
     const element = this.getElement();
 
@@ -446,5 +329,23 @@ export class Thought {
       x,
       y,
     };
+  }
+
+  static clone(thought: Thought): Thought {
+    const clone = new Thought(thought.id, { x: thought.x, y: thought.y }, thought.parentId);
+
+    clone.children = thought.children;
+    clone.childrenRelativePosition = thought.childrenRelativePosition;
+    clone.closestOverlapId = thought.closestOverlapId;
+    clone.content = thought.content;
+    clone.diffX = thought.diffX;
+    clone.diffY = thought.diffY;
+    clone.isMarkedForRemoval = thought.isMarkedForRemoval;
+    clone.isRootThought = thought.isRootThought;
+    clone.prevIsParentOnLeft = thought.prevIsParentOnLeft;
+    clone.state = thought.state;
+    clone.zIndex = thought.zIndex;
+
+    return clone;
   }
 }

@@ -1,4 +1,4 @@
-import { css, DefaultTheme, FlattenSimpleInterpolation } from 'styled-components';
+import { css, FlattenSimpleInterpolation } from 'styled-components';
 import { ObjectOfStrings } from 'types/baseTypes';
 import { setBoxShadow, setColorGetter } from 'utils/styles';
 
@@ -42,8 +42,9 @@ const fontSizes = {
   title: 2.4,
   paragraph: 1.8,
 };
+export type TFontSize = keyof typeof fontSizes;
 
-const setFontSize = (size: keyof typeof fontSizes): string => {
+const setFontSize = (size: TFontSize): string => {
   const regularSize: number = fontSizes[size];
 
   return `
@@ -69,7 +70,7 @@ export const chessboardBackground = (
   `;
 };
 
-export const theme: DefaultTheme = {
+export const theme = {
   setBoxShadow,
   chessboardBackground,
   colors,
@@ -77,3 +78,5 @@ export const theme: DefaultTheme = {
   fontSizes,
   setFontSize,
 };
+
+export type CustomTheme = typeof theme;

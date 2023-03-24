@@ -1,16 +1,15 @@
 import { ChangeEvent, useCallback, useEffect, useRef } from 'react';
 
-import { Thought } from 'classes/Thought';
+import { Thought } from 'stores/Thought';
 import { getSafeRef } from 'utils/get';
+import { useMindMapStore, useSelection } from '../../stores/mind-map-store';
 import {
   clearHighlightSelector,
   initialThoughtWidthSelector,
   pointerSelector,
   setHighlightSelector,
   updateSelectionContentSelector,
-  useSelection,
-  useMindMapStore,
-} from '../../stores/store';
+} from '../../stores/selectors';
 import * as Styled from './SingleThought.styled';
 
 type ThoughtProps = {
@@ -25,29 +24,34 @@ export function SingleThought({ thought }: ThoughtProps) {
   const clearHighlight = useMindMapStore(clearHighlightSelector);
   const initialThoughtWidth = useMindMapStore(initialThoughtWidthSelector);
 
-  const wrapper = useRef(null);
   const contentRef = useRef(null);
-  const isSelected = !thought.isIdle();
-  const isEdited = thought.isEdited();
+  const isSelected = thought.isIdle && !thought.isIdle();
+  const isEdited = thought.isEdited && thought.isEdited();
 
-  const updateContent = (event: ChangeEvent): void => {
-    const textareaSafeRef = getSafeRef(contentRef);
-    if (textareaSafeRef) {
-      textareaSafeRef.style.overflow = 'hidden';
-      const { value } = event.target as HTMLTextAreaElement;
-      updateSelectionContent(value);
+  const updateContent = useCallback(
+    (event: ChangeEvent): void => {
+      const textareaSafeRef = getSafeRef(contentRef);
+      if (textareaSafeRef) {
+        textareaSafeRef.style.overflow = 'hidden';
+        const { value } = event.target as HTMLTextAreaElement;
+        if (!value) {
+          return;
+        }
+        updateSelectionContent(value);
 
-      window.setTimeout(() => {
-        textareaSafeRef.style.width = `${thought.getWidth()}px`;
-        textareaSafeRef.style.height = `${thought.getHeight()}px`;
-        textareaSafeRef.style.overflow = 'visible';
-        thought.refreshPosition();
-      }, 5);
-    }
-  };
+        window.setTimeout(() => {
+          textareaSafeRef.style.width = `${thought.getWidth()}px`;
+          textareaSafeRef.style.height = `${thought.getHeight()}px`;
+          textareaSafeRef.style.overflow = 'visible';
+          thought.refreshPosition();
+        }, 5);
+      }
+    },
+    [thought, updateSelectionContent],
+  );
 
   useEffect(() => {
-    if (thought.isEdited()) {
+    if (thought.isEdited && thought.isEdited()) {
       const textareaSafeRef = getSafeRef<HTMLTextAreaElement>(contentRef);
       if (textareaSafeRef) {
         textareaSafeRef.style.width = `${thought.getWidth() + 2}px`;
@@ -59,7 +63,7 @@ export function SingleThought({ thought }: ThoughtProps) {
 
   const onMouseEnter = useCallback((): void => {
     if (!pointer.isLeftButtonDown) {
-      setHighlight(thought);
+      setHighlight(thought.id);
     }
   }, [pointer.isLeftButtonDown, setHighlight, thought]);
 
@@ -85,12 +89,11 @@ export function SingleThought({ thought }: ThoughtProps) {
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
-      ref={wrapper}
       zIndex={thought.zIndex}
     >
       <div className='underline' id={`${thought.id}`} />
       {thought.content}
-      {thought.isEdited() && (
+      {isEdited && (
         <Styled.Textarea id={`${thought.id}`} onChange={updateContent} ref={contentRef} value={thought.content} />
       )}
     </Styled.Thought>

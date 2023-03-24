@@ -60,7 +60,7 @@ module.exports = {
     // rules turned off
     camelcase: off,
     'no-nested-ternary': off,
-    'no-use-before-define': off,
+    // 'no-use-before-define': off,
     'class-methods-use-this': off,
     'import/prefer-default-export': off,
     'import/no-internal-modules': off,
@@ -71,6 +71,5 @@ module.exports = {
     'no-continue': off,
     'lines-between-class-members': off,
     '@typescript-eslint/lines-between-class-members': off,
-    '@typescript-eslint/unbound-method': off,
   },
 };

@@ -1,5 +1,7 @@
 import { ReactNode, useEffect, useRef } from 'react';
-import { pointerSelector, useMindMapStore, viewSelector } from '../../stores/store';
+import { useMindMapStore } from '../../stores/mind-map-store';
+import { pointerSelector } from '../../stores/selectors';
+import { view } from '../../stores/view';
 import * as Styled from './ThoughtsContainer.styled';
 
 type ThoughtsContainerProps = {
@@ -8,7 +10,6 @@ type ThoughtsContainerProps = {
 
 export function ThoughtsContainer({ children }: ThoughtsContainerProps) {
   const pointer = useMindMapStore(pointerSelector);
-  const view = useMindMapStore(viewSelector);
   const ref = useRef(null);
 
   const onMouseMove = (): void => {

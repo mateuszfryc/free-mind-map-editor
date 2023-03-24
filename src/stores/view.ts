@@ -3,24 +3,59 @@ import { Miniature, Vector } from 'types/baseTypes';
 import { get, getParsedStyle, getWindowInnerSize } from 'utils/get';
 import { clamp } from 'utils/math';
 
-export class ViewController {
-  canvas: HTMLCanvasElement;
+export type View = {
+  canvas?: HTMLCanvasElement;
   context?: CanvasRenderingContext2D | null;
   thoughtsContainer?: HTMLDivElement;
   miniMap?: HTMLDivElement;
   miniMapViewport?: HTMLDivElement;
+  setReferences(): void;
+  getMiniMapMiniature(position: Vector, size: Vector, id: string): Miniature;
+  setMiniMapViewportProportionalSize(): void;
+  setMiniMapViewportPosition(x?: number, y?: number): void;
+  addMiniMapViewportPosition(x?: number, y?: number): void;
+  setMiniMapViewportToPointerPosition(pointerPosition: Vector): void;
+  getThoughtsContainerPosition(): Vector;
+  getThoughtsContainerSize(): Vector;
+  setThoughtsContainerPosition(x?: number, y?: number): void;
+  setMapPosition(x?: number, y?: number): void;
+  dragMinimapViewport(x?: number, y?: number): void;
+  centerMindMap(): void;
+  getScaleBySpaceName(spaceName: string): Vector;
+  translateFullToMiniMapSize(width: number, height: number): Vector;
+  translateCoordinatesToSpace(x?: number, y?: number, spaceName?: string): { x: number; y: number };
+  getMapCenterCoordinates(): Vector;
+  drawBezierCurve(
+    start: Vector,
+    end: Vector,
+    controlPointA: Vector,
+    controlPointB: Vector,
+    lineWidth?: number,
+    color?: string,
+  ): void;
+  drawMiniature(miniature: Miniature): void;
+};
 
-  constructor(canvas: HTMLCanvasElement) {
+export const view: View = {
+  canvas: undefined,
+  context: null,
+  thoughtsContainer: undefined,
+  miniMap: undefined,
+  miniMapViewport: undefined,
+
+  setReferences(): void {
+    const canvas = get<HTMLCanvasElement>('canvas');
+    if (!canvas) throw new Error('Could not find canvas.');
+
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.thoughtsContainer = get<HTMLDivElement>('#thoughts-container');
     this.miniMap = get<HTMLDivElement>('#mini-map');
     this.miniMapViewport = get<HTMLDivElement>('#mini-map__viewport');
-
     this.setMiniMapViewportProportionalSize();
-  }
+  },
 
-  getMiniMapMiniature(position: Vector, size: Vector, id: number): Miniature {
+  getMiniMapMiniature(position: Vector, size: Vector, id: string): Miniature {
     const positionScaled = this.translateCoordinatesToSpace(position.x, position.y, 'mini');
     const sizeScaled = this.translateFullToMiniMapSize(size.x, size.y);
     const windowSize = getWindowInnerSize();
@@ -35,7 +70,7 @@ export class ViewController {
       y: positionScaled.y,
       id,
     };
-  }
+  },
 
   setMiniMapViewportProportionalSize(): void {
     if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
@@ -46,14 +81,14 @@ export class ViewController {
 
     this.miniMapViewport.style.width = `${(size.x * minimapWidth) / thoughtsWidth}px`;
     this.miniMapViewport.style.height = `${(size.y * minimapHeight) / thoughtsHeight}px`;
-  }
+  },
 
   setMiniMapViewportPosition(x = 0, y = 0): void {
     if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
 
     this.miniMapViewport.style.left = `${x}px`;
     this.miniMapViewport.style.top = `${y}px`;
-  }
+  },
 
   addMiniMapViewportPosition(x = 0, y = 0): void {
     if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
@@ -64,7 +99,7 @@ export class ViewController {
       clamp(x + left, 0, mapSize.width - width),
       clamp(y + top, 0, mapSize.height - height),
     );
-  }
+  },
 
   setMiniMapViewportToPointerPosition(pointerPosition: Vector): void {
     if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
@@ -80,7 +115,7 @@ export class ViewController {
     );
     const positionScaled = this.translateCoordinatesToSpace(-pointerInMapX, -pointerInMapY, 'full');
     this.setThoughtsContainerPosition(positionScaled.x, positionScaled.y);
-  }
+  },
 
   getThoughtsContainerPosition(): Vector {
     if (!this.thoughtsContainer) return { x: 0, y: 0 };
@@ -89,7 +124,7 @@ export class ViewController {
       x: parseInt(this.thoughtsContainer.style.left, 10),
       y: parseInt(this.thoughtsContainer.style.top, 10),
     };
-  }
+  },
 
   getThoughtsContainerSize(): Vector {
     if (!this.thoughtsContainer) return { x: 0, y: 0 };
@@ -98,7 +133,7 @@ export class ViewController {
       x: parseInt(this.thoughtsContainer.style.width, 10),
       y: parseInt(this.thoughtsContainer.style.height, 10),
     };
-  }
+  },
 
   setThoughtsContainerPosition(x = 0, y = 0): void {
     if (!this.thoughtsContainer) return;
@@ -109,7 +144,7 @@ export class ViewController {
     const yInRange = clamp(y, size.y - containerSize.y, 0);
     this.thoughtsContainer.style.left = `${xInRange}px`;
     this.thoughtsContainer.style.top = `${yInRange}px`;
-  }
+  },
 
   setMapPosition(x = 0, y = 0): void {
     const { x: left, y: top } = this.getThoughtsContainerPosition();
@@ -118,7 +153,7 @@ export class ViewController {
     this.setThoughtsContainerPosition(xMap, yMap);
     const positionScaled = this.translateCoordinatesToSpace(-xMap, -yMap, 'mini');
     this.setMiniMapViewportPosition(positionScaled.x, positionScaled.y);
-  }
+  },
 
   dragMinimapViewport(x = 0, y = 0): void {
     this.addMiniMapViewportPosition(x, y);
@@ -126,13 +161,13 @@ export class ViewController {
     const positionScaled = this.translateCoordinatesToSpace(x, y, 'full');
     const containerPosition = this.getThoughtsContainerPosition();
     this.setThoughtsContainerPosition(containerPosition.x - positionScaled.x, containerPosition.y - positionScaled.y);
-  }
+  },
 
   centerMindMap(): void {
     const windowSize = getWindowInnerSize();
     const containerSize = this.getThoughtsContainerSize();
     this.setMapPosition((-containerSize.x + windowSize.x) * 0.5, (-containerSize.y + windowSize.y) * 0.5);
-  }
+  },
 
   getScaleBySpaceName(spaceName: string): Vector {
     const mapSize = getParsedStyle(this.miniMap as Element, 'width', 'height');
@@ -155,7 +190,7 @@ export class ViewController {
     }
 
     return { x: xScale, y: yScale };
-  }
+  },
 
   translateFullToMiniMapSize(width: number, height: number): Vector {
     const { x } = this.getScaleBySpaceName('mini');
@@ -164,7 +199,7 @@ export class ViewController {
       x: width * x,
       y: height * x,
     };
-  }
+  },
 
   translateCoordinatesToSpace(x = 0, y = 0, spaceName = ''): { x: number; y: number } {
     const scale = this.getScaleBySpaceName(spaceName);
@@ -173,7 +208,7 @@ export class ViewController {
       x: scale.x * x,
       y: scale.y * y,
     };
-  }
+  },
 
   getMapCenterCoordinates(): Vector {
     const size = this.getThoughtsContainerSize();
@@ -182,7 +217,7 @@ export class ViewController {
       x: size.x * 0.5,
       y: size.y * 0.5,
     };
-  }
+  },
 
   drawBezierCurve(
     start: Vector,
@@ -208,7 +243,7 @@ export class ViewController {
       end.y,
     );
     context.stroke();
-  }
+  },
 
   drawMiniature(miniature: Miniature): void {
     const { context } = this;
@@ -219,5 +254,5 @@ export class ViewController {
     context.fillStyle = 'transparent';
     context.lineWidth = 1;
     context.strokeRect(x, y, width, height);
-  }
-}
+  },
+};

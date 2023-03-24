@@ -4,7 +4,8 @@ import { MiniMap } from 'components/MiniMap';
 import { SingleThought } from 'components/SingleThought';
 import { ThoughtsContainer } from 'components/ThoughtsContainer';
 import * as Input from 'input';
-import { initializeSelector, onMouseMoveSelector, thoughtsSelector, useMindMapStore } from '../../stores/store';
+import { useMindMapStore } from '../../stores/mind-map-store';
+import { initializeSelector, onMouseMoveSelector, thoughtsSelector } from '../../stores/selectors';
 import * as Styled from './MindMap.styled';
 
 export function MindMap() {

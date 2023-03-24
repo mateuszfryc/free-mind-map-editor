@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { TFontSize } from '../../styles/themeDefault';
 
 type FlexType = {
     align?: string;
@@ -118,13 +119,13 @@ export const Link = styled.a(
         }
     `
 );
-
-export const Title = styled(({ children, ...props }) => (
-    // eslint-disable-next-line react/jsx-props-no-spreading
-  <h1 {...props}>
-    {children}
-  </h1>
-))(
+type TTileProps = {
+    display?: string;
+    margin?: string;
+    maxWidth?: string;
+    size?: TFontSize;
+}
+export const Title = styled.h1<TTileProps>(
     ({
         display = 'block',
         margin = '0 0 10px',

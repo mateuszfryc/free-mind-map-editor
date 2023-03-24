@@ -3,18 +3,14 @@ import { ChangeEvent, useCallback, useRef, useState } from 'react';
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
 import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import { SavedStateType } from 'types/baseTypes';
-import {
-  loadUploadedMindMapSelector,
-  savedMindMapSelector,
-  setDrawLockSelector,
-  useMindMapStore,
-} from '../../stores/store';
+import { useMindMapStore } from '../../stores/mind-map-store';
+import { deserializeMindMapSelector, savedMindMapSelector, setDrawLockSelector } from '../../stores/selectors';
 import * as Styled from './Navigation.styled';
 
 export function Navigation() {
   const savedMindMap = useMindMapStore(savedMindMapSelector);
   const setDrawLock = useMindMapStore(setDrawLockSelector);
-  const loadUploadedMindMap = useMindMapStore(loadUploadedMindMapSelector);
+  const deserializeMindMap = useMindMapStore(deserializeMindMapSelector);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const stickyMenuRef = useRef(null);
 
@@ -22,33 +18,36 @@ export function Navigation() {
     setIsMenuOpen((current) => !current);
   }, []);
 
-  const closeMenu = () => {
+  const closeMenu = useCallback(() => {
     if (isMenuOpen) {
       setIsMenuOpen(false);
     }
-  };
+  }, [isMenuOpen]);
 
   useOnClickOutside(stickyMenuRef, closeMenu);
 
-  const uploadSavedMindMap = (event: ChangeEvent): void => {
-    const target = event.target as HTMLInputElement;
+  const uploadSavedMindMap = useCallback(
+    (event: ChangeEvent): void => {
+      const target = event.target as HTMLInputElement;
 
-    if (target && target.files && target.files.length > 0) {
-      const reader = new FileReader();
+      if (target && target.files && target.files.length > 0) {
+        const reader = new FileReader();
 
-      reader.addEventListener('load', () => {
-        const payload = reader.result as string;
+        reader.addEventListener('load', () => {
+          const payload = reader.result as string;
 
-        if (payload && typeof payload === 'string') {
-          const result: SavedStateType = JSON.parse(payload) as SavedStateType;
-          setDrawLock(true);
-          loadUploadedMindMap(result);
-        }
-      });
+          if (payload && typeof payload === 'string') {
+            const result: SavedStateType = JSON.parse(payload) as SavedStateType;
+            setDrawLock(true);
+            deserializeMindMap(result);
+          }
+        });
 
-      reader.readAsText(target.files[0]);
-    }
-  };
+        reader.readAsText(target.files[0]);
+      }
+    },
+    [deserializeMindMap, setDrawLock],
+  );
 
   return (
     <Styled.Navigation ref={stickyMenuRef}>
