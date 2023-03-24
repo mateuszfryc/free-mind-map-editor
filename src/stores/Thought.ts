@@ -35,12 +35,12 @@ export class Thought {
     initialPosition: Vector,
     parentId?: string,
     isRootThought = false,
-    defaultText: string = defaultTextTemplate,
+    content: string = defaultTextTemplate,
   ) {
     this.children = [];
     this.childrenRelativePosition = [];
     this.closestOverlapId = undefined;
-    this.content = defaultText;
+    this.content = content;
     this.diffX = 0;
     this.diffY = 0;
     this.id = id;
@@ -48,7 +48,7 @@ export class Thought {
     this.isRootThought = isRootThought;
     this.parentId = parentId;
     this.prevIsParentOnLeft = true;
-    this.state = THOUGHT_STATE.EDITED;
+    this.state = THOUGHT_STATE.IDLE;
     this.x = initialPosition.x;
     this.y = initialPosition.y;
     this.zIndex = 2;

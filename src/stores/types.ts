@@ -25,7 +25,7 @@ export type TStore = /* View & */ {
   thoughts: Thought[];
   pointer: Pointer;
   initialize(): void;
-  addThought(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, id?: string): Thought;
+  addThought(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Thought;
   getThoughtById(id: string): Thought | undefined;
   getNewID(): string;
   getHighlightedThought(): Thought | undefined;
@@ -43,7 +43,7 @@ export type TStore = /* View & */ {
   createSiblingThought(thought: Thought): void;
   setHighlight(thoughtId: string): void;
   clearHighlight(): void;
-  setSelection(thought: Thought): void;
+  setSelection(newSelectionId: string): void;
   clearSelection(): void;
   stopEditing(checkDefaultValue?: boolean): void;
   setIsGroupDragOn(isOn: boolean): void;

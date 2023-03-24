@@ -45,8 +45,12 @@ export const useMindMapStore = create(
         view.setReferences();
         store.updateWorkspaceSize();
         view.setThoughtsContainerPosition();
-        view.centerMindMap();
-        store.setPositionAsync(store.rootThought.id, view.getMapCenterCoordinates());
+        const root = store.rootThought;
+        if (root.x === 0 && root.y === 0) {
+          store.setPositionAsync(root.id, view.getMapCenterCoordinates());
+        }
+
+        store.setSelection(root.id);
         store.editSelection();
 
         const drawLoop = (): void => {
@@ -55,20 +59,30 @@ export const useMindMapStore = create(
         };
 
         drawLoop();
-        store.restoreChildrenRelativePosition(store.rootThought.id);
+        store.restoreChildrenRelativePosition(root.id);
+
+        setTimeout(() => {
+          view.centerOnThought(store.rootThought);
+        }, 500);
       },
 
       getNewID(): string {
         return uuidv4();
       },
 
-      addThought(position: Vector, isRoot?: boolean, parentId?: string, initText?: string): Thought {
+      addThought(
+        position: Vector,
+        isRoot?: boolean,
+        parentId?: string,
+        initText?: string,
+        existingId?: string,
+      ): Thought {
         const store = get();
 
-        const thought = new Thought(store.getNewID(), position, parentId, isRoot, initText);
+        const thought = new Thought(existingId ?? store.getNewID(), position, parentId, isRoot, initText);
         store.updateSingleItem(thought);
         if (isRoot) {
-          store.rootThought = thought;
+          set(() => ({ rootThought: thought }));
         }
 
         store.setPositionAsync(thought.id, position);
@@ -160,7 +174,7 @@ export const useMindMapStore = create(
         const newChild: Thought = store.addThought(targetPosition, false, parent.id);
         parent.children.push(newChild.id);
 
-        store.setSelection(newChild);
+        store.setSelection(newChild.id);
         store.resolveOverlaps(newChild);
         newChild.refreshPosition();
         store.saveChildrenRelativePosition(parent.id);
@@ -182,7 +196,7 @@ export const useMindMapStore = create(
 
         if (sibling.parentId !== undefined) store.addChildThought(sibling.parentId, newSibling.id);
 
-        store.setSelection(newSibling);
+        store.setSelection(newSibling.id);
         store.resolveOverlaps(newSibling);
         newSibling.refreshPosition();
 
@@ -199,6 +213,9 @@ export const useMindMapStore = create(
         if (!parent) return;
 
         parent.children = parent.children.filter((childId) => childId !== childToBeRemovedId);
+        parent.childrenRelativePosition = parent.childrenRelativePosition.filter(
+          (position) => position.id !== childToBeRemovedId,
+        );
 
         const child = store.getThoughtById(childToBeRemovedId);
         if (!child) return;
@@ -253,8 +270,10 @@ export const useMindMapStore = create(
         if (!parent || parent.children.length < 1) return [];
 
         const childrenIds = store.getChildrenIds(parentId, includeGrandChildren);
+        const children = childrenIds.map((childId) => store.getThoughtById(childId));
+        const filtered = children.filter(Boolean) as Thought[];
 
-        return childrenIds.map((childId) => store.getThoughtById(childId)).filter(Boolean) as Thought[];
+        return filtered;
       },
 
       setHighlight(thoughtId: string): void {
@@ -265,7 +284,7 @@ export const useMindMapStore = create(
         set(() => ({ highlightId: undefined }));
       },
 
-      setSelection(item: Thought): void {
+      setSelection(newSelectionId: string): void {
         const store = get();
         if (store.selectionId !== undefined) {
           const selection = store.getSelectedThought();
@@ -274,9 +293,13 @@ export const useMindMapStore = create(
             store.updateSingleItem(selection);
           }
         }
-        set(() => ({ selectionId: item.id }));
-        item.setState(THOUGHT_STATE.SELECTED);
-        store.updateSingleItem(item);
+        set(() => ({ selectionId: newSelectionId }));
+        const newlySelected = store.getThoughtById(newSelectionId);
+        if (!newlySelected) {
+          throw new Error('Could not find newly selected item');
+        }
+        newlySelected.setState(THOUGHT_STATE.SELECTED);
+        store.updateSingleItem(newlySelected);
       },
 
       clearSelection(): void {
@@ -541,17 +564,17 @@ export const useMindMapStore = create(
 
         return {
           thoughts: store.thoughts.map((t: Thought): SavedThoughtStateType => {
-            const { content, id, isRootThought, prevIsParentOnLeft, x, y } = t;
+            const { content, id, isRootThought, prevIsParentOnLeft, x, y, parentId, children } = t;
 
             return {
-              children: t.children.map((child) => child),
               content,
               id,
               isRootThought,
-              parentId: t.parentId,
               prevIsParentOnLeft,
               x,
               y,
+              parentId,
+              children,
             };
           }),
         };
@@ -571,56 +594,27 @@ export const useMindMapStore = create(
         store.clearSelection();
         set(() => ({ thoughts: [] }));
 
-        const uploadedThoughts: Thought[] = saved.thoughts.map((t: SavedThoughtStateType): Thought => {
-          const { id, x, y, isRootThought, content } = t;
-          const restored: Thought = store.addThought({ x, y }, isRootThought, undefined, content, id);
+        let rootId: string | undefined;
 
+        // recreate saved nodes
+        const uploadedThoughts: Thought[] = saved.thoughts.map((t: SavedThoughtStateType): Thought => {
+          const { id, x, y, isRootThought, content, parentId } = t;
+          const restored: Thought = store.addThought({ x, y }, isRootThought, parentId, content, id);
+          restored.children = t.children;
+          store.saveChildrenRelativePosition(restored.id);
+          if (isRootThought) rootId = id;
           return restored;
         });
 
-        const thoughts = uploadedThoughts.map((thought: Thought): Thought => {
-          const t = thought;
-          const savedThought = saved.thoughts.find((savedT) => savedT.id === t.id);
-
-          if (!savedThought) return t;
-
-          const { parentId } = savedThought;
-          if (parentId !== undefined) {
-            const parent = uploadedThoughts.find((potentialParent) => potentialParent.id === parentId);
-            if (parent) {
-              t.setParent(parent.id);
-            }
-          }
-          if (savedThought.children.length > 0) {
-            savedThought.children.forEach((childId: string): void => {
-              const child = uploadedThoughts.find((potentialChild) => potentialChild.id === childId);
-              if (child) {
-                store.addChildThought(t.id, child.id);
-              }
-            });
-          }
-          store.saveChildrenRelativePosition(t.id);
-          t.prevIsParentOnLeft = savedThought.prevIsParentOnLeft;
-          t.state = 0;
-
-          return t;
-        });
-
-        set(() => ({ thoughts }));
-
-        store.thoughts.forEach((t: Thought) => {
-          t.refreshPosition();
-          if (t.isRootThought) {
-            const root = store.rootThought;
-
-            root.updateContent(t.content);
-            root.id = t.id;
-            store.setPositionAsync(root.id, { x: t.x, y: t.y }, () => {
-              set(() => ({ isDrawingLocked: false }));
-              store.saveCurrentMindMapAsJSON();
-            });
-          }
-        });
+        const postSetup = () => {
+          set(() => ({ thoughts: uploadedThoughts }));
+          set(() => ({ isDrawingLocked: false }));
+          store.setSelection(store.rootThought.id);
+          store.editSelection();
+          view.centerOnThought(store.rootThought);
+          store.restoreChildrenRelativePosition(store.rootThought.id);
+        };
+        setTimeout(postSetup, 500);
       },
 
       setDrawLock(isDrawingLocked: boolean): void {
@@ -628,13 +622,24 @@ export const useMindMapStore = create(
       },
 
       draw(): void {
+        if (!view) {
+          throw new Error('View object reference not avilable');
+        }
+
         const store = get();
-        if (!view.canvas || !view.context || !view.canvas || store.isDrawingLocked) return;
+        if (store.isDrawingLocked) return;
+
+        const { canvas, context } = view;
+        if (!canvas) {
+          throw new Error('canvas object reference not avilable');
+        }
+        if (!context) {
+          throw new Error('context object reference not avilable');
+        }
 
         const { connectorsCurveDividerWidth, rootThought, thoughts } = store;
 
-        // view.context.translate(0.5, 0.5);
-        view.context?.clearRect(0, 0, view.canvas.width, view.canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
 
         if (thoughts.length < 1 || rootThought === undefined) return;
 
@@ -731,7 +736,7 @@ export const useMindMapStore = create(
       customOnFinishHydration(): void {
         const store = get();
         const hydratedThoughts = store.thoughts.map((thought) => Thought.clone(thought));
-        const root = hydratedThoughts.filter(({ isRootThought }) => !isRootThought)[0];
+        const root = hydratedThoughts.find(({ isRootThought }) => !!isRootThought);
 
         set(() => ({
           thoughts: hydratedThoughts,
@@ -741,7 +746,7 @@ export const useMindMapStore = create(
     }),
     {
       // local storage id, change to abandon current storage and use new local storage
-      name: 'c913d614-da17-4383-809f-fa6d631453540',
+      name: 'c913d614-da17-4383-809f-fa6d631453543',
       merge: (persistedState: unknown, currentState: TStore): TStore => {
         const retrivedState = persistedState as TStore;
         const retrivedThoughts = retrivedState.thoughts.map((thought) => Thought.clone(thought));
@@ -750,14 +755,14 @@ export const useMindMapStore = create(
           ...retrivedState,
           ...currentState,
           thoughts: retrivedThoughts,
-          rootThought: retrivedThoughts.filter(({ isRootThought }) => !isRootThought)[0],
+          rootThought: retrivedThoughts.find(({ isRootThought }) => !!isRootThought),
         } as TStore;
       },
     },
   ),
 );
 
-export const useSelection = (): [Thought | undefined, (thought: Thought) => void, () => void] =>
+export const useSelection = (): [Thought | undefined, (id: string) => void, () => void] =>
   useMindMapStore(
     (state) => [state.getSelectedThought(), state.setSelection.bind(state), state.editSelection.bind(state)],
     shallow,

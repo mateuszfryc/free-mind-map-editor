@@ -82,7 +82,7 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
     if (KEYS[TAB].isPressed && selection.parentId !== undefined) {
       const parent = store.getThoughtById(selection.parentId);
       if (parent) {
-        store.setSelection(parent);
+        store.setSelection(parent.id);
       }
     }
 

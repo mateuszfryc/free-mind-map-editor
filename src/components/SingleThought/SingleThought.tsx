@@ -75,7 +75,7 @@ export function SingleThought({ thought }: ThoughtProps) {
 
   const onMouseDown = useCallback(() => {
     if (!selection || selection.id !== thought.id) {
-      setSelection(thought);
+      setSelection(thought.id);
     }
   }, [selection, setSelection, thought]);
 

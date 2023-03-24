@@ -2,6 +2,7 @@ import { colors } from 'styles/themeDefault';
 import { Miniature, Vector } from 'types/baseTypes';
 import { get, getParsedStyle, getWindowInnerSize } from 'utils/get';
 import { clamp } from 'utils/math';
+import { Thought } from './Thought';
 
 export type View = {
   canvas?: HTMLCanvasElement;
@@ -20,6 +21,7 @@ export type View = {
   setThoughtsContainerPosition(x?: number, y?: number): void;
   setMapPosition(x?: number, y?: number): void;
   dragMinimapViewport(x?: number, y?: number): void;
+  centerOnThought(v: Vector): void;
   centerMindMap(): void;
   getScaleBySpaceName(spaceName: string): Vector;
   translateFullToMiniMapSize(width: number, height: number): Vector;
@@ -161,6 +163,17 @@ export const view: View = {
     const positionScaled = this.translateCoordinatesToSpace(x, y, 'full');
     const containerPosition = this.getThoughtsContainerPosition();
     this.setThoughtsContainerPosition(containerPosition.x - positionScaled.x, containerPosition.y - positionScaled.y);
+  },
+
+  //   centerOnThought(v: Vector): void {
+  //     const windowSize = getWindowInnerSize();
+  //     this.setMapPosition(-v.x + windowSize.x * 0.5, -v.y + windowSize.y * 0.5);
+  //   },
+
+  centerOnThought(thought: Thought): void {
+    const windowSize = getWindowInnerSize();
+    const { x: left, y: top } = this.getThoughtsContainerPosition();
+    this.setMapPosition(-thought.x - left + windowSize.x * 0.5, -thought.y - top + windowSize.y * 0.5);
   },
 
   centerMindMap(): void {
