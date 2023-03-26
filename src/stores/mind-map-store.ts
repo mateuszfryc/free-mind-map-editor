@@ -36,6 +36,7 @@ export const useMindMapStore = create(
       scale: 1,
       lastNewId: 0,
       selection: undefined,
+      saveDebounceId: undefined,
 
       initialize(): void {
         const store = get();
@@ -207,6 +208,33 @@ export const useMindMapStore = create(
         }, 100);
       },
 
+      removeThought(thoughtId: string): void {
+        const store = get();
+        const thought = store.getThoughtById(thoughtId);
+        if (!thought) return;
+
+        thought.markForRemoval();
+
+        if (thought.parentId !== undefined) {
+          store.removeChildThought(thought.parentId, thoughtId);
+        }
+        if (store.highlightId === thoughtId) {
+          set(() => ({ highlightId: undefined }));
+        }
+        if (store.selectionId === thoughtId) {
+          set(() => ({ selectionId: undefined }));
+        }
+
+        set(() => ({
+          thoughts: [...store.thoughts.filter((item: Thought) => item.id !== thoughtId)],
+        }));
+        thought.children.forEach((childId) => {
+          store.removeThought(childId);
+        });
+
+        store.saveCurrentMindMapAsJSON();
+      },
+
       removeChildThought(parentId: string, childToBeRemovedId: string): void {
         const store = get();
         const parent = store.getThoughtById(parentId);
@@ -309,7 +337,7 @@ export const useMindMapStore = create(
         if (!selection) return;
 
         if (!selection.hasValue() && !selection.hasDefaultValue() && !selection.isRootThought) {
-          store.removeThought(selection);
+          store.removeThought(selection.id);
 
           return;
         }
@@ -328,7 +356,7 @@ export const useMindMapStore = create(
         const isntRootThought = selection.id !== store.rootThought.id;
         const hasDefaultValue = checkDefaultValue && !selection.hasDefaultValue();
         if ((isEmpty && isntRootThought) || hasDefaultValue) {
-          store.removeThought(selection);
+          store.removeThought(selection.id);
 
           return;
         }
@@ -347,38 +375,12 @@ export const useMindMapStore = create(
         set(() => ({ isGroupDragOn: isOn }));
       },
 
-      removeThought(thought: Thought): void {
-        const store = get();
-        thought.markForRemoval();
-
-        if (store.highlightId === thought.id) {
-          set(() => ({ highlightId: undefined }));
-        }
-        if (store.selectionId === thought.id) {
-          set(() => ({ selectionId: undefined }));
-        }
-        thought.children.forEach((childId) => {
-          const child = store.getThoughtById(childId);
-          if (!child) return;
-          store.removeThought(child);
-        });
-        if (thought.parentId !== undefined) {
-          store.removeChildThought(thought.parentId, thought.id);
-        }
-        set(() => ({
-          thoughts: store.thoughts.filter((item: Thought) => item.id !== thought.id),
-        }));
-        setTimeout(() => {
-          store.saveCurrentMindMapAsJSON();
-        }, 200);
-      },
-
       /* Remove thought and return true if was removed and false if it wasn't. */
       removeIfEmpty(thought: Thought): boolean {
         const store = get();
 
         if (!thought.hasValue() && !thought.hasDefaultValue()) {
-          store.removeThought(thought);
+          store.removeThought(thought.id);
 
           return true;
         }
@@ -583,8 +585,14 @@ export const useMindMapStore = create(
       saveCurrentMindMapAsJSON(): void {
         const store = get();
 
-        const data = JSON.stringify(store.getCurrentMindMapState());
-        set(() => ({ savedMindMap: `text/json;charset=utf-8,${encodeURIComponent(data)}` }));
+        if (store.saveDebounceId) clearTimeout(store.saveDebounceId);
+
+        set(() => ({
+          saveDebounceId: setTimeout(() => {
+            const data = JSON.stringify(store.getCurrentMindMapState());
+            set(() => ({ savedMindMap: `text/json;charset=utf-8,${encodeURIComponent(data)}` }));
+          }, 500),
+        }));
       },
 
       deserializeMindMap(saved: SavedStateType): void {
@@ -594,15 +602,12 @@ export const useMindMapStore = create(
         store.clearSelection();
         set(() => ({ thoughts: [] }));
 
-        let rootId: string | undefined;
-
         // recreate saved nodes
         const uploadedThoughts: Thought[] = saved.thoughts.map((t: SavedThoughtStateType): Thought => {
           const { id, x, y, isRootThought, content, parentId } = t;
           const restored: Thought = store.addThought({ x, y }, isRootThought, parentId, content, id);
           restored.children = t.children;
           store.saveChildrenRelativePosition(restored.id);
-          if (isRootThought) rootId = id;
           return restored;
         });
 
@@ -746,7 +751,7 @@ export const useMindMapStore = create(
     }),
     {
       // local storage id, change to abandon current storage and use new local storage
-      name: 'c913d614-da17-4383-809f-fa6d631453543',
+      name: 'c913d614-da17-4383-809f-fa6d6314535491',
       merge: (persistedState: unknown, currentState: TStore): TStore => {
         const retrivedState = persistedState as TStore;
         const retrivedThoughts = retrivedState.thoughts.map((thought) => Thought.clone(thought));

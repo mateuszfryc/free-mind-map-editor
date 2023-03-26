@@ -110,7 +110,7 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
   }
 
   if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
-    store.removeThought(selection);
+    store.removeThought(selection.id);
 
     return;
   }

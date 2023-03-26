@@ -24,6 +24,7 @@ export type TStore = /* View & */ {
   selectionId?: string;
   thoughts: Thought[];
   pointer: Pointer;
+  saveDebounceId?: NodeJS.Timeout;
   initialize(): void;
   addThought(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Thought;
   getThoughtById(id: string): Thought | undefined;
@@ -47,7 +48,7 @@ export type TStore = /* View & */ {
   clearSelection(): void;
   stopEditing(checkDefaultValue?: boolean): void;
   setIsGroupDragOn(isOn: boolean): void;
-  removeThought(thought: Thought): void;
+  removeThought(thoughtId: string): void;
   removeIfEmpty(thought: Thought): void;
   editSelection(): void;
   isParentOnLeft(thoughtId: string): boolean;
