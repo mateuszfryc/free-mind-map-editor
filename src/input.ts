@@ -1,4 +1,4 @@
-import { THOUGHT_STATE } from 'types/baseTypes';
+import { NODE_STATE } from 'types/baseTypes';
 import { useMindMapStore } from './stores/mind-map-store';
 
 export class KeyData {
@@ -53,7 +53,7 @@ const KEYS_BINDINGS: BindingsInterface = {
 
 export function onPressKeyHandler(event: KeyboardEvent): void {
   const store = useMindMapStore.getState();
-  const selection = store.getSelectedThought();
+  const selection = store.getSelectedNode();
   const { key, keyCode, shiftKey } = event;
 
   if (key) {
@@ -80,7 +80,7 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
   // allow to navigate back to parent (select parent) by pressing shift + tab
   if (KEYS[SHIFT].isPressed) {
     if (KEYS[TAB].isPressed && selection.parentId !== undefined) {
-      const parent = store.getThoughtById(selection.parentId);
+      const parent = store.getNodeById(selection.parentId);
       if (parent) {
         store.setSelection(parent.id);
       }
@@ -90,13 +90,13 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
   }
 
   if (KEYS_BINDINGS.addChild.isPressed) {
-    store.createChildThought(selection);
+    store.createChildNode(selection);
 
     return;
   }
 
   if (KEYS_BINDINGS.addSibling.isPressed && hasParent) {
-    store.createSiblingThought(selection);
+    store.createSiblingNode(selection);
 
     return;
   }
@@ -109,8 +109,8 @@ export function onPressKeyHandler(event: KeyboardEvent): void {
     return;
   }
 
-  if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootThought) {
-    store.removeThought(selection.id);
+  if (KEYS_BINDINGS.deleteSelected.isPressed && !selection.isRootNode) {
+    store.removeNode(selection.id);
 
     return;
   }
@@ -140,8 +140,8 @@ export function onReleaseKeyHandler(event: KeyboardEvent): void {
 export function onMouseDownHandler(event: MouseEvent): void {
   const store = useMindMapStore.getState();
   const { pointer } = store;
-  const highlight = store.getHighlightedThought();
-  const selection = store.getSelectedThought();
+  const highlight = store.getHighlightedNode();
+  const selection = store.getSelectedNode();
   const target = event.target as HTMLElement;
   pointer.setDraggedId(target.id);
   const { id } = target;
@@ -168,8 +168,8 @@ export function onMouseDownHandler(event: MouseEvent): void {
 export function onMouseUpHandler(): void {
   const store = useMindMapStore.getState();
   const { pointer } = store;
-  const highlight = store.getHighlightedThought();
-  const selection = store.getSelectedThought();
+  const highlight = store.getHighlightedNode();
+  const selection = store.getSelectedNode();
   pointer.setIsLeftButtonDown(false);
 
   if (highlight && highlight.isBeingDragged()) {
@@ -179,14 +179,14 @@ export function onMouseUpHandler(): void {
       !store.isParentOf(highlight.id, closestOverlapId, true) &&
       !store.isChildOf(closestOverlapId, highlight.id)
     ) {
-      if (parentId) store.removeChildThought(parentId, highlight.id);
-      store.addChildThought(closestOverlapId, highlight.id);
+      if (parentId) store.removeChildNode(parentId, highlight.id);
+      store.addChildNode(closestOverlapId, highlight.id);
       store.resolveOverlaps(highlight, 'x');
       store.restoreChildrenRelativePosition(highlight.id);
       store.getChildren(highlight.id, true).forEach((child) => store.resolveOverlaps(child));
     }
 
-    highlight.setState(THOUGHT_STATE.SELECTED);
+    highlight.setState(NODE_STATE.SELECTED);
     if (!pointer.wasShiftPressedOnDown) store.restoreChildrenRelativePosition(highlight.id);
   }
 
@@ -196,11 +196,3 @@ export function onMouseUpHandler(): void {
     store.saveCurrentMindMapAsJSON();
   }, 100);
 }
-
-// export function onMouseMoveHandler(event: MouseEvent): void {
-//     const { pointer } = useStore.getState();
-//     pointer.lastPosition.x = pointer.position.x;
-//     pointer.lastPosition.y = pointer.position.y;
-//     pointer.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-//     pointer.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-// }

@@ -1,4 +1,4 @@
-import { ChildPositionData, ObjectOfVectors, THOUGHT_STATE, Vector } from 'types/baseTypes';
+import { ChildPositionData, NODE_STATE, ObjectOfVectors, Vector } from 'types/baseTypes';
 import { getParsedStyle, getWindowInnerSize } from 'utils/get';
 
 const defaultTextTemplate = "What's on your mind?";
@@ -8,12 +8,12 @@ type BoundingBox = {
   y: number;
   height: number;
   width: number;
-  parent: Thought;
+  parent: Node;
 };
 
-/** Thought represents data structure and methods for single mind map item - a single thought. */
+/** Node represents data structure and methods for single mind map item - a single node. */
 
-export class Thought {
+export class Node {
   id: string;
   children: string[];
   childrenRelativePosition: ChildPositionData[];
@@ -22,7 +22,7 @@ export class Thought {
   diffX: number;
   diffY: number;
   isMarkedForRemoval: boolean;
-  isRootThought: boolean;
+  isRootNode: boolean;
   parentId?: string;
   prevIsParentOnLeft: boolean;
   state: number;
@@ -34,7 +34,7 @@ export class Thought {
     id: string,
     initialPosition: Vector,
     parentId?: string,
-    isRootThought = false,
+    isRootNode = false,
     content: string = defaultTextTemplate,
   ) {
     this.children = [];
@@ -45,10 +45,10 @@ export class Thought {
     this.diffY = 0;
     this.id = id;
     this.isMarkedForRemoval = false;
-    this.isRootThought = isRootThought;
+    this.isRootNode = isRootNode;
     this.parentId = parentId;
     this.prevIsParentOnLeft = true;
-    this.state = THOUGHT_STATE.IDLE;
+    this.state = NODE_STATE.IDLE;
     this.x = initialPosition.x;
     this.y = initialPosition.y;
     this.zIndex = 2;
@@ -71,15 +71,15 @@ export class Thought {
   }
 
   isIdle(): boolean {
-    return this.state === THOUGHT_STATE.IDLE;
+    return this.state === NODE_STATE.IDLE;
   }
 
   isEdited(): boolean {
-    return this.state === THOUGHT_STATE.EDITED;
+    return this.state === NODE_STATE.EDITED;
   }
 
   isBeingDragged(): boolean {
-    return this.state === THOUGHT_STATE.DRAGGED;
+    return this.state === NODE_STATE.DRAGGED;
   }
 
   getBoundingBox(): BoundingBox {
@@ -115,7 +115,7 @@ export class Thought {
     };
   }
 
-  addPosition(positionToAdd: Vector): Thought {
+  addPosition(positionToAdd: Vector): Node {
     this.x += positionToAdd.x;
     this.y += positionToAdd.y;
     const element: HTMLElement | null = this.getElement();
@@ -135,7 +135,7 @@ export class Thought {
     };
   }
 
-  setPosition(newPosition: Vector): Thought {
+  setPosition(newPosition: Vector): Node {
     this.x = newPosition.x;
     this.y = newPosition.y;
     const element: HTMLElement | null = this.getElement();
@@ -250,13 +250,13 @@ export class Thought {
     return this.content !== defaultTextTemplate;
   }
 
-  setOnTop(): Thought {
+  setOnTop(): Node {
     this.zIndex = 3;
 
     return this;
   }
 
-  resetZIndex(): Thought {
+  resetZIndex(): Node {
     this.zIndex = 2;
 
     return this;
@@ -270,8 +270,8 @@ export class Thought {
     this.prevIsParentOnLeft = isOnTheLeft;
   }
 
-  setClosestOverlap(thoughtId: string): void {
-    this.closestOverlapId = thoughtId;
+  setClosestOverlap(nodeId: string): void {
+    this.closestOverlapId = nodeId;
   }
 
   clearClosestOverlap(): void {
@@ -297,10 +297,10 @@ export class Thought {
   }
 
   /*
-    Return offset of the given thought in relation to viewport.
+    Return offset of the given node in relation to viewport.
     If position is outside of left or top the axis value will be below 0.
     If position is outside of right or bottom it will be higher than zero.
-    If thought element is fully inside viewport axis value will be 0.
+    If node element is fully inside viewport axis value will be 0.
   */
   getViewportOffset(): Vector {
     const element = this.getElement();
@@ -331,20 +331,20 @@ export class Thought {
     };
   }
 
-  static clone(thought: Thought): Thought {
-    const clone = new Thought(thought.id, { x: thought.x, y: thought.y }, thought.parentId);
+  static clone(node: Node): Node {
+    const clone = new Node(node.id, { x: node.x, y: node.y }, node.parentId);
 
-    clone.children = thought.children;
-    clone.childrenRelativePosition = thought.childrenRelativePosition;
-    clone.closestOverlapId = thought.closestOverlapId;
-    clone.content = thought.content;
-    clone.diffX = thought.diffX;
-    clone.diffY = thought.diffY;
-    clone.isMarkedForRemoval = thought.isMarkedForRemoval;
-    clone.isRootThought = thought.isRootThought;
-    clone.prevIsParentOnLeft = thought.prevIsParentOnLeft;
-    clone.state = thought.state;
-    clone.zIndex = thought.zIndex;
+    clone.children = node.children;
+    clone.childrenRelativePosition = node.childrenRelativePosition;
+    clone.closestOverlapId = node.closestOverlapId;
+    clone.content = node.content;
+    clone.diffX = node.diffX;
+    clone.diffY = node.diffY;
+    clone.isMarkedForRemoval = node.isMarkedForRemoval;
+    clone.isRootNode = node.isRootNode;
+    clone.prevIsParentOnLeft = node.prevIsParentOnLeft;
+    clone.state = node.state;
+    clone.zIndex = node.zIndex;
 
     return clone;
   }

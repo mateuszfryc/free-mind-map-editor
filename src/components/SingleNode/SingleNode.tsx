@@ -1,32 +1,32 @@
 import { ChangeEvent, useCallback, useEffect, useRef } from 'react';
 
-import { Thought } from 'stores/Thought';
+import { Node } from 'stores/Node';
 import { getSafeRef } from 'utils/get';
 import { useMindMapStore, useSelection } from '../../stores/mind-map-store';
 import {
   clearHighlightSelector,
-  initialThoughtWidthSelector,
+  initialNodeWidthSelector,
   pointerSelector,
   setHighlightSelector,
   updateSelectionContentSelector,
 } from '../../stores/selectors';
-import * as Styled from './SingleThought.styled';
+import * as Styled from './SingleNode.styled';
 
-type ThoughtProps = {
-  thought: Thought;
+type NodeProps = {
+  node: Node;
 };
 
-export function SingleThought({ thought }: ThoughtProps) {
+export function SingleNode({ node }: NodeProps) {
   const pointer = useMindMapStore(pointerSelector);
   const [selection, setSelection, editSelection] = useSelection();
   const updateSelectionContent = useMindMapStore(updateSelectionContentSelector);
   const setHighlight = useMindMapStore(setHighlightSelector);
   const clearHighlight = useMindMapStore(clearHighlightSelector);
-  const initialThoughtWidth = useMindMapStore(initialThoughtWidthSelector);
+  const initialNodeWidth = useMindMapStore(initialNodeWidthSelector);
 
   const contentRef = useRef(null);
-  const isSelected = thought.isIdle && !thought.isIdle();
-  const isEdited = thought.isEdited && thought.isEdited();
+  const isSelected = node.isIdle && !node.isIdle();
+  const isEdited = node.isEdited && node.isEdited();
 
   const updateContent = useCallback(
     (event: ChangeEvent): void => {
@@ -40,32 +40,32 @@ export function SingleThought({ thought }: ThoughtProps) {
         updateSelectionContent(value);
 
         window.setTimeout(() => {
-          textareaSafeRef.style.width = `${thought.getWidth()}px`;
-          textareaSafeRef.style.height = `${thought.getHeight()}px`;
+          textareaSafeRef.style.width = `${node.getWidth()}px`;
+          textareaSafeRef.style.height = `${node.getHeight()}px`;
           textareaSafeRef.style.overflow = 'visible';
-          thought.refreshPosition();
+          node.refreshPosition();
         }, 5);
       }
     },
-    [thought, updateSelectionContent],
+    [node, updateSelectionContent],
   );
 
   useEffect(() => {
-    if (thought.isEdited && thought.isEdited()) {
+    if (node.isEdited && node.isEdited()) {
       const textareaSafeRef = getSafeRef<HTMLTextAreaElement>(contentRef);
       if (textareaSafeRef) {
-        textareaSafeRef.style.width = `${thought.getWidth() + 2}px`;
-        textareaSafeRef.style.height = `${thought.getHeight()}px`;
+        textareaSafeRef.style.width = `${node.getWidth() + 2}px`;
+        textareaSafeRef.style.height = `${node.getHeight()}px`;
         textareaSafeRef.select();
       }
     }
-  }, [thought, thought.state]);
+  }, [node, node.state]);
 
   const onMouseEnter = useCallback((): void => {
     if (!pointer.isLeftButtonDown) {
-      setHighlight(thought.id);
+      setHighlight(node.id);
     }
-  }, [pointer.isLeftButtonDown, setHighlight, thought]);
+  }, [pointer.isLeftButtonDown, setHighlight, node]);
 
   const onMouseLeave = useCallback((): void => {
     if (!pointer.isLeftButtonDown) {
@@ -74,28 +74,26 @@ export function SingleThought({ thought }: ThoughtProps) {
   }, [clearHighlight, pointer.isLeftButtonDown]);
 
   const onMouseDown = useCallback(() => {
-    if (!selection || selection.id !== thought.id) {
-      setSelection(thought.id);
+    if (!selection || selection.id !== node.id) {
+      setSelection(node.id);
     }
-  }, [selection, setSelection, thought]);
+  }, [selection, setSelection, node]);
 
   return (
-    <Styled.Thought
-      id={`${thought.id}`}
+    <Styled.Node
+      id={`${node.id}`}
       isEdited={isEdited}
       isSelected={isSelected}
-      maxWidth={initialThoughtWidth}
+      maxWidth={initialNodeWidth}
       onDoubleClick={editSelection}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
-      zIndex={thought.zIndex}
+      zIndex={node.zIndex}
     >
-      <div className='underline' id={`${thought.id}`} />
-      {thought.content}
-      {isEdited && (
-        <Styled.Textarea id={`${thought.id}`} onChange={updateContent} ref={contentRef} value={thought.content} />
-      )}
-    </Styled.Thought>
+      <div className='underline' id={`${node.id}`} />
+      {node.content}
+      {isEdited && <Styled.Textarea id={`${node.id}`} onChange={updateContent} ref={contentRef} value={node.content} />}
+    </Styled.Node>
   );
 }

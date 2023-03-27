@@ -2,12 +2,12 @@ import { colors } from 'styles/themeDefault';
 import { Miniature, Vector } from 'types/baseTypes';
 import { get, getParsedStyle, getWindowInnerSize } from 'utils/get';
 import { clamp } from 'utils/math';
-import { Thought } from './Thought';
+import { Node } from './Node';
 
 export type View = {
   canvas?: HTMLCanvasElement;
   context?: CanvasRenderingContext2D | null;
-  thoughtsContainer?: HTMLDivElement;
+  nodesContainer?: HTMLDivElement;
   miniMap?: HTMLDivElement;
   miniMapViewport?: HTMLDivElement;
   setReferences(): void;
@@ -16,12 +16,12 @@ export type View = {
   setMiniMapViewportPosition(x?: number, y?: number): void;
   addMiniMapViewportPosition(x?: number, y?: number): void;
   setMiniMapViewportToPointerPosition(pointerPosition: Vector): void;
-  getThoughtsContainerPosition(): Vector;
-  getThoughtsContainerSize(): Vector;
-  setThoughtsContainerPosition(x?: number, y?: number): void;
+  getNodesContainerPosition(): Vector;
+  getNodesContainerSize(): Vector;
+  setNodesContainerPosition(x?: number, y?: number): void;
   setMapPosition(x?: number, y?: number): void;
   dragMinimapViewport(x?: number, y?: number): void;
-  centerOnThought(v: Vector): void;
+  centerOnNode(v: Vector): void;
   centerMindMap(): void;
   getScaleBySpaceName(spaceName: string): Vector;
   translateFullToMiniMapSize(width: number, height: number): Vector;
@@ -41,7 +41,7 @@ export type View = {
 export const view: View = {
   canvas: undefined,
   context: null,
-  thoughtsContainer: undefined,
+  nodesContainer: undefined,
   miniMap: undefined,
   miniMapViewport: undefined,
 
@@ -51,7 +51,7 @@ export const view: View = {
 
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
-    this.thoughtsContainer = get<HTMLDivElement>('#thoughts-container');
+    this.nodesContainer = get<HTMLDivElement>('#nodes-container');
     this.miniMap = get<HTMLDivElement>('#mini-map');
     this.miniMapViewport = get<HTMLDivElement>('#mini-map__viewport');
     this.setMiniMapViewportProportionalSize();
@@ -75,25 +75,25 @@ export const view: View = {
   },
 
   setMiniMapViewportProportionalSize(): void {
-    if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
+    if (!this.context || !this.nodesContainer || !this.miniMap || !this.miniMapViewport) return;
 
     const size = getWindowInnerSize();
-    const { width: thoughtsWidth, height: thoughtsHeight } = getParsedStyle(this.thoughtsContainer, 'width', 'height');
+    const { width: nodesWidth, height: nodesHeight } = getParsedStyle(this.nodesContainer, 'width', 'height');
     const { width: minimapWidth, height: minimapHeight } = getParsedStyle(this.miniMap, 'width', 'height');
 
-    this.miniMapViewport.style.width = `${(size.x * minimapWidth) / thoughtsWidth}px`;
-    this.miniMapViewport.style.height = `${(size.y * minimapHeight) / thoughtsHeight}px`;
+    this.miniMapViewport.style.width = `${(size.x * minimapWidth) / nodesWidth}px`;
+    this.miniMapViewport.style.height = `${(size.y * minimapHeight) / nodesHeight}px`;
   },
 
   setMiniMapViewportPosition(x = 0, y = 0): void {
-    if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
+    if (!this.context || !this.nodesContainer || !this.miniMap || !this.miniMapViewport) return;
 
     this.miniMapViewport.style.left = `${x}px`;
     this.miniMapViewport.style.top = `${y}px`;
   },
 
   addMiniMapViewportPosition(x = 0, y = 0): void {
-    if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
+    if (!this.context || !this.nodesContainer || !this.miniMap || !this.miniMapViewport) return;
 
     const mapSize = getParsedStyle(this.miniMap, 'width', 'height');
     const { left, top, width, height } = getParsedStyle(this.miniMapViewport, 'left', 'top', 'width', 'height');
@@ -104,7 +104,7 @@ export const view: View = {
   },
 
   setMiniMapViewportToPointerPosition(pointerPosition: Vector): void {
-    if (!this.context || !this.thoughtsContainer || !this.miniMap || !this.miniMapViewport) return;
+    if (!this.context || !this.nodesContainer || !this.miniMap || !this.miniMapViewport) return;
 
     const mapStyle = getParsedStyle(this.miniMap, 'width', 'height', 'right', 'bottom');
     const viewportStyle = getParsedStyle(this.miniMapViewport, 'left', 'top', 'width', 'height');
@@ -116,43 +116,43 @@ export const view: View = {
       clamp(pointerInMapY, 0, mapStyle.height - viewportStyle.height),
     );
     const positionScaled = this.translateCoordinatesToSpace(-pointerInMapX, -pointerInMapY, 'full');
-    this.setThoughtsContainerPosition(positionScaled.x, positionScaled.y);
+    this.setNodesContainerPosition(positionScaled.x, positionScaled.y);
   },
 
-  getThoughtsContainerPosition(): Vector {
-    if (!this.thoughtsContainer) return { x: 0, y: 0 };
+  getNodesContainerPosition(): Vector {
+    if (!this.nodesContainer) return { x: 0, y: 0 };
 
     return {
-      x: parseInt(this.thoughtsContainer.style.left, 10),
-      y: parseInt(this.thoughtsContainer.style.top, 10),
+      x: parseInt(this.nodesContainer.style.left, 10),
+      y: parseInt(this.nodesContainer.style.top, 10),
     };
   },
 
-  getThoughtsContainerSize(): Vector {
-    if (!this.thoughtsContainer) return { x: 0, y: 0 };
+  getNodesContainerSize(): Vector {
+    if (!this.nodesContainer) return { x: 0, y: 0 };
 
     return {
-      x: parseInt(this.thoughtsContainer.style.width, 10),
-      y: parseInt(this.thoughtsContainer.style.height, 10),
+      x: parseInt(this.nodesContainer.style.width, 10),
+      y: parseInt(this.nodesContainer.style.height, 10),
     };
   },
 
-  setThoughtsContainerPosition(x = 0, y = 0): void {
-    if (!this.thoughtsContainer) return;
+  setNodesContainerPosition(x = 0, y = 0): void {
+    if (!this.nodesContainer) return;
 
     const size = getWindowInnerSize();
-    const containerSize = this.getThoughtsContainerSize();
+    const containerSize = this.getNodesContainerSize();
     const xInRange = clamp(x, size.x - containerSize.x, 0);
     const yInRange = clamp(y, size.y - containerSize.y, 0);
-    this.thoughtsContainer.style.left = `${xInRange}px`;
-    this.thoughtsContainer.style.top = `${yInRange}px`;
+    this.nodesContainer.style.left = `${xInRange}px`;
+    this.nodesContainer.style.top = `${yInRange}px`;
   },
 
   setMapPosition(x = 0, y = 0): void {
-    const { x: left, y: top } = this.getThoughtsContainerPosition();
+    const { x: left, y: top } = this.getNodesContainerPosition();
     const xMap = x + left;
     const yMap = y + top;
-    this.setThoughtsContainerPosition(xMap, yMap);
+    this.setNodesContainerPosition(xMap, yMap);
     const positionScaled = this.translateCoordinatesToSpace(-xMap, -yMap, 'mini');
     this.setMiniMapViewportPosition(positionScaled.x, positionScaled.y);
   },
@@ -161,30 +161,25 @@ export const view: View = {
     this.addMiniMapViewportPosition(x, y);
     // reflect move of the viewport on the full sized mind map
     const positionScaled = this.translateCoordinatesToSpace(x, y, 'full');
-    const containerPosition = this.getThoughtsContainerPosition();
-    this.setThoughtsContainerPosition(containerPosition.x - positionScaled.x, containerPosition.y - positionScaled.y);
+    const containerPosition = this.getNodesContainerPosition();
+    this.setNodesContainerPosition(containerPosition.x - positionScaled.x, containerPosition.y - positionScaled.y);
   },
 
-  //   centerOnThought(v: Vector): void {
-  //     const windowSize = getWindowInnerSize();
-  //     this.setMapPosition(-v.x + windowSize.x * 0.5, -v.y + windowSize.y * 0.5);
-  //   },
-
-  centerOnThought(thought: Thought): void {
+  centerOnNode(node: Node): void {
     const windowSize = getWindowInnerSize();
-    const { x: left, y: top } = this.getThoughtsContainerPosition();
-    this.setMapPosition(-thought.x - left + windowSize.x * 0.5, -thought.y - top + windowSize.y * 0.5);
+    const { x: left, y: top } = this.getNodesContainerPosition();
+    this.setMapPosition(-node.x - left + windowSize.x * 0.5, -node.y - top + windowSize.y * 0.5);
   },
 
   centerMindMap(): void {
     const windowSize = getWindowInnerSize();
-    const containerSize = this.getThoughtsContainerSize();
+    const containerSize = this.getNodesContainerSize();
     this.setMapPosition((-containerSize.x + windowSize.x) * 0.5, (-containerSize.y + windowSize.y) * 0.5);
   },
 
   getScaleBySpaceName(spaceName: string): Vector {
     const mapSize = getParsedStyle(this.miniMap as Element, 'width', 'height');
-    const containerSize = this.getThoughtsContainerSize();
+    const containerSize = this.getNodesContainerSize();
 
     let xScale = 1;
     let yScale = 1;
@@ -224,7 +219,7 @@ export const view: View = {
   },
 
   getMapCenterCoordinates(): Vector {
-    const size = this.getThoughtsContainerSize();
+    const size = this.getNodesContainerSize();
 
     return {
       x: size.x * 0.5,

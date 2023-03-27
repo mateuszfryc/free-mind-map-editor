@@ -2,13 +2,13 @@ import { ReactNode, useEffect, useRef } from 'react';
 import { useMindMapStore } from '../../stores/mind-map-store';
 import { pointerSelector } from '../../stores/selectors';
 import { view } from '../../stores/view';
-import * as Styled from './ThoughtsContainer.styled';
+import * as Styled from './NodesContainer.styled';
 
-type ThoughtsContainerProps = {
+type NodesContainerProps = {
   children: ReactNode;
 };
 
-export function ThoughtsContainer({ children }: ThoughtsContainerProps) {
+export function NodesContainer({ children }: NodesContainerProps) {
   const pointer = useMindMapStore(pointerSelector);
   const ref = useRef(null);
 
@@ -33,8 +33,8 @@ export function ThoughtsContainer({ children }: ThoughtsContainerProps) {
   });
 
   return (
-    <Styled.ThoughtsContainer id='thoughts-container' style={{ width: '4000px', height: '4000px' }} ref={ref}>
+    <Styled.NodesContainer id='nodes-container' style={{ width: '4000px', height: '4000px' }} ref={ref}>
       {children}
-    </Styled.ThoughtsContainer>
+    </Styled.NodesContainer>
   );
 }

@@ -1,21 +1,21 @@
 import { SavedStateType } from '../types/baseTypes';
+import { Node } from './Node';
 import { Pointer } from './pointer';
-import { Thought } from './Thought';
 import { TStore } from './types';
 
 export const initializeSelector = (store: TStore): (() => void) => store.initialize.bind(store);
-export const thoughtsSelector = (store: TStore): Thought[] => store.thoughts;
+export const nodesSelector = (store: TStore): Node[] => store.nodes;
 export const pointerSelector = (store: TStore): Pointer => store.pointer;
-export const selectionSelector = (store: TStore): Thought | undefined => store.getSelectedThought();
+export const selectionSelector = (store: TStore): Node | undefined => store.getSelectedNode();
 export const editSelectionSelector = (store: TStore): (() => void) => store.editSelection.bind(store);
 export const updateSelectionContentSelector = (store: TStore): ((value: string) => void) =>
   store.updateSelectionContent.bind(store);
-export const findClosestOverlapForSelector = (store: TStore): ((thought: Thought) => void) =>
+export const findClosestOverlapForSelector = (store: TStore): ((node: Node) => void) =>
   store.findClosestOverlapFor.bind(store);
 export const isGroupDragOnSelector = (store: TStore): boolean => store.isGroupDragOn;
-export const setHighlightSelector = (store: TStore): ((thoughtId: string) => void) => store.setHighlight.bind(store);
+export const setHighlightSelector = (store: TStore): ((nodeId: string) => void) => store.setHighlight.bind(store);
 export const clearHighlightSelector = (store: TStore): (() => void) => store.clearHighlight.bind(store);
-export const initialThoughtWidthSelector = (store: TStore): number => store.initialThoughtWidth;
+export const initialNodeWidthSelector = (store: TStore): number => store.initialNodeWidth;
 export const savedMindMapSelector = (store: TStore): string => store.savedMindMap;
 export const setDrawLockSelector = (store: TStore): ((isDrawingLocked: boolean) => void) =>
   store.setDrawLock.bind(store);

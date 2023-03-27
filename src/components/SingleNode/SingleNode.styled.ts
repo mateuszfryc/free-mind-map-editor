@@ -1,13 +1,13 @@
 import styled, { css } from 'styled-components';
 
-type ThoughtStyleType = {
+type NodeStyleType = {
     maxWidth: number;
     isSelected: boolean;
     isEdited: boolean;
     zIndex: number;
 };
 
-export const Thought = styled.div<ThoughtStyleType>(
+export const Node = styled.div<NodeStyleType>(
     ({ maxWidth, isSelected, isEdited, zIndex, theme: { colors } }) => css`
         background-color: transparent;
         border: none;

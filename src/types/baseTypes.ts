@@ -23,7 +23,7 @@ export type Miniature = {
   width: number;
 };
 
-export const THOUGHT_STATE: ObjectOfNumbers = {
+export const NODE_STATE: ObjectOfNumbers = {
   IDLE: 0,
   SELECTED: 1,
   EDITED: 2,
@@ -39,11 +39,11 @@ export type IconProps = {
   color?: string;
 };
 
-export type SavedThoughtStateType = {
+export type SavedNodeStateType = {
   children: string[];
   content: string;
   id: string;
-  isRootThought: boolean;
+  isRootNode: boolean;
   parentId: string | undefined;
   prevIsParentOnLeft: boolean;
   x: number;
@@ -51,5 +51,5 @@ export type SavedThoughtStateType = {
 };
 
 export type SavedStateType = {
-  thoughts: SavedThoughtStateType[];
+  nodes: SavedNodeStateType[];
 };

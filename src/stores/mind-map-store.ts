@@ -6,19 +6,19 @@ import { theme } from '../styles/themeDefault';
 import {
   ChildPositionData,
   Miniature,
+  NODE_STATE,
   ObjectOfVectors,
+  SavedNodeStateType,
   SavedStateType,
-  SavedThoughtStateType,
-  THOUGHT_STATE,
   Vector,
 } from '../types/baseTypes';
 import { getTwoPointsDistance, getWindowInnerSize } from '../utils/get';
+import { Node } from './Node';
 import { pointer } from './pointer';
-import { Thought } from './Thought';
 import { OverlapResult, TStore } from './types';
 import { view } from './view';
 
-const defaultRoot = new Thought(uuidv4(), { x: 0, y: 0 }, undefined, true, "What's on your mind?");
+const defaultRoot = new Node(uuidv4(), { x: 0, y: 0 }, undefined, true, "What's on your mind?");
 
 export const useMindMapStore = create(
   persist<TStore>(
@@ -29,9 +29,9 @@ export const useMindMapStore = create(
       isDrawingLocked: false,
       isGroupDragOn: false,
       isInitialized: false,
-      initialThoughtWidth: 200,
-      rootThought: defaultRoot,
-      thoughts: [defaultRoot],
+      initialNodeWidth: 200,
+      rootNode: defaultRoot,
+      nodes: [defaultRoot],
       savedMindMap: '',
       scale: 1,
       lastNewId: 0,
@@ -45,17 +45,12 @@ export const useMindMapStore = create(
 
         view.setReferences();
         store.updateWorkspaceSize();
-        view.setThoughtsContainerPosition();
-        const root = store.rootThought;
-        // if (root.x === 0 && root.y === 0) {
-        //   store.setPositionAsync(root.id, view.getMapCenterCoordinates());
-        // }
-
+        view.setNodesContainerPosition();
+        const root = store.rootNode;
         store.setSelection(root.id);
         store.editSelection();
-
         store.initPositions();
-        view.centerOnThought(store.rootThought);
+        view.centerOnNode(store.rootNode);
 
         const drawLoop = (): void => {
           store.draw();
@@ -69,27 +64,21 @@ export const useMindMapStore = create(
         return uuidv4();
       },
 
-      addThought(
-        position: Vector,
-        isRoot?: boolean,
-        parentId?: string,
-        initText?: string,
-        existingId?: string,
-      ): Thought {
+      addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Node {
         const store = get();
 
-        const thought = new Thought(existingId ?? store.getNewID(), position, parentId, isRoot, initText);
-        store.updateSingleItem(thought);
+        const node = new Node(existingId ?? store.getNewID(), position, parentId, isRoot, initText);
+        store.updateSingleItem(node);
         if (isRoot) {
-          set(() => ({ rootThought: thought }));
+          set(() => ({ rootNode: node }));
         }
 
-        store.setPositionAsync(thought.id, position);
+        store.setPositionAsync(node.id, position);
 
-        return thought;
+        return node;
       },
 
-      postNewThoughActions(newItem: Thought): void {
+      postNewThoughActions(newItem: Node): void {
         const store = get();
 
         const isFullyWithinViewport = !newItem.isFullyWithinViewport();
@@ -101,19 +90,19 @@ export const useMindMapStore = create(
         store.saveCurrentMindMapAsJSON();
       },
 
-      getThoughtById(id: string): Thought | undefined {
+      getNodeById(id: string): Node | undefined {
         const store = get();
 
-        return store.thoughts.find((t) => t.id === id);
+        return store.nodes.find((t) => t.id === id);
       },
 
-      addChildThought(newParentId: string, childId: string): void {
+      addChildNode(newParentId: string, childId: string): void {
         const store = get();
 
-        const newParent = store.getThoughtById(newParentId);
+        const newParent = store.getNodeById(newParentId);
         if (!newParent) return;
 
-        const child = store.getThoughtById(childId);
+        const child = store.getNodeById(childId);
         if (!child) return;
 
         if (newParent.children.every((existingChildId) => existingChildId !== child.id)) {
@@ -125,30 +114,28 @@ export const useMindMapStore = create(
       saveChildrenRelativePosition(id: string): void {
         const store = get();
 
-        const thought = store.getThoughtById(id);
+        const node = store.getNodeById(id);
 
-        if (!thought || thought.children.length < 1) return;
+        if (!node || node.children.length < 1) return;
 
-        const myPosition = thought.getPosition();
-        thought.childrenRelativePosition = store
-          .getChildren(thought.id, true)
-          .map((child: Thought): ChildPositionData => {
-            let { x, y } = child.getPosition();
-            x -= myPosition.x;
-            y -= myPosition.y;
+        const myPosition = node.getPosition();
+        node.childrenRelativePosition = store.getChildren(node.id, true).map((child: Node): ChildPositionData => {
+          let { x, y } = child.getPosition();
+          x -= myPosition.x;
+          y -= myPosition.y;
 
-            return { position: { x, y }, id: child.id };
-          });
+          return { position: { x, y }, id: child.id };
+        });
       },
 
       restoreChildrenRelativePosition(id: string): void {
         const store = get();
-        const thought = store.getThoughtById(id);
-        if (!thought || thought.children.length < 1) return;
+        const node = store.getNodeById(id);
+        if (!node || node.children.length < 1) return;
 
-        const myPosition = thought.getPosition();
-        const allChildren = store.getChildren(thought.id, true);
-        thought.childrenRelativePosition.forEach((positionData): void => {
+        const myPosition = node.getPosition();
+        const allChildren = store.getChildren(node.id, true);
+        node.childrenRelativePosition.forEach((positionData): void => {
           const actionedChild = allChildren.find((child) => child.id === positionData.id);
           if (actionedChild) {
             actionedChild.setPosition({
@@ -159,7 +146,7 @@ export const useMindMapStore = create(
         });
       },
 
-      createChildThought(parent: Thought): void {
+      createChildNode(parent: Node): void {
         const store = get();
         store.stopEditing();
 
@@ -168,9 +155,9 @@ export const useMindMapStore = create(
         const targetPosition: Vector = parent.getPosition();
         const sideMod = parent.hasParent() && !store.isParentOnLeft(parent.id) ? -1 : 1;
         targetPosition.x +=
-          (parent.getOuterWidth() * 0.5 + store.initialThoughtWidth * 0.5 + store.defaultSpawnGap.x) * sideMod;
+          (parent.getOuterWidth() * 0.5 + store.initialNodeWidth * 0.5 + store.defaultSpawnGap.x) * sideMod;
 
-        const newChild: Thought = store.addThought(targetPosition, false, parent.id);
+        const newChild: Node = store.addNode(targetPosition, false, parent.id);
         parent.children.push(newChild.id);
 
         store.setSelection(newChild.id);
@@ -183,7 +170,7 @@ export const useMindMapStore = create(
         }, 100);
       },
 
-      createSiblingThought(sibling: Thought): void {
+      createSiblingNode(sibling: Node): void {
         const store = get();
         store.stopEditing();
 
@@ -191,9 +178,9 @@ export const useMindMapStore = create(
 
         const targetPosition: Vector = sibling.getPosition();
         targetPosition.y += sibling.getOuterHeight() * 0.5 + 30 + store.defaultSpawnGap.y;
-        const newSibling: Thought = store.addThought(targetPosition, false, sibling.parentId);
+        const newSibling: Node = store.addNode(targetPosition, false, sibling.parentId);
 
-        if (sibling.parentId !== undefined) store.addChildThought(sibling.parentId, newSibling.id);
+        if (sibling.parentId !== undefined) store.addChildNode(sibling.parentId, newSibling.id);
 
         store.setSelection(newSibling.id);
         store.resolveOverlaps(newSibling);
@@ -206,36 +193,36 @@ export const useMindMapStore = create(
         }, 100);
       },
 
-      removeThought(thoughtId: string): void {
+      removeNode(nodeId: string): void {
         const store = get();
-        const thought = store.getThoughtById(thoughtId);
-        if (!thought) return;
+        const node = store.getNodeById(nodeId);
+        if (!node) return;
 
-        thought.markForRemoval();
+        node.markForRemoval();
 
-        if (thought.parentId !== undefined) {
-          store.removeChildThought(thought.parentId, thoughtId);
+        if (node.parentId !== undefined) {
+          store.removeChildNode(node.parentId, nodeId);
         }
-        if (store.highlightId === thoughtId) {
+        if (store.highlightId === nodeId) {
           set(() => ({ highlightId: undefined }));
         }
-        if (store.selectionId === thoughtId) {
+        if (store.selectionId === nodeId) {
           set(() => ({ selectionId: undefined }));
         }
 
         set((state) => ({
-          thoughts: [...state.thoughts.filter((item: Thought) => item.id !== thoughtId)],
+          nodes: [...state.nodes.filter((item: Node) => item.id !== nodeId)],
         }));
-        thought.children.forEach((childId) => {
-          store.removeThought(childId);
+        node.children.forEach((childId) => {
+          store.removeNode(childId);
         });
 
         store.saveCurrentMindMapAsJSON();
       },
 
-      removeChildThought(parentId: string, childToBeRemovedId: string): void {
+      removeChildNode(parentId: string, childToBeRemovedId: string): void {
         const store = get();
-        const parent = store.getThoughtById(parentId);
+        const parent = store.getNodeById(parentId);
         if (!parent) return;
 
         parent.children = parent.children.filter((childId) => childId !== childToBeRemovedId);
@@ -243,17 +230,17 @@ export const useMindMapStore = create(
           (position) => position.id !== childToBeRemovedId,
         );
 
-        const child = store.getThoughtById(childToBeRemovedId);
+        const child = store.getNodeById(childToBeRemovedId);
         if (!child) return;
         child.clearParent();
       },
 
       isParentOf(parentId: string, unknownChildId: string, includeGrandChildren = false): boolean {
         const store = get();
-        const child = store.getThoughtById(unknownChildId);
+        const child = store.getNodeById(unknownChildId);
         if (!child) return false;
 
-        const parent = store.getThoughtById(parentId);
+        const parent = store.getNodeById(parentId);
         if (!parent) return false;
 
         if (includeGrandChildren) {
@@ -265,10 +252,10 @@ export const useMindMapStore = create(
 
       isChildOf(childId: string, potentialParentId: string): boolean {
         const store = get();
-        const child = store.getThoughtById(childId);
+        const child = store.getNodeById(childId);
         if (!child) return false;
 
-        const parent = store.getThoughtById(potentialParentId);
+        const parent = store.getNodeById(potentialParentId);
         if (!parent) return false;
 
         return parent.children.some((existingChildId) => existingChildId === child.id);
@@ -276,7 +263,7 @@ export const useMindMapStore = create(
 
       getChildrenIds(parentId: string, includeGrandChildren?: boolean): string[] {
         const store = get();
-        const parent = store.getThoughtById(parentId);
+        const parent = store.getNodeById(parentId);
         if (!parent || parent.children.length < 1) return [];
 
         if (includeGrandChildren) {
@@ -290,20 +277,20 @@ export const useMindMapStore = create(
         return parent.children;
       },
 
-      getChildren(parentId: string, includeGrandChildren = false): Thought[] {
+      getChildren(parentId: string, includeGrandChildren = false): Node[] {
         const store = get();
-        const parent = store.getThoughtById(parentId);
+        const parent = store.getNodeById(parentId);
         if (!parent || parent.children.length < 1) return [];
 
         const childrenIds = store.getChildrenIds(parentId, includeGrandChildren);
-        const children = childrenIds.map((childId) => store.getThoughtById(childId));
-        const filtered = children.filter(Boolean) as Thought[];
+        const children = childrenIds.map((childId) => store.getNodeById(childId));
+        const filtered = children.filter(Boolean) as Node[];
 
         return filtered;
       },
 
-      setHighlight(thoughtId: string): void {
-        set(() => ({ highlightId: thoughtId }));
+      setHighlight(nodeId: string): void {
+        set(() => ({ highlightId: nodeId }));
       },
 
       clearHighlight(): void {
@@ -313,34 +300,34 @@ export const useMindMapStore = create(
       setSelection(newSelectionId: string): void {
         const store = get();
         if (store.selectionId !== undefined) {
-          const selection = store.getSelectedThought();
+          const selection = store.getSelectedNode();
           if (selection) {
-            selection.setState(THOUGHT_STATE.IDLE);
+            selection.setState(NODE_STATE.IDLE);
             store.updateSingleItem(selection);
           }
         }
         set(() => ({ selectionId: newSelectionId }));
-        const newlySelected = store.getThoughtById(newSelectionId);
+        const newlySelected = store.getNodeById(newSelectionId);
         if (!newlySelected) {
+          console.log('Could not find newly selected item');
           return;
-          //   throw new Error('Could not find newly selected item');
         }
-        newlySelected.setState(THOUGHT_STATE.SELECTED);
+        newlySelected.setState(NODE_STATE.SELECTED);
         store.updateSingleItem(newlySelected);
       },
 
       clearSelection(): void {
         const store = get();
         if (store.selectionId === undefined) return;
-        const selection = store.getSelectedThought();
+        const selection = store.getSelectedNode();
         if (!selection) return;
 
-        if (!selection.hasValue() && !selection.hasDefaultValue() && !selection.isRootThought) {
-          store.removeThought(selection.id);
+        if (!selection.hasValue() && !selection.hasDefaultValue() && !selection.isRootNode) {
+          store.removeNode(selection.id);
 
           return;
         }
-        selection.setState(THOUGHT_STATE.IDLE);
+        selection.setState(NODE_STATE.IDLE);
         store.updateSingleItem(selection);
         set(() => ({ selectionId: undefined }));
       },
@@ -348,19 +335,19 @@ export const useMindMapStore = create(
       stopEditing(checkDefaultValue = false): void {
         const store = get();
         if (store.selectionId === undefined) return;
-        const selection = store.getSelectedThought();
+        const selection = store.getSelectedNode();
         if (!selection) return;
 
         const isEmpty = !selection.hasValue();
-        const isntRootThought = selection.id !== store.rootThought.id;
+        const isntRootNode = selection.id !== store.rootNode.id;
         const hasDefaultValue = checkDefaultValue && !selection.hasDefaultValue();
-        if ((isEmpty && isntRootThought) || hasDefaultValue) {
-          store.removeThought(selection.id);
+        if ((isEmpty && isntRootNode) || hasDefaultValue) {
+          store.removeNode(selection.id);
 
           return;
         }
 
-        selection.setState(THOUGHT_STATE.SELECTED);
+        selection.setState(NODE_STATE.SELECTED);
         store.updateSingleItem(selection);
         store.resolveOverlaps(selection);
         selection.refreshPosition();
@@ -374,12 +361,12 @@ export const useMindMapStore = create(
         set(() => ({ isGroupDragOn: isOn }));
       },
 
-      /* Remove thought and return true if was removed and false if it wasn't. */
-      removeIfEmpty(thought: Thought): boolean {
+      /* Remove node and return true if was removed and false if it wasn't. */
+      removeIfEmpty(node: Node): boolean {
         const store = get();
 
-        if (!thought.hasValue() && !thought.hasDefaultValue()) {
-          store.removeThought(thought.id);
+        if (!node.hasValue() && !node.hasDefaultValue()) {
+          store.removeNode(node.id);
 
           return true;
         }
@@ -387,33 +374,33 @@ export const useMindMapStore = create(
         return false;
       },
 
-      getHighlightedThought(): Thought | undefined {
+      getHighlightedNode(): Node | undefined {
         const store = get();
-        return store.highlightId ? store.getThoughtById(store.highlightId) : undefined;
+        return store.highlightId ? store.getNodeById(store.highlightId) : undefined;
       },
 
-      getSelectedThought(): Thought | undefined {
+      getSelectedNode(): Node | undefined {
         const store = get();
-        return store.selectionId ? store.getThoughtById(store.selectionId) : undefined;
+        return store.selectionId ? store.getNodeById(store.selectionId) : undefined;
       },
 
       editSelection(): void {
         const store = get();
-        const selection = store.getSelectedThought();
+        const selection = store.getSelectedNode();
         if (!selection) return;
 
-        selection.setState(THOUGHT_STATE.EDITED);
+        selection.setState(NODE_STATE.EDITED);
         selection.refreshPosition();
         store.updateSingleItem(selection);
       },
 
-      updateSingleItem(item: Thought): void {
-        set((state) => ({ thoughts: [item, ...state.thoughts.filter((i) => i.id !== item.id)] }));
+      updateSingleItem(item: Node): void {
+        set((state) => ({ nodes: [item, ...state.nodes.filter((i) => i.id !== item.id)] }));
       },
 
       updateSelectionContent(value: string): void {
         const store = get();
-        const selection = store.getSelectedThought();
+        const selection = store.getSelectedNode();
         if (!selection) return;
 
         selection.updateContent(value);
@@ -421,8 +408,8 @@ export const useMindMapStore = create(
         store.updateSingleItem(selection);
       },
 
-      isOverlappingWith(thought: Thought, other: Thought): OverlapResult {
-        const { width, height, x, y } = thought.getBoundingBox();
+      isOverlappingWith(node: Node, other: Node): OverlapResult {
+        const { width, height, x, y } = node.getBoundingBox();
         const { x: a, y: b, width: otherWidth, height: otherHeight } = other.getBoundingBox();
         const isColliding = x + width >= a && y + height >= b && y <= b + otherHeight && x <= a + otherWidth;
         const result = {
@@ -440,12 +427,12 @@ export const useMindMapStore = create(
         return result;
       },
 
-      findOverlapsFor(thought: Thought): OverlapResult[] {
+      findOverlapsFor(node: Node): OverlapResult[] {
         const store = get();
         const overlaps: OverlapResult[] = [];
-        store.thoughts.forEach((otherThought: Thought) => {
-          if (otherThought.id !== thought.id) {
-            const result = store.isOverlappingWith(thought, otherThought);
+        store.nodes.forEach((otherNode: Node) => {
+          if (otherNode.id !== node.id) {
+            const result = store.isOverlappingWith(node, otherNode);
 
             if (result.isColliding) {
               overlaps.push(result);
@@ -456,30 +443,30 @@ export const useMindMapStore = create(
         return overlaps;
       },
 
-      resolveOverlaps(thought: Thought, axis = 'y'): Thought {
+      resolveOverlaps(node: Node, axis = 'y'): Node {
         const store = get();
-        const overlaps: OverlapResult[] = store.findOverlapsFor(thought);
-        if (overlaps.length < 1) return thought;
+        const overlaps: OverlapResult[] = store.findOverlapsFor(node);
+        if (overlaps.length < 1) return node;
 
         const { amount } = overlaps[0];
         if (amount.x > 0 || amount.y > 0) {
-          const targetPosition: Vector = thought.getPosition();
+          const targetPosition: Vector = node.getPosition();
           if (axis === 'y') {
             targetPosition.x += amount[axis] + Math.sign(amount[axis]) * store.defaultSpawnGap[axis];
           } else if (axis === 'x') {
             targetPosition.y += amount[axis] + Math.sign(amount[axis]) * store.defaultSpawnGap[axis];
           }
-          thought.setPosition(targetPosition);
-          store.resolveOverlaps(thought, 'y');
+          node.setPosition(targetPosition);
+          store.resolveOverlaps(node, 'y');
         }
 
-        return thought;
+        return node;
       },
 
-      findClosestOverlapFor(thought: Thought): void {
+      findClosestOverlapFor(node: Node): void {
         const store = get();
-        const myPosition = thought.getPosition();
-        const overlaps: OverlapResult[] = store.findOverlapsFor(thought);
+        const myPosition = node.getPosition();
+        const overlaps: OverlapResult[] = store.findOverlapsFor(node);
         let closestIndex = 0;
         let closestDistance = 0;
 
@@ -491,38 +478,38 @@ export const useMindMapStore = create(
               closestIndex = index;
             }
           });
-          thought.setClosestOverlap(overlaps[closestIndex].other.id);
+          node.setClosestOverlap(overlaps[closestIndex].other.id);
 
           return;
         }
 
-        thought.clearClosestOverlap();
+        node.clearClosestOverlap();
       },
 
-      isParentOnLeft(thoughtId: string): boolean {
+      isParentOnLeft(nodeId: string): boolean {
         const store = get();
-        const thought = store.getThoughtById(thoughtId);
-        if (!thought) return false;
+        const node = store.getNodeById(nodeId);
+        if (!node) return false;
 
-        const parent = store.getThoughtById(thought.parentId ?? '');
+        const parent = store.getNodeById(node.parentId ?? '');
         if (!parent) return false;
 
-        return parent.x < thought.x;
+        return parent.x < node.x;
       },
 
-      getConnectorPoints(thoughtId: string): ObjectOfVectors {
+      getConnectorPoints(nodeId: string): ObjectOfVectors {
         const store = get();
-        const thought = store.getThoughtById(thoughtId);
-        if (!thought) return {};
+        const node = store.getNodeById(nodeId);
+        if (!node) return {};
 
-        const parent = store.getThoughtById(thought.parentId ?? '');
+        const parent = store.getNodeById(node.parentId ?? '');
         if (!parent) return {};
 
-        const isParentsOnLeft = parent ? parent.x < thought.x : false;
-        const grandParent = store.getThoughtById(parent.parentId ?? '');
+        const isParentsOnLeft = parent ? parent.x < node.x : false;
+        const grandParent = store.getNodeById(parent.parentId ?? '');
         const isParentsOutOnLeft = parent && grandParent ? grandParent.x < parent.x : isParentsOnLeft;
 
-        const myCorners = thought.getCorners();
+        const myCorners = node.getCorners();
         const parentCorners = parent.getCorners() ?? myCorners;
 
         return {
@@ -531,28 +518,28 @@ export const useMindMapStore = create(
         };
       },
 
-      setPositionAsync(thoughtId: string, newPosition: Vector, callback?: () => void): void {
+      setPositionAsync(nodeId: string, newPosition: Vector, callback?: () => void): void {
         const store = get();
-        const thought = store.getThoughtById(thoughtId);
-        if (!thought) return;
+        const node = store.getNodeById(nodeId);
+        if (!node) return;
 
         setTimeout(() => {
-          if (thought.getElement()) {
-            thought.setPosition(newPosition);
-            if (thought.parentId !== undefined) thought.prevIsParentOnLeft = store.isParentOnLeft(thought.id);
+          if (node.getElement()) {
+            node.setPosition(newPosition);
+            if (node.parentId !== undefined) node.prevIsParentOnLeft = store.isParentOnLeft(node.id);
             if (callback) {
               callback();
             }
             return;
           }
 
-          setTimeout(() => store.setPositionAsync(thought.id, newPosition), 20);
+          setTimeout(() => store.setPositionAsync(node.id, newPosition), 20);
         }, 0);
       },
 
       initPositions(): void {
-        get().thoughts.forEach((t: Thought) => {
-          if (t.isRootThought && t.x === 0 && t.y === 0) {
+        get().nodes.forEach((t: Node) => {
+          if (t.isRootNode && t.x === 0 && t.y === 0) {
             t.setPosition(view.getMapCenterCoordinates());
           }
           t.refreshPosition();
@@ -573,13 +560,13 @@ export const useMindMapStore = create(
         const store = get();
 
         return {
-          thoughts: store.thoughts.map((t: Thought): SavedThoughtStateType => {
-            const { content, id, isRootThought, prevIsParentOnLeft, x, y, parentId, children } = t;
+          nodes: store.nodes.map((t: Node): SavedNodeStateType => {
+            const { content, id, isRootNode, prevIsParentOnLeft, x, y, parentId, children } = t;
 
             return {
               content,
               id,
-              isRootThought,
+              isRootNode,
               prevIsParentOnLeft,
               x,
               y,
@@ -608,24 +595,24 @@ export const useMindMapStore = create(
 
         store.clearHighlight();
         store.clearSelection();
-        set(() => ({ thoughts: [] }));
+        set(() => ({ nodes: [] }));
 
         // recreate saved nodes
-        const uploadedThoughts: Thought[] = saved.thoughts.map((t: SavedThoughtStateType): Thought => {
-          const { id, x, y, isRootThought, content, parentId } = t;
-          const restored: Thought = store.addThought({ x, y }, isRootThought, parentId, content, id);
+        const uploadedNodes: Node[] = saved.nodes.map((t: SavedNodeStateType): Node => {
+          const { id, x, y, isRootNode, content, parentId } = t;
+          const restored: Node = store.addNode({ x, y }, isRootNode, parentId, content, id);
           restored.children = t.children;
           store.saveChildrenRelativePosition(restored.id);
           return restored;
         });
 
         const postSetup = () => {
-          set(() => ({ thoughts: uploadedThoughts }));
+          set(() => ({ nodes: uploadedNodes }));
           set(() => ({ isDrawingLocked: false }));
-          store.setSelection(store.rootThought.id);
+          store.setSelection(store.rootNode.id);
           store.editSelection();
           store.initPositions();
-          view.centerOnThought(store.rootThought);
+          view.centerOnNode(store.rootNode);
         };
         setTimeout(postSetup, 0);
       },
@@ -650,24 +637,24 @@ export const useMindMapStore = create(
           throw new Error('context object reference not avilable');
         }
 
-        const { connectorsCurveDividerWidth, rootThought, thoughts } = store;
+        const { connectorsCurveDividerWidth, rootNode, nodes } = store;
 
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        if (thoughts.length < 1 || rootThought === undefined) return;
+        if (nodes.length < 1 || rootNode === undefined) return;
 
         const miniatures: Miniature[] = [];
-        thoughts.forEach((thought) => {
-          const miniature = view.getMiniMapMiniature(thought.getPosition(), thought.getSize(), thought.id);
+        nodes.forEach((node) => {
+          const miniature = view.getMiniMapMiniature(node.getPosition(), node.getSize(), node.id);
           miniatures.push(miniature);
           view.drawMiniature(miniature);
         });
 
-        const rootsChildren: Thought[] = store.getChildren(rootThought.id, true);
-        const offset: Vector = view.getThoughtsContainerPosition();
+        const rootsChildren: Node[] = store.getChildren(rootNode.id, true);
+        const offset: Vector = view.getNodesContainerPosition();
         if (rootsChildren.length < 1) return;
 
-        rootsChildren.forEach((child: Thought) => {
+        rootsChildren.forEach((child: Node) => {
           const { me, parent } = store.getConnectorPoints(child.id);
           me.x += offset.x;
           me.y += offset.y - 1;
@@ -715,7 +702,7 @@ export const useMindMapStore = create(
       onMouseMove(event: MouseEvent): void {
         const store = get();
         const { pointer: mouse } = store;
-        const selection = store.getSelectedThought();
+        const selection = store.getSelectedNode();
 
         mouse.lastPosition.x = mouse.position.x;
         mouse.lastPosition.y = mouse.position.y;
@@ -728,7 +715,7 @@ export const useMindMapStore = create(
 
         const { x, y } = mouse.position;
         store.findClosestOverlapFor(selection);
-        selection.setState(THOUGHT_STATE.DRAGGED);
+        selection.setState(NODE_STATE.DRAGGED);
         selection.setOnTop();
         selection.setPosition({
           x: x + selection.diffX,
@@ -739,7 +726,7 @@ export const useMindMapStore = create(
         if (!canDragSelectionChildren) return;
 
         const isParentOnLeft = store.isParentOnLeft(selection.id);
-        if (!selection.isRootThought && isParentOnLeft !== selection.prevIsParentOnLeft) {
+        if (!selection.isRootNode && isParentOnLeft !== selection.prevIsParentOnLeft) {
           selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
             const positionData = selection.childrenRelativePosition[index];
             positionData.position.x *= -1; // eslint-disable-line no-param-reassign
@@ -751,12 +738,12 @@ export const useMindMapStore = create(
 
       customOnFinishHydration(): void {
         const store = get();
-        const hydratedThoughts = store.thoughts.map((thought) => Thought.clone(thought));
-        const root = hydratedThoughts.find(({ isRootThought }) => !!isRootThought);
+        const hydratedNodes = store.nodes.map((node) => Node.clone(node));
+        const root = hydratedNodes.find(({ isRootNode }) => !!isRootNode);
 
         set(() => ({
-          thoughts: hydratedThoughts,
-          rootThought: root,
+          nodes: hydratedNodes,
+          rootNode: root,
         }));
       },
     }),
@@ -765,21 +752,21 @@ export const useMindMapStore = create(
       name: 'c913d614-da17-4383-809f-fa6d6314535491',
       merge: (persistedState: unknown, currentState: TStore): TStore => {
         const retrivedState = persistedState as TStore;
-        const retrivedThoughts = retrivedState.thoughts.map((thought) => Thought.clone(thought));
+        const retrivedNodes = retrivedState.nodes.map((node) => Node.clone(node));
 
         return {
           ...retrivedState,
           ...currentState,
-          thoughts: retrivedThoughts,
-          rootThought: retrivedThoughts.find(({ isRootThought }) => !!isRootThought),
+          nodes: retrivedNodes,
+          rootNode: retrivedNodes.find(({ isRootNode }) => !!isRootNode),
         } as TStore;
       },
     },
   ),
 );
 
-export const useSelection = (): [Thought | undefined, (id: string) => void, () => void] =>
+export const useSelection = (): [Node | undefined, (id: string) => void, () => void] =>
   useMindMapStore(
-    (state) => [state.getSelectedThought(), state.setSelection.bind(state), state.editSelection.bind(state)],
+    (state) => [state.getSelectedNode(), state.setSelection.bind(state), state.editSelection.bind(state)],
     shallow,
   );

@@ -1,6 +1,6 @@
 import SelectGif from 'assets/tutorial/select.gif';
 import EditGif from 'assets/tutorial/edit.gif';
-import MoveSingletToughtGif from 'assets/tutorial/movesinglethought.gif';
+import MoveSingletToughtGif from 'assets/tutorial/movesinglenode.gif';
 import MoveWithoutChildrenGif from 'assets/tutorial/dragalone.gif';
 import MakeChildGif from 'assets/tutorial/makechild.gif';
 import MakeSiblingGif from 'assets/tutorial/makesibling.gif';
@@ -17,38 +17,38 @@ export type TutorialItemType = {
 export const TutorialItems: TutorialItemType[] = [
   {
     title: 'Select',
-    description: 'To select single thought click on it once with mouse/touchpad.',
+    description: 'To select single node click on it once with mouse/touchpad.',
     src: SelectGif,
   },
   {
     title: 'Edit',
     description:
-      'To edit single thought you can either double click on it with mouse/touchpad or when the thought is selected hit Space on the keyboard.',
+      'To edit single node you can either double click on it with mouse/touchpad or when the node is selected hit Space on the keyboard.',
     src: EditGif,
   },
   {
-    title: 'Drag single thought around',
-    description: 'Click and hold to drag single thought around.',
+    title: 'Drag single node around',
+    description: 'Click and hold to drag single node around.',
     src: MoveSingletToughtGif,
   },
   {
-    title: 'Drag thought without children',
-    description: 'To drag thought without its children hold Shift on keyboard and than drag it.',
+    title: 'Drag node without children',
+    description: 'To drag node without its children hold Shift on keyboard and than drag it.',
     src: MoveWithoutChildrenGif,
   },
   {
-    title: 'Make child thought',
-    description: 'To create new child thought hit Tab on the keyboard while the parent is selected.',
+    title: 'Make child node',
+    description: 'To create new child node hit Tab on the keyboard while the parent is selected.',
     src: MakeChildGif,
   },
   {
-    title: 'Make sibling thought',
-    description: 'To create sibling thought hit Enter on the keyboard while the thought is selected.',
+    title: 'Make sibling node',
+    description: 'To create sibling node hit Enter on the keyboard while the node is selected.',
     src: MakeSiblingGif,
   },
   {
-    title: 'Attach child to another thought',
-    description: 'Click and hold mouse button to drag and drop thoughts to new parents.',
+    title: 'Attach child to another node',
+    description: 'Click and hold mouse button to drag and drop nodes to new parents.',
     src: ReparentGif,
   },
   {

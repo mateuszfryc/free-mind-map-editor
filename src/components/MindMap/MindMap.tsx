@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 
 import { MiniMap } from 'components/MiniMap';
-import { SingleThought } from 'components/SingleThought';
-import { ThoughtsContainer } from 'components/ThoughtsContainer';
+import { NodesContainer } from 'components/NodesContainer';
+import { SingleNode } from 'components/SingleNode';
 import * as Input from 'input';
 import { useMindMapStore } from '../../stores/mind-map-store';
-import { initializeSelector, onMouseMoveSelector, thoughtsSelector } from '../../stores/selectors';
+import { initializeSelector, nodesSelector, onMouseMoveSelector } from '../../stores/selectors';
 import * as Styled from './MindMap.styled';
 
 export function MindMap() {
-  const thoughts = useMindMapStore(thoughtsSelector);
+  const nodes = useMindMapStore(nodesSelector);
   const initialize = useMindMapStore(initializeSelector);
   const onMouseMove = useMindMapStore(onMouseMoveSelector);
 
@@ -18,7 +18,6 @@ export function MindMap() {
 
     document.addEventListener('mousedown', Input.onMouseDownHandler);
     document.addEventListener('mouseup', Input.onMouseUpHandler);
-    // document.addEventListener('mousemove', Input.onMouseMoveHandler);
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown', Input.onPressKeyHandler);
     document.addEventListener('keyup', Input.onReleaseKeyHandler);
@@ -26,7 +25,6 @@ export function MindMap() {
     return () => {
       document.removeEventListener('mousedown', Input.onMouseDownHandler);
       document.removeEventListener('mouseup', Input.onMouseUpHandler);
-      // document.removeEventListener('mousemove', Input.onMouseMoveHandler);
       document.removeEventListener('mousemove', onMouseMove);
       document.removeEventListener('keydown', Input.onPressKeyHandler);
       document.removeEventListener('keyup', Input.onReleaseKeyHandler);
@@ -37,11 +35,11 @@ export function MindMap() {
   return (
     <Styled.MindMap id='mindmap'>
       <Styled.Canvas />
-      <ThoughtsContainer>
-        {thoughts.map((thought) => (
-          <SingleThought key={thought.id} thought={thought} />
+      <NodesContainer>
+        {nodes.map((node) => (
+          <SingleNode key={node.id} node={node} />
         ))}
-      </ThoughtsContainer>
+      </NodesContainer>
       <MiniMap />
     </Styled.MindMap>
   );
