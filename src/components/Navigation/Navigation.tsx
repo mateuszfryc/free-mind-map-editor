@@ -61,11 +61,11 @@ export function Navigation() {
         </Styled.Link>
 
         <Styled.Link as='a' subLink onClick={closeMenu} download='MindMap.json' href={`data: ${savedMindMap}`}>
-          Save
+          Download current map
         </Styled.Link>
 
         <Styled.Link as='a' subLink onClick={closeMenu} padding='0'>
-          <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload</ButtonUploadFIle>
+          <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload local file</ButtonUploadFIle>
         </Styled.Link>
 
         <Styled.Link onClick={closeMenu} to='help' margin='20px 0 0'>

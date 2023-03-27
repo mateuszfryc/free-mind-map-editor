@@ -135,15 +135,6 @@ export class Thought {
     };
   }
 
-  refreshPosition(): void {
-    const element: HTMLElement | null = this.getElement();
-    if (element !== null) {
-      const size = this.getOuterSize();
-      element.style.left = `${this.x - size.x * 0.5}px`;
-      element.style.top = `${this.y - size.y * 0.5}px`;
-    }
-  }
-
   setPosition(newPosition: Vector): Thought {
     this.x = newPosition.x;
     this.y = newPosition.y;
@@ -155,6 +146,15 @@ export class Thought {
     }
 
     return this;
+  }
+
+  refreshPosition(): void {
+    const element: HTMLElement | null = this.getElement();
+    if (element !== null) {
+      const size = this.getOuterSize();
+      element.style.left = `${this.x - size.x * 0.5}px`;
+      element.style.top = `${this.y - size.y * 0.5}px`;
+    }
   }
 
   getWidth(): number {

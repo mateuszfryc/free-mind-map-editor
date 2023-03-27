@@ -47,12 +47,15 @@ export const useMindMapStore = create(
         store.updateWorkspaceSize();
         view.setThoughtsContainerPosition();
         const root = store.rootThought;
-        if (root.x === 0 && root.y === 0) {
-          store.setPositionAsync(root.id, view.getMapCenterCoordinates());
-        }
+        // if (root.x === 0 && root.y === 0) {
+        //   store.setPositionAsync(root.id, view.getMapCenterCoordinates());
+        // }
 
         store.setSelection(root.id);
         store.editSelection();
+
+        store.initPositions();
+        view.centerOnThought(store.rootThought);
 
         const drawLoop = (): void => {
           store.draw();
@@ -60,11 +63,6 @@ export const useMindMapStore = create(
         };
 
         drawLoop();
-        store.restoreChildrenRelativePosition(root.id);
-
-        setTimeout(() => {
-          view.centerOnThought(store.rootThought);
-        }, 500);
       },
 
       getNewID(): string {
@@ -225,8 +223,8 @@ export const useMindMapStore = create(
           set(() => ({ selectionId: undefined }));
         }
 
-        set(() => ({
-          thoughts: [...store.thoughts.filter((item: Thought) => item.id !== thoughtId)],
+        set((state) => ({
+          thoughts: [...state.thoughts.filter((item: Thought) => item.id !== thoughtId)],
         }));
         thought.children.forEach((childId) => {
           store.removeThought(childId);
@@ -324,7 +322,8 @@ export const useMindMapStore = create(
         set(() => ({ selectionId: newSelectionId }));
         const newlySelected = store.getThoughtById(newSelectionId);
         if (!newlySelected) {
-          throw new Error('Could not find newly selected item');
+          return;
+          //   throw new Error('Could not find newly selected item');
         }
         newlySelected.setState(THOUGHT_STATE.SELECTED);
         store.updateSingleItem(newlySelected);
@@ -548,7 +547,16 @@ export const useMindMapStore = create(
           }
 
           setTimeout(() => store.setPositionAsync(thought.id, newPosition), 20);
-        }, 20);
+        }, 0);
+      },
+
+      initPositions(): void {
+        get().thoughts.forEach((t: Thought) => {
+          if (t.isRootThought && t.x === 0 && t.y === 0) {
+            t.setPosition(view.getMapCenterCoordinates());
+          }
+          t.refreshPosition();
+        });
       },
 
       updateWorkspaceSize(): void {
@@ -616,10 +624,10 @@ export const useMindMapStore = create(
           set(() => ({ isDrawingLocked: false }));
           store.setSelection(store.rootThought.id);
           store.editSelection();
+          store.initPositions();
           view.centerOnThought(store.rootThought);
-          store.restoreChildrenRelativePosition(store.rootThought.id);
         };
-        setTimeout(postSetup, 500);
+        setTimeout(postSetup, 0);
       },
 
       setDrawLock(isDrawingLocked: boolean): void {
@@ -715,27 +723,30 @@ export const useMindMapStore = create(
           event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
         mouse.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 
-        if (mouse.isLeftButtonDown && selection && selection.id.toString() === mouse.draggedItemId) {
-          const { x, y } = mouse.position;
-          store.findClosestOverlapFor(selection);
-          selection.setState(THOUGHT_STATE.DRAGGED);
-          selection.setOnTop();
-          selection.setPosition({
-            x: x + selection.diffX,
-            y: y + selection.diffY,
+        const selectionCanBeDragged = mouse.isLeftButtonDown && selection && selection.id === mouse.draggedItemId;
+        if (!selectionCanBeDragged) return;
+
+        const { x, y } = mouse.position;
+        store.findClosestOverlapFor(selection);
+        selection.setState(THOUGHT_STATE.DRAGGED);
+        selection.setOnTop();
+        selection.setPosition({
+          x: x + selection.diffX,
+          y: y + selection.diffY,
+        });
+
+        const canDragSelectionChildren = store.isGroupDragOn && selection.hasChildren();
+        if (!canDragSelectionChildren) return;
+
+        const isParentOnLeft = store.isParentOnLeft(selection.id);
+        if (!selection.isRootThought && isParentOnLeft !== selection.prevIsParentOnLeft) {
+          selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
+            const positionData = selection.childrenRelativePosition[index];
+            positionData.position.x *= -1; // eslint-disable-line no-param-reassign
           });
-          if (store.isGroupDragOn && selection.hasChildren()) {
-            const isParentOnLeft = store.isParentOnLeft(selection.id);
-            if (!selection.isRootThought && isParentOnLeft !== selection.prevIsParentOnLeft) {
-              selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
-                const positionData = selection.childrenRelativePosition[index];
-                positionData.position.x *= -1; // eslint-disable-line no-param-reassign
-              });
-            }
-            store.restoreChildrenRelativePosition(selection.id);
-            selection.setPrevIsParentOnLeft(isParentOnLeft);
-          }
         }
+        store.restoreChildrenRelativePosition(selection.id);
+        selection.setPrevIsParentOnLeft(isParentOnLeft);
       },
 
       customOnFinishHydration(): void {

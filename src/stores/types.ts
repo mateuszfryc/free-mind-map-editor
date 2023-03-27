@@ -59,6 +59,7 @@ export type TStore = /* View & */ {
   resolveOverlaps(thought: Thought, axis?: TAxis): Thought;
   findClosestOverlapFor(thought: Thought): void;
   setPositionAsync(thoughtId: string, newPosition: Vector, callback?: () => void): void;
+  initPositions(): void;
   updateWorkspaceSize(): void;
   saveCurrentMindMapAsJSON(): void;
   getCurrentMindMapState(): SavedStateType;
