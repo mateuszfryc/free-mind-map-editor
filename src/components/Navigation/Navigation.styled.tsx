@@ -68,24 +68,24 @@ export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subL
     `
 );
 
-export const MenuButton = styled.button(
-    ({ theme: { colors } }) => css`
+export const MenuButton = styled.button<{ primary?: boolean }>(
+    ({ theme: { colors }, primary = false }) => css`
         align-items: center;
-        background-color: ${colors.primary()};
-        border: 1px solid ${colors.shade()};
+        background-color: ${primary ? colors.primaryDarker() : 'transparent'};
+        border: 1px solid ${primary ? 'transparent' : colors.shade()};
         border-radius: 10px;
-        color: ${colors.secondary()};
+        color: ${primary ? colors.primary() : colors.secondary()};
         cursor: pointer;
         display: flex;
         height: 37px;
         justify-content: center;
         padding: 10px;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        transition: background-color 0.15s ease, color 0.15s ease;
         z-index: 11;
 
         &:hover,
         &:focus {
-            background-color: ${colors.shade(0.25)};
+            background-color: ${primary ? colors.contrast(0.85) : colors.shade(0.25)};
         }
     `
 );

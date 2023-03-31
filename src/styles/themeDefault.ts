@@ -13,7 +13,7 @@ export const breakpoints: ObjectOfStrings = {
 const white = '255, 255, 255';
 const lightBlue = '0, 190, 250';
 const red = '255, 0, 0';
-const blueDarker = '40, 90, 115';
+const blueDarker = '0, 150, 230';
 
 const darkGray = '100, 100, 100';
 const gray = '180, 180, 180';
