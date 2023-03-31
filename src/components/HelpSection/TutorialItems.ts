@@ -1,12 +1,12 @@
-import SelectGif from 'assets/tutorial/select.gif';
-import EditGif from 'assets/tutorial/edit.gif';
-import MoveSingletToughtGif from 'assets/tutorial/movesinglenode.gif';
 import MoveWithoutChildrenGif from 'assets/tutorial/dragalone.gif';
+import DragViewportdGif from 'assets/tutorial/dragviewport.gif';
+import EditGif from 'assets/tutorial/edit.gif';
 import MakeChildGif from 'assets/tutorial/makechild.gif';
 import MakeSiblingGif from 'assets/tutorial/makesibling.gif';
-import ReparentGif from 'assets/tutorial/reparent.gif';
-import DragViewportdGif from 'assets/tutorial/dragviewport.gif';
 import MinimapdGif from 'assets/tutorial/minimap.gif';
+import MoveSingletNodeGif from 'assets/tutorial/movesinglenode.gif';
+import ReparentGif from 'assets/tutorial/reparent.gif';
+import SelectGif from 'assets/tutorial/select.gif';
 
 export type TutorialItemType = {
   title: string;
@@ -29,7 +29,7 @@ export const TutorialItems: TutorialItemType[] = [
   {
     title: 'Drag single node around',
     description: 'Click and hold to drag single node around.',
-    src: MoveSingletToughtGif,
+    src: MoveSingletNodeGif,
   },
   {
     title: 'Drag node without children',

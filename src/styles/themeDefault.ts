@@ -15,14 +15,14 @@ const lightBlue = '0, 190, 250';
 const red = '255, 0, 0';
 const blueDarker = '40, 90, 115';
 
-const darkGray = '20, 20, 20';
-const gray = '110, 110, 110';
+const darkGray = '100, 100, 100';
+const gray = '180, 180, 180';
 
 const dominantColor = darkGray;
 
 export const colors = {
-  primary: setColorGetter(dominantColor),
-  secondary: setColorGetter(white),
+  primary: setColorGetter(white),
+  secondary: setColorGetter(dominantColor),
   shade: setColorGetter(gray),
   contrast: setColorGetter(lightBlue),
 
@@ -74,7 +74,7 @@ export const theme = {
   setBoxShadow,
   chessboardBackground,
   colors,
-  connectorsWidth: 3,
+  connectorsWidth: 2,
   fontSizes,
   setFontSize,
 };

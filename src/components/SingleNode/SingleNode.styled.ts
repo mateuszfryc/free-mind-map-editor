@@ -25,7 +25,7 @@ export const Node = styled.div<NodeStyleType>(
         z-index: ${zIndex};
 
         & .underline {
-            border-color: ${colors.primary()};
+            border-color: ${colors.secondary()};
             border-style: solid;
             border-width: 0 0 3px;
             bottom: 0;
@@ -70,7 +70,7 @@ export const Node = styled.div<NodeStyleType>(
 export const Textarea = styled.textarea`
     ${({ theme }) => css`
         background-color: transparent;
-        border-color: ${theme.colors.primary()};
+        border-color: ${theme.colors.secondary()};
         border-radius: 12px;
         border-style: solid;
         border-width: 0 0 5px 0;

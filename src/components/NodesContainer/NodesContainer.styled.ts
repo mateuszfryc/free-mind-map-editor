@@ -1,8 +1,7 @@
 import styled, { css } from 'styled-components';
 
 export const NodesContainer = styled.div(
-    ({ theme: { colors, chessboardBackground } }) => css`
-        ${chessboardBackground(100, colors.primary(0.02), 'transparent')}
+    () => css`
         height: 100%;
         position: absolute;
         width: 100%;
