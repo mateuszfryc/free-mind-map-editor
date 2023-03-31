@@ -19,6 +19,7 @@ export const LinksContainer = styled.div<{ isOpen: boolean }>(
         background-color: ${colors.primary()};
         color: ${colors.secondary()};
         display: flex;
+        opacity: ${isOpen ? 1 : 0};
         flex-direction: column;
         height: 0;
         justify-content: center;
