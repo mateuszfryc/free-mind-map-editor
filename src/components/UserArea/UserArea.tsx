@@ -1,15 +1,15 @@
-import { MenuButton } from '../Navigation/Navigation.styled';
+import { FoldableArea } from '../FoldableArea';
 import * as Styled from './UserArea.styled';
 
 export function UserArea() {
   return (
     <Styled.UserArea>
-      <MenuButton type='button' style={{ marginRight: '10px' }}>
-        Log In
-      </MenuButton>
-      <MenuButton primary type='button'>
-        Sign In
-      </MenuButton>
+      <FoldableArea alignContainerRight buttonContent='Log In'>
+        Log in form
+      </FoldableArea>
+      <FoldableArea alignContainerRight buttonContent='Register' primary style={{ marginLeft: '10px' }}>
+        Register form
+      </FoldableArea>
     </Styled.UserArea>
   );
 }

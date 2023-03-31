@@ -1,10 +1,10 @@
-import { ChangeEvent, useCallback, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useState } from 'react';
 
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
-import { useOnClickOutside } from 'hooks/useOnClickOutside';
 import { SavedStateType } from 'types/baseTypes';
 import { useMindMapStore } from '../../stores/mind-map-store';
 import { deserializeMindMapSelector, savedMindMapSelector, setDrawLockSelector } from '../../stores/selectors';
+import { FoldableArea } from '../FoldableArea';
 import * as Styled from './Navigation.styled';
 
 export function Navigation() {
@@ -12,19 +12,6 @@ export function Navigation() {
   const setDrawLock = useMindMapStore(setDrawLockSelector);
   const deserializeMindMap = useMindMapStore(deserializeMindMapSelector);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const stickyMenuRef = useRef(null);
-
-  const toggleMobileMenu = useCallback(() => {
-    setIsMenuOpen((current) => !current);
-  }, []);
-
-  const closeMenu = useCallback(() => {
-    if (isMenuOpen) {
-      setIsMenuOpen(false);
-    }
-  }, [isMenuOpen]);
-
-  useOnClickOutside(stickyMenuRef, closeMenu);
 
   const uploadSavedMindMap = useCallback(
     (event: ChangeEvent): void => {
@@ -50,28 +37,30 @@ export function Navigation() {
   );
 
   return (
-    <Styled.Navigation ref={stickyMenuRef}>
-      <Styled.MenuButton type='button' onClick={toggleMobileMenu}>
-        <Styled.BurgerIcon isActive={isMenuOpen} />
-      </Styled.MenuButton>
+    <Styled.Navigation>
+      <FoldableArea buttonContent={<Styled.BurgerIcon isActive={false} />}>
+        <FoldableArea.Child onCLickClose>
+          <Styled.Link to='/'>Editor</Styled.Link>
+        </FoldableArea.Child>
 
-      <Styled.LinksContainer isOpen={isMenuOpen}>
-        <Styled.Link onClick={closeMenu} to='/'>
-          Editor
-        </Styled.Link>
+        <FoldableArea.Child onCLickClose>
+          <Styled.Link as='a' subLink download='MindMap.json' href={`data: ${savedMindMap}`}>
+            Download current map
+          </Styled.Link>
+        </FoldableArea.Child>
 
-        <Styled.Link as='a' subLink onClick={closeMenu} download='MindMap.json' href={`data: ${savedMindMap}`}>
-          Download current map
-        </Styled.Link>
+        <FoldableArea.Child onCLickClose>
+          <Styled.Link as='a' subLink padding='0'>
+            <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload local file</ButtonUploadFIle>
+          </Styled.Link>
+        </FoldableArea.Child>
 
-        <Styled.Link as='a' subLink onClick={closeMenu} padding='0'>
-          <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload local file</ButtonUploadFIle>
-        </Styled.Link>
-
-        <Styled.Link onClick={closeMenu} to='help' margin='20px 0 0'>
-          How To
-        </Styled.Link>
-      </Styled.LinksContainer>
+        <FoldableArea.Child onCLickClose>
+          <Styled.Link to='help' margin='20px 0 0'>
+            How To
+          </Styled.Link>
+        </FoldableArea.Child>
+      </FoldableArea>
     </Styled.Navigation>
   );
 }

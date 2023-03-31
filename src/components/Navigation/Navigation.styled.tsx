@@ -12,13 +12,15 @@ export const Navigation = styled.header`
     z-index: 10;
 `;
 
-export const LinksContainer = styled.div<{ isOpen: boolean }>(
+export const Container = styled.div<{ isOpen: boolean }>(
     ({ isOpen, theme: { colors } }) => css`
         align-items: flex-start;
-        border: 1px solid ${colors.shade()};
+        box-shadow: 0 0 7px ${colors.shade(0.3)};
         background-color: ${colors.primary()};
+        border: 1px solid ${colors.shade(0.3)};
         color: ${colors.secondary()};
         display: flex;
+        border-radius: 6px;
         opacity: ${isOpen ? 1 : 0};
         flex-direction: column;
         height: 0;
@@ -26,12 +28,12 @@ export const LinksContainer = styled.div<{ isOpen: boolean }>(
         left: 45px;
         overflow: hidden;
         padding: 0;
-        position: absolute;
         transition: width 0.3s ease, height 0.3s ease, padding 0.3s ease;
         width: 0;
+        margin-top: 10px;
         ${isOpen && css`
             height: initial;
-            padding: 15px;
+            padding: 10px;
             width: max-content;
         `}
     `
@@ -72,8 +74,8 @@ export const MenuButton = styled.button<{ primary?: boolean }>(
     ({ theme: { colors }, primary = false }) => css`
         align-items: center;
         background-color: ${primary ? colors.primaryDarker() : 'transparent'};
-        border: 1px solid ${primary ? 'transparent' : colors.shade()};
-        border-radius: 10px;
+        border: 1px solid ${primary ? 'transparent' : colors.shade(0.7)};
+        border-radius: 6px;
         color: ${primary ? colors.primary() : colors.secondary()};
         cursor: pointer;
         display: flex;
@@ -85,7 +87,7 @@ export const MenuButton = styled.button<{ primary?: boolean }>(
 
         &:hover,
         &:focus {
-            background-color: ${primary ? colors.contrast(0.85) : colors.shade(0.25)};
+            background-color: ${primary ? colors.primaryDarker(0.7) : colors.shade(0.25)};
         }
     `
 );
