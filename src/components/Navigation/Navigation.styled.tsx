@@ -12,33 +12,6 @@ export const Navigation = styled.header`
     z-index: 10;
 `;
 
-export const Container = styled.div<{ isOpen: boolean }>(
-    ({ isOpen, theme: { colors } }) => css`
-        align-items: flex-start;
-        box-shadow: 0 0 7px ${colors.shade(0.3)};
-        background-color: ${colors.primary()};
-        border: 1px solid ${colors.shade(0.3)};
-        color: ${colors.secondary()};
-        display: flex;
-        border-radius: 6px;
-        opacity: ${isOpen ? 1 : 0};
-        flex-direction: column;
-        height: 0;
-        justify-content: center;
-        left: 45px;
-        overflow: hidden;
-        padding: 0;
-        transition: width 0.3s ease, height 0.3s ease, padding 0.3s ease;
-        width: 0;
-        margin-top: 10px;
-        ${isOpen && css`
-            height: initial;
-            padding: 10px;
-            width: max-content;
-        `}
-    `
-);
-
 export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subLink?: boolean }>(
     ({
         margin = '0',
@@ -70,6 +43,7 @@ export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subL
     `
 );
 
+// TODO: make this into regular button component
 export const MenuButton = styled.button<{ primary?: boolean }>(
     ({ theme: { colors }, primary = false }) => css`
         align-items: center;

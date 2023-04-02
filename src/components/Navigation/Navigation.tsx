@@ -38,7 +38,7 @@ export function Navigation() {
 
   return (
     <Styled.Navigation>
-      <FoldableArea buttonContent={<Styled.BurgerIcon isActive={false} />}>
+      <FoldableArea buttonContent={<Styled.BurgerIcon />}>
         <FoldableArea.Child onCLickClose>
           <Styled.Link to='/'>Editor</Styled.Link>
         </FoldableArea.Child>

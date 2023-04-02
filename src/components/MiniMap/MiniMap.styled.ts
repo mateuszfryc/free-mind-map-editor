@@ -2,13 +2,14 @@ import styled, { css } from 'styled-components';
 
 export const MiniMap = styled.div(
     ({ theme: { colors } }) => css`
-        background-color: ${colors.baseMiniMap(0.15)};
+        background-color: ${colors.baseMiniMap(0)};
         border: 1px solid ${colors.baseMiniMap(0.5)};
+        box-shadow: 0 0 10px ${colors.baseMiniMap(0.2)};
         bottom: 15px;
-        height: 300px;
+        height: 250px;
         position: absolute;
         right: 15px;
-        width: 300px;
+        width: 250px;
         z-index: 4;
     `
 );

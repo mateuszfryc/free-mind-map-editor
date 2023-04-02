@@ -5,6 +5,7 @@
   "homepage": "/",
   "dependencies": {
     "@types/uuid": "^9.0.1",
+    "firebase": "^9.19.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
@@ -17,6 +18,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.5.0",
     "@commitlint/config-conventional": "^17.4.4",
+    "@types/firebase": "^3.2.1",
     "@types/node": "^18.15.5",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",

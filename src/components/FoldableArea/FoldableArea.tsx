@@ -3,12 +3,13 @@ import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import { MenuButton } from '../Navigation/Navigation.styled';
 import * as Styled from './FoldableArea.styled';
 
-type ChildContext = { closeMenu?: () => void };
+type ChildContext = { closeMenu?: () => void; isOpen?: boolean };
 const ChildrenContext = createContext<ChildContext>({});
 
 type ChildProps = React.PropsWithChildren<{
   onClick?: () => void;
   onCLickClose?: boolean;
+  isOpen?: boolean;
 }>;
 
 export function Child({ children, onClick = undefined, onCLickClose = undefined }: ChildProps) {
@@ -59,7 +60,7 @@ function FoldableArea({
   useOnClickOutside(containerRef, closeMenu);
 
   return (
-    <ChildrenContext.Provider value={{ closeMenu }}>
+    <ChildrenContext.Provider value={{ closeMenu, isOpen }}>
       <Styled.Wrapper ref={containerRef} style={style}>
         <MenuButton onClick={toggleuserForm} primary={primary} type='button'>
           {buttonContent}

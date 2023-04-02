@@ -42,6 +42,7 @@ const fontSizes = {
   title: 2.4,
   paragraph: 1.8,
 };
+
 export type TFontSize = keyof typeof fontSizes;
 
 const setFontSize = (size: TFontSize): string => {
