@@ -1,4 +1,4 @@
-# Free Mind Map Editor
+# Mind Map Editor
 
 Simple tool do draw mind maps. Detailed "How To" describing how to use it: [LINK](https://mindmapeditor.dysonspheregames.com/#howto).
 
@@ -23,6 +23,11 @@ It's recommended to configure the below as environment plugins (e.g. VS Code or 
 - ESLint
 - StyleLint
 - Prettier
+
+### Branches
+
+main - development
+production - published and accessible by users
 
 ### TO DO
 
