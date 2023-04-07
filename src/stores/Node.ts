@@ -1,7 +1,7 @@
 import { ChildPositionData, NODE_STATE, ObjectOfVectors, Vector } from 'types/baseTypes';
 import { getParsedStyle, getWindowInnerSize } from 'utils/get';
 
-const defaultTextTemplate = "What's on your mind?";
+export const defaultTextTemplate = 'New idea';
 
 type BoundingBox = {
   x: number;
@@ -100,17 +100,17 @@ export class Node {
     bottom: ObjectOfVectors;
   } {
     const width: number = this.getOuterWidth() * 0.5;
-    const height: number = this.getOuterHeight() * 0.5;
+    // const height: number = this.getOuterHeight() * 0.5;
     const { x, y } = this.getPosition();
 
     return {
       top: {
-        left: { x: x - width, y: y - height - 1 },
-        right: { x: x + width, y: y - height - 1 },
+        left: { x: x - width, y: y /* - height - 1 */ },
+        right: { x: x + width, y: y /* - height - 1 */ },
       },
       bottom: {
-        left: { x: x - width, y: y + height - 1 },
-        right: { x: x + width, y: y + height - 1 },
+        left: { x: x - width, y: y /* + height - 1 */ },
+        right: { x: x + width, y: y /* + height - 1 */ },
       },
     };
   }

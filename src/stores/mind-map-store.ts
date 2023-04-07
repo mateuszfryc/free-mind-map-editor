@@ -13,21 +13,23 @@ import {
   Vector,
 } from '../types/baseTypes';
 import { getTwoPointsDistance, getWindowInnerSize } from '../utils/get';
-import { Node } from './Node';
+import { defaultTextTemplate, Node } from './Node';
 import { pointer } from './pointer';
 import { OverlapResult, TStore } from './types';
 import { view } from './view';
 
-const defaultRoot = new Node(uuidv4(), { x: 0, y: 0 }, undefined, true, "What's on your mind?");
+const defaultRoot = new Node(uuidv4(), { x: 0, y: 0 }, undefined, true, defaultTextTemplate);
+const maxSteps = 100;
+let count = 0;
 
 export const useMindMapStore = create(
   persist<TStore>(
     (set, get) => ({
       pointer,
       connectorsCurveDividerWidth: 2.2,
-      defaultSpawnGap: { x: 25, y: 10 },
+      defaultSpawnGap: { x: 25, y: 5 },
       isDrawingLocked: false,
-      isGroupDragOn: false,
+      isGroupDragOn: true,
       isInitialized: false,
       initialNodeWidth: 200,
       rootNode: defaultRoot,
@@ -451,13 +453,16 @@ export const useMindMapStore = create(
         const { amount } = overlaps[0];
         if (amount.x > 0 || amount.y > 0) {
           const targetPosition: Vector = node.getPosition();
-          if (axis === 'y') {
-            targetPosition.x += amount[axis] + Math.sign(amount[axis]) * store.defaultSpawnGap[axis];
-          } else if (axis === 'x') {
-            targetPosition.y += amount[axis] + Math.sign(amount[axis]) * store.defaultSpawnGap[axis];
+          const offset = amount[axis] + Math.sign(amount[axis]) * store.defaultSpawnGap[axis];
+          if (node.prevIsParentOnLeft) {
+            targetPosition[axis] += offset;
+          } else {
+            targetPosition[axis] -= offset;
           }
           node.setPosition(targetPosition);
-          store.resolveOverlaps(node, 'y');
+          count++;
+          if (count < maxSteps) store.resolveOverlaps(node, 'y');
+          else count = 0;
         }
 
         return node;
@@ -657,9 +662,9 @@ export const useMindMapStore = create(
         rootsChildren.forEach((child: Node) => {
           const { me, parent } = store.getConnectorPoints(child.id);
           me.x += offset.x;
-          me.y += offset.y - 1;
+          me.y += offset.y;
           parent.x += offset.x;
-          parent.y += offset.y - 1;
+          parent.y += offset.y;
           me.x += 1;
           parent.x -= 1;
           const { x } = me;

@@ -109,8 +109,12 @@ export const view: View = {
     const mapStyle = getParsedStyle(this.miniMap, 'width', 'height', 'right', 'bottom');
     const viewportStyle = getParsedStyle(this.miniMapViewport, 'left', 'top', 'width', 'height');
     const size = getWindowInnerSize();
-    const pointerInMapX = pointerPosition.x - (size.x - mapStyle.right - mapStyle.width) - viewportStyle.width * 0.5;
-    const pointerInMapY = pointerPosition.y - (size.y - mapStyle.bottom - mapStyle.height) - viewportStyle.height * 0.5;
+    let pointerInMapX = pointerPosition.x - (size.x - mapStyle.right - mapStyle.width);
+    let pointerInMapY = pointerPosition.y - (size.y - mapStyle.bottom - mapStyle.height);
+
+    pointerInMapX -= pointerInMapX - viewportStyle.left;
+    pointerInMapY -= pointerInMapY - viewportStyle.top;
+
     this.setMiniMapViewportPosition(
       clamp(pointerInMapX, 0, mapStyle.width - viewportStyle.width),
       clamp(pointerInMapY, 0, mapStyle.height - viewportStyle.height),

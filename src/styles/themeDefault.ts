@@ -41,6 +41,8 @@ const fontSizes = {
   sectionTitle: 4,
   title: 2.4,
   paragraph: 1.8,
+  root: 1.4,
+  node: 1,
 };
 
 export type TFontSize = keyof typeof fontSizes;

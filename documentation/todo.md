@@ -1,20 +1,51 @@
-### TODO:
+### MVP:
 
-- [ ] bug: after comming back from other routs the state is not restored (or maybe even not saved before changing route)
-- [ ] small shadow (or other indication) showing which node will become new parent while dragging
-- [ ] create children and siblings on the left with shift as modifier
+- [ ] !! fixfeat: new overlaps solver: move overlaps away for all ndoes? like in simple simulation?
+
+- [ ] new mind map button
+  - [ ] modal informing that this will remove current mind map
+    - [ ] add modal functionality
+- [ ] fix: small shadow (or other indication) showing which node will become new parent while dragging
+- [ ] feat: on hover over potential parent indicate new parent (shadow or something)
+
+- [ ] some kind of indication that single mind map mode can be expanded to list of mind maps
+- [ ] three (or any number) of basic styles
+- [ ] info of upcomming paid bonuses
+- [ ] alternative drag form: on drag create shadow under item with shadow link and that instead?
+- [ ] feat: while draggin node show notification that pressing shift allows for draggin parent alone
+  - [ ] add notifications module
+- [ ] fix/feat: there is no way to do a next line while editing text. Consider adding text editor, if [Enter] then use other key for sibling
+- [ ] feat: select multiple nodes
+  - [ ] move multiple nodes
+  - [ ] remove multiple nodes
+- [ ] fix: when draging node on the left of the parent sometimes children of that node get flipped to the right
+- [x] change parent change action to happen on mouse hover not entire node
+- [x] fix: while draging the mouse should not interact with minimap
+- [x] fix: click on minimap viewport miniature jumps that viewport to center on the mouse but shouldn't
+- [x] fix: right after loading the app parent can be dragged without children even though shift isn't pressed
+
+### Paid user options:
+
+- [ ] additional styles
+- [ ] custom styles
+- [ ] register new user
+- [ ] log in/out
+- [ ] mind maps CRUD per user
+  - [ ] mind maps list
+    - [ ] new mind map
+    - [ ] open existing mind map
+    - [ ] remove mind map
+
+### To do:
+
+- [ ] app icon instead of burger menu? UX compliant?
 - [ ] generate link with mind map data
 - [ ] load mind map by url data
-- [ ] general purpose modal
-- [ ] splash screen welcome modal
 - [ ] zoom in/out
   - [ ] funcionality (zomm in/out text, nodes and connectors)
   - [ ] buttons, touch gesture and UI buttons (next to mini map)
-- [ ] design & implement logo
-  - [ ] favicon
-- [ ] persist current mind map in cokies
 - [ ] mouse controlls
-  - [ ] open node menu on right click
+  - [ ] open node menu on right click?
     - [ ] align children in different ways
     - [ ] make child
     - [ ] make sibling
@@ -23,21 +54,23 @@
   - [ ] edit on double touch
   - [ ] drag on touch & hold
   - [ ] open node menu on longer thouch hold
-- [ ] burger responsive menu:
-  - [x] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
-  - [x] save to desktop as JSON
-  - [x] load from desktop as JSON
-  - [ ] generate link with mindmap data
-  - [ ] save as jpg/png
-  - [ ] save as PDF
-  - [ ] printint optimisations
-  - [ ] settings (styles & behavior, dark mode, auto alignmen)
-  - [ ] how to instructions
-  - [ ] Q&A
+- [ ] save as jpg/png
+- [ ] save as PDF
+- [ ] printint optimisations
+- [ ] settings (styles & behavior, dark mode, auto alignmen)
+- [ ] Q&A
 - [ ] footer
 
 ### Done:
 
+- [x] how to instructions
+- [x] bug: after comming back from other routs the state is not restored (or maybe even not saved before changing route)
+- [x] design & implement logo
+  - [x] favicon
+- [x] persist current mind map in cokies
+- [x] burger icon with action to open/close menu (close menu on: item click or elsewhere on the page)
+- [x] save to desktop as JSON
+- [x] load from desktop as JSON
 - [x] mouse controlls
   - [x] select tought on mouse click
   - [x] edit node on dbl click

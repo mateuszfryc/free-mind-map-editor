@@ -81,6 +81,7 @@ export function SingleNode({ node }: NodeProps) {
 
   return (
     <Styled.Node
+      fontSize={node.isRootNode ? 'root' : 'node'}
       id={`${node.id}`}
       isEdited={isEdited}
       isSelected={isSelected}

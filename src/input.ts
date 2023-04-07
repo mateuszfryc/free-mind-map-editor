@@ -1,5 +1,6 @@
 import { NODE_STATE } from 'types/baseTypes';
 import { useMindMapStore } from './stores/mind-map-store';
+import { getAllElementsUnderPointer } from './utils/dom';
 
 export class KeyData {
   code: number;
@@ -173,14 +174,18 @@ export function onMouseUpHandler(): void {
   pointer.setIsLeftButtonDown(false);
 
   if (highlight && highlight.isBeingDragged()) {
-    const { closestOverlapId, parentId } = highlight;
+    const { parentId } = highlight;
+    const { x, y } = pointer.position;
+    const elementsUnderPointer = getAllElementsUnderPointer(x, y).filter(({ id }) => id !== highlight.id);
+    const nodeUnderMouse = store.getNodeById(elementsUnderPointer[0]?.id ?? '');
     if (
-      closestOverlapId &&
-      !store.isParentOf(highlight.id, closestOverlapId, true) &&
-      !store.isChildOf(closestOverlapId, highlight.id)
+      nodeUnderMouse &&
+      nodeUnderMouse.id !== highlight.id &&
+      !store.isParentOf(highlight.id, nodeUnderMouse.id, true) &&
+      !store.isChildOf(nodeUnderMouse.id, highlight.id)
     ) {
       if (parentId) store.removeChildNode(parentId, highlight.id);
-      store.addChildNode(closestOverlapId, highlight.id);
+      store.addChildNode(nodeUnderMouse.id, highlight.id);
       store.resolveOverlaps(highlight, 'x');
       store.restoreChildrenRelativePosition(highlight.id);
       store.getChildren(highlight.id, true).forEach((child) => store.resolveOverlaps(child));

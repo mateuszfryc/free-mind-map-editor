@@ -1,20 +1,22 @@
 import styled, { css } from 'styled-components';
+import { TFontSize } from '../../styles/themeDefault';
 
 type NodeStyleType = {
     maxWidth: number;
     isSelected: boolean;
     isEdited: boolean;
     zIndex: number;
+    fontSize: TFontSize;
 };
 
 export const Node = styled.div<NodeStyleType>(
-    ({ maxWidth, isSelected, isEdited, zIndex, theme: { colors } }) => css`
+    ({ maxWidth, isSelected, isEdited, zIndex, fontSize, theme: { colors, setFontSize } }) => css`
+        ${setFontSize(fontSize)}
         background-color: transparent;
         border: none;
         color: #000;
         cursor: pointer;
         display: inline-block;
-        line-height: 20px;
         max-width: ${maxWidth}px;
         outline: none;
         overflow: visible;
@@ -27,7 +29,8 @@ export const Node = styled.div<NodeStyleType>(
         & .underline {
             border-color: ${colors.secondary()};
             border-style: solid;
-            border-width: 0 0 3px;
+            /* border-width: 0 0 3px; */
+            border-width: 0;
             bottom: 0;
             left: 0;
             height: 12px;
