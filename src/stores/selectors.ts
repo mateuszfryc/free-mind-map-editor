@@ -16,6 +16,7 @@ export const isGroupDragOnSelector = (store: TStore): boolean => store.isGroupDr
 export const setHighlightSelector = (store: TStore): ((nodeId: string) => void) => store.setHighlight.bind(store);
 export const clearHighlightSelector = (store: TStore): (() => void) => store.clearHighlight.bind(store);
 export const initialNodeWidthSelector = (store: TStore): number => store.initialNodeWidth;
+export const maxNodeWidthSelector = (store: TStore): number => store.maxNodeWidth;
 export const savedMindMapSelector = (store: TStore): string => store.savedMindMap;
 export const setDrawLockSelector = (store: TStore): ((isDrawingLocked: boolean) => void) =>
   store.setDrawLock.bind(store);

@@ -10,7 +10,7 @@ export type OverlapResult = {
 
 export type TAxis = 'x' | 'y';
 
-export type TStore = /* View & */ {
+export type TStore = {
   connectorsCurveDividerWidth: number;
   defaultSpawnGap: Vector;
   highlightId?: string;
@@ -18,6 +18,7 @@ export type TStore = /* View & */ {
   isGroupDragOn: boolean;
   isInitialized: boolean;
   initialNodeWidth: number;
+  maxNodeWidth: number;
   rootNode: Node;
   savedMindMap: string;
   scale: number;

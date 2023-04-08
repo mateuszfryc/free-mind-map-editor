@@ -43,7 +43,7 @@ export function MindMap() {
         ))}
       </NodesContainer>
       <MiniMap />
-      <HelpButton to='help'>Help</HelpButton>
+      <HelpButton to='help'>How to use</HelpButton>
     </MindMapContainer>
   );
 }

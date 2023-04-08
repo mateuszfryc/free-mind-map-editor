@@ -44,7 +44,7 @@ export type SavedNodeStateType = {
   content: string;
   id: string;
   isRootNode: boolean;
-  parentId: string | undefined;
+  parentId?: string;
   prevIsParentOnLeft: boolean;
   x: number;
   y: number;

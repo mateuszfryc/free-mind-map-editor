@@ -12,6 +12,7 @@ type FlexType = {
     reverse?: boolean;
     width?: string;
     wrap?: string;
+    gap?: string;
 };
 
 export const Flex = styled.div<FlexType>(
@@ -26,6 +27,7 @@ export const Flex = styled.div<FlexType>(
         reverse = false,
         width = 'unset',
         wrap = 'no-wrap',
+        gap = '0'
     }) => css`
         align-items: ${align};
         display: ${inlie ? 'inline-flex' : 'flex'};
@@ -36,6 +38,7 @@ export const Flex = styled.div<FlexType>(
         max-width: ${maxWidth};
         padding: ${padding};
         width: ${width};
+        gap: ${gap};
     `
 );
 
@@ -49,25 +52,30 @@ export const SectionContainer = styled(Flex)(
         color: ${colors.secondary()};
         justify-content: space-between;
         height: 100%;
-        max-width: 1100px;
-        margin: 0 auto;
+        width: 100%;
         padding: 0;
-        overflow: hidden;
     `
 );
 
+export const ColumnLeft = styled(Flex)`
+    width: 30%;
+    padding: 0 30px;
+`;
+
+export const ColumnRight = styled(Flex)`
+    width: 70%;
+`;
+
 export const StickyMenu = styled(Flex)`
     flex-direction: column;
-    max-width: 350px;
-    padding-top: 30px;
+    margin-top: 50px;
 `;
 
 export const Actions = styled('div')`
-    overflow-x: hidden;
-    overflow-y: scroll;
     margin: 30px 0;
     padding-right: 20px;
     height: calc(100vh - 60px);
+    max-width: 550px;
 `;
 
 export const Anchor = styled.div`
@@ -143,15 +151,14 @@ export const Title = styled.h1<TTileProps>(
     `
 );
 
-export const Paragraph = styled.p<{ padding?: string; margin?: string }>(
-    ({ padding = '10px 0', margin = '0 0 20px', theme: { colors } }) => css`
+export const Paragraph = styled.p(
+    ({ theme: { colors } }) => css`
         color: ${colors.secondary()};
-        margin: ${margin};
-        padding: ${padding};
+        padding: 10px 0;
     `
 );
 
 export const TutorialGif = styled.img`
-    width: 260px;
-    height: auto;
+    width: auto;
+    height: 210px;
 `;

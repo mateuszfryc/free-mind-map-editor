@@ -5,7 +5,7 @@ import { getSafeRef } from 'utils/get';
 import { useMindMapStore, useSelection } from '../../stores/mind-map-store';
 import {
   clearHighlightSelector,
-  initialNodeWidthSelector,
+  maxNodeWidthSelector,
   pointerSelector,
   setHighlightSelector,
   updateSelectionContentSelector,
@@ -22,7 +22,7 @@ export function SingleNode({ node }: NodeProps) {
   const updateSelectionContent = useMindMapStore(updateSelectionContentSelector);
   const setHighlight = useMindMapStore(setHighlightSelector);
   const clearHighlight = useMindMapStore(clearHighlightSelector);
-  const initialNodeWidth = useMindMapStore(initialNodeWidthSelector);
+  const maxNodeWidth = useMindMapStore(maxNodeWidthSelector);
 
   const contentRef = useRef(null);
   const isSelected = node.isIdle && !node.isIdle();
@@ -77,11 +77,11 @@ export function SingleNode({ node }: NodeProps) {
 
   return (
     <Styled.Node
-      fontSize={node.isRootNode ? 'root' : 'node'}
+      fontSize={node.isRootNode ? 'itemTitle' : 'normal'}
       id={`${node.id}`}
       isEdited={isEdited}
       isSelected={isSelected}
-      maxWidth={initialNodeWidth}
+      maxWidth={maxNodeWidth}
       onDoubleClick={editSelection}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}

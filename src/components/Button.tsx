@@ -7,7 +7,8 @@ export type ButtonProps = {
   style?: React.CSSProperties;
 };
 
-export const ButtonStyle = ({ theme: { colors }, primary = false }: ButtonProps) => css`
+export const ButtonStyle = ({ theme: { colors, setFontSize }, primary = false }: ButtonProps) => css`
+  ${setFontSize('normal')}
   display: flex;
   align-items: center;
   justify-content: center;
