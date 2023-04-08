@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { ButtonStyle } from '../Button';
 
 export const Wrapper = styled.div`
-    height: 32px;
     position: relative;
 `;
 

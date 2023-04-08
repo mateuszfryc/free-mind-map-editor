@@ -17,7 +17,7 @@ export const ButtonStyle = ({ theme: { colors, setFontSize }, primary = false }:
   border-radius: 6px;
   color: ${primary ? colors.primary() : colors.secondary()};
   cursor: pointer;
-  padding: 5px 10px;
+  padding: 7px 10px;
   transition: background-color 0.15s ease, color 0.15s ease;
   z-index: 11;
   text-decoration: none;

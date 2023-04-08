@@ -10,8 +10,8 @@ export const GlobalStyles = createGlobalStyle`
     dl, dt, dd, ol, ul, li,
     fieldset, form, label, legend,
     table, caption, tbody, tfoot, thead, tr, th, td,
-    article, aside, canvas, details, embed, 
-    figure, figcaption, footer, header, hgroup, 
+    article, aside, canvas, details, embed,
+    figure, figcaption, footer, header, hgroup,
     menu, nav, output, ruby, section, summary,
     time, mark, audio, video, button {
         background-color: transparent;
@@ -23,7 +23,7 @@ export const GlobalStyles = createGlobalStyle`
     }
 
     /* HTML5 display-role reset for older browsers */
-    article, aside, details, figcaption, figure, 
+    article, aside, details, figcaption, figure,
     footer, header, hgroup, menu, nav, section {
         display: block;
     }
@@ -51,7 +51,7 @@ export const GlobalStyles = createGlobalStyle`
     html,
     body {
         font-family: Arial, Helvetica, sans-serif;
-        font-size: 16px;
+        font-size: 15px;
         font-weight: normal;
         height: 100%;
         line-height: 24px;

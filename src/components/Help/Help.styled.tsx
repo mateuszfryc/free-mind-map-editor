@@ -75,7 +75,7 @@ export const Actions = styled('div')`
     margin: 30px 0;
     padding-right: 20px;
     height: calc(100vh - 60px);
-    max-width: 550px;
+    max-width: 650px;
 `;
 
 export const Anchor = styled.div`

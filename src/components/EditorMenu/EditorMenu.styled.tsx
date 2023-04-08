@@ -53,26 +53,25 @@ export const BurgerIcon = styled.div<{ isActive?: boolean }>(
         &,
         &::before,
         &::after {
-            content: '';
-            height: 2.5px;
-            transition: all 0.3s ease-out;
+            height: 2px;
             width: 16px;
         }
 
         &::before,
         &::after {
+            content: '';
             background-color: ${colors.secondary(0.8)};
             left: 0;
             position: absolute;
         }
 
         &::before {
-            top: ${isActive ? '0' : '-5.5px'};
+            top: ${isActive ? '0' : '-6.5px'};
             transform: ${isActive ? 'rotate(45deg)' : 'none'};
         }
 
         &::after {
-            top: ${isActive ? '0' : '6px'};
+            top: ${isActive ? '0' : '6.5px'};
             transform: ${isActive ? 'rotate(135deg)' : 'none'};
         }
     `
