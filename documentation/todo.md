@@ -15,6 +15,9 @@
 - [ ] feat: while draggin node show notification that pressing shift allows for draggin parent alone
   - [ ] add notifications module
 - [ ] fix/feat: there is no way to do a next line while editing text. Consider adding text editor, if [Enter] then use other key for sibling
+- [ ] feat: tips at the bottom of the screen
+- [ ] feat: bezier curves or oter more accurate curves so that input/output arrives from the right direction
+- [ ] feat: change size of the node with resize drag operations (like illustrator)
 - [ ] feat: select multiple nodes
   - [ ] move multiple nodes
   - [ ] remove multiple nodes

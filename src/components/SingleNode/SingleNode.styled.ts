@@ -80,15 +80,15 @@ export const Textarea = styled.textarea`
         font-family: inherit;
         font-size: inherit;
         left: -2px;
-        line-height: 20px;
         margin: 0;
         outline: none;
         overflow: hidden;
-        padding: 7px 12px;
+        padding: 7px 14px;
         position: absolute;
         resize: none;
         top: 1px;
         visibility: visible;
+        min-height: 13px;
 
         overflow-wrap: break-word;
         word-wrap: break-word;

@@ -32,19 +32,15 @@ export function SingleNode({ node }: NodeProps) {
     (event: ChangeEvent): void => {
       const textareaSafeRef = getSafeRef(contentRef);
       if (textareaSafeRef) {
-        textareaSafeRef.style.overflow = 'hidden';
         const { value } = event.target as HTMLTextAreaElement;
-        if (!value) {
-          return;
-        }
-        updateSelectionContent(value);
+
+        updateSelectionContent(value ?? '');
 
         window.setTimeout(() => {
-          textareaSafeRef.style.width = `${node.getWidth()}px`;
+          textareaSafeRef.style.width = `${node.getOuterWidth()}px`;
           textareaSafeRef.style.height = `${node.getHeight()}px`;
-          textareaSafeRef.style.overflow = 'visible';
           node.refreshPosition();
-        }, 5);
+        }, 0);
       }
     },
     [node, updateSelectionContent],

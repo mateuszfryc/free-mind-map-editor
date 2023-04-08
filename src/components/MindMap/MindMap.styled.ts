@@ -17,7 +17,7 @@ export const Canvas = styled.canvas`
 
 export const HelpButton = styled(ButtonLink)`
     position: fixed;
-    left: 10px;
-    bottom: 10px;
+    left: 15px;
+    bottom: 15px;
     z-index: 2;
 `;

@@ -13,7 +13,7 @@ import {
   Vector,
 } from '../types/baseTypes';
 import { getTwoPointsDistance, getWindowInnerSize } from '../utils/get';
-import { defaultTextTemplate, Node } from './Node';
+import { Node, defaultTextTemplate } from './Node';
 import { pointer } from './pointer';
 import { OverlapResult, TStore } from './types';
 import { view } from './view';
@@ -715,7 +715,11 @@ export const useMindMapStore = create(
           event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
         mouse.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 
-        const selectionCanBeDragged = mouse.isLeftButtonDown && selection && selection.id === mouse.draggedItemId;
+        const selectionCanBeDragged =
+          mouse.isLeftButtonDown &&
+          selection &&
+          selection.id === mouse.draggedItemId &&
+          selection.state !== NODE_STATE.EDITED;
         if (!selectionCanBeDragged) return;
 
         const { x, y } = mouse.position;
@@ -728,9 +732,12 @@ export const useMindMapStore = create(
         });
 
         const canDragSelectionChildren = store.isGroupDragOn && selection.hasChildren();
-        if (!canDragSelectionChildren) return;
-
         const isParentOnLeft = store.isParentOnLeft(selection.id);
+        if (!canDragSelectionChildren) {
+          selection.setPrevIsParentOnLeft(isParentOnLeft);
+          return;
+        }
+
         if (!selection.isRootNode && isParentOnLeft !== selection.prevIsParentOnLeft) {
           selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
             const positionData = selection.childrenRelativePosition[index];
