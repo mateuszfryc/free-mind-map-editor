@@ -6,7 +6,8 @@ import { SingleNode } from 'components/SingleNode';
 import * as Input from 'input';
 import { useMindMapStore } from '../../stores/mind-map-store';
 import { initializeSelector, nodesSelector, onMouseMoveSelector } from '../../stores/selectors';
-import * as Styled from './MindMap.styled';
+import { EditorMenu } from '../EditorMenu';
+import { Canvas, HelpButton, MindMapContainer } from './MindMap.styled';
 
 export function MindMap() {
   const nodes = useMindMapStore(nodesSelector);
@@ -33,14 +34,16 @@ export function MindMap() {
   }, []);
 
   return (
-    <Styled.MindMap id='mindmap'>
-      <Styled.Canvas />
+    <MindMapContainer id='mindmap'>
+      <EditorMenu />
+      <Canvas />
       <NodesContainer>
         {nodes.map((node) => (
           <SingleNode key={node.id} node={node} />
         ))}
       </NodesContainer>
       <MiniMap />
-    </Styled.MindMap>
+      <HelpButton to='help'>Help</HelpButton>
+    </MindMapContainer>
   );
 }

@@ -1,17 +1,26 @@
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 
 import { ButtonUploadFIle } from 'components/ButtonUploadFIle';
 import { SavedStateType } from 'types/baseTypes';
 import { useMindMapStore } from '../../stores/mind-map-store';
 import { deserializeMindMapSelector, savedMindMapSelector, setDrawLockSelector } from '../../stores/selectors';
 import { FoldableArea } from '../FoldableArea';
-import * as Styled from './Navigation.styled';
+import { ButtonLink } from '../Link';
+import * as Styled from './EditorMenu.styled';
 
-export function Navigation() {
+const buttonsStyle = {
+  border: 'none',
+  justifyContent: 'left',
+};
+
+const childStyle = {
+  width: '100%',
+};
+
+export function EditorMenu() {
   const savedMindMap = useMindMapStore(savedMindMapSelector);
   const setDrawLock = useMindMapStore(setDrawLockSelector);
   const deserializeMindMap = useMindMapStore(deserializeMindMapSelector);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const uploadSavedMindMap = useCallback(
     (event: ChangeEvent): void => {
@@ -39,26 +48,16 @@ export function Navigation() {
   return (
     <Styled.Navigation>
       <FoldableArea buttonContent={<Styled.BurgerIcon />}>
-        <FoldableArea.Child onCLickClose>
-          <Styled.Link to='/'>Editor</Styled.Link>
-        </FoldableArea.Child>
-
-        <FoldableArea.Child onCLickClose>
-          <Styled.Link as='a' subLink download='MindMap.json' href={`data: ${savedMindMap}`}>
+        <FoldableArea.Child onCLickClose style={childStyle}>
+          <ButtonLink as='a' download='MindMap.json' href={`data: ${savedMindMap}`} style={buttonsStyle}>
             Download current map
-          </Styled.Link>
+          </ButtonLink>
         </FoldableArea.Child>
 
-        <FoldableArea.Child onCLickClose>
-          <Styled.Link as='a' subLink padding='0'>
-            <ButtonUploadFIle onChange={uploadSavedMindMap}>Upload local file</ButtonUploadFIle>
-          </Styled.Link>
-        </FoldableArea.Child>
-
-        <FoldableArea.Child onCLickClose>
-          <Styled.Link to='help' margin='20px 0 0'>
-            How To
-          </Styled.Link>
+        <FoldableArea.Child onCLickClose style={childStyle}>
+          <ButtonUploadFIle onChange={uploadSavedMindMap} style={buttonsStyle}>
+            Upload local file
+          </ButtonUploadFIle>
         </FoldableArea.Child>
       </FoldableArea>
     </Styled.Navigation>

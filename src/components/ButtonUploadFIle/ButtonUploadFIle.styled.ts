@@ -1,17 +1,12 @@
 import styled from 'styled-components';
+import { ButtonStyle } from '../Button';
 
 export const Wrapper = styled.div`
     height: 32px;
     position: relative;
 `;
 
-export const Label = styled.label`
-    align-items: center;
-    display: flex;
-    height: 100%;
-    justify-content: center;
-    padding: 0 15px;
-`;
+export const Label = styled.label(ButtonStyle)
 
 export const Input = styled.input`
     display: block;

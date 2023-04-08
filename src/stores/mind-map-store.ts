@@ -754,7 +754,7 @@ export const useMindMapStore = create(
     }),
     {
       // local storage id, change to abandon current storage and use new local storage
-      name: 'c913d614-da17-4383-809f-fa6d6314535491',
+      name: 'c913d614-da17-4383-809f-fa6d63145d5491',
       merge: (persistedState: unknown, currentState: TStore): TStore => {
         const retrivedState = persistedState as TStore;
         const retrivedNodes = retrivedState.nodes.map((node) => Node.clone(node));

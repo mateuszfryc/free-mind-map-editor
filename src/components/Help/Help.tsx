@@ -1,6 +1,7 @@
 import { MutableRefObject, useRef } from 'react';
 
 import { addClass, removeClass } from 'utils/dom';
+import { ButtonLink } from '../Link';
 import {
   Actions,
   Anchor,
@@ -12,10 +13,10 @@ import {
   StickyMenu,
   Title,
   TutorialGif,
-} from './HelpSection.styled';
+} from './Help.styled';
 import { TutorialItems, TutorialItemType } from './TutorialItems';
 
-export function HelpSection() {
+export function Help() {
   const actionsRefs: { [key: string]: MutableRefObject<null> } = {};
   TutorialItems.forEach((item: TutorialItemType): void => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -38,6 +39,9 @@ export function HelpSection() {
   return (
     <SectionContainer id='howto'>
       <StickyMenu>
+        <ButtonLink to='/' style={{ marginBottom: '20px' }}>
+          Back to editor
+        </ButtonLink>
         <Title size='sectionTitle'>How To</Title>
         <Paragraph margin='0 0 30px'>
           Each action has description and visualisation showing how it can be performed.

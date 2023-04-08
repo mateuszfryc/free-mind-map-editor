@@ -1,1 +1,1 @@
-export { HelpSection } from 'components/HelpSection';
+export { Help } from 'components/Help';

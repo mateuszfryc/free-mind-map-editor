@@ -48,26 +48,26 @@ export const SectionContainer = styled(Flex)(
         background-color: ${colors.primary()};
         color: ${colors.secondary()};
         justify-content: space-between;
-        padding: 100px;
         height: 100%;
-        overflow: scroll;
-        width: calc(100% - 200px);
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0;
+        overflow: hidden;
     `
 );
 
 export const StickyMenu = styled(Flex)`
     flex-direction: column;
     max-width: 350px;
-    position: sticky;
-    top: 100px;
+    padding-top: 30px;
 `;
 
-export const Actions = styled(Flex)`
-    flex-direction: column;
-    margin: 0;
-    justify-content: center;
-    max-width: 1200px;
-    width: 100%;
+export const Actions = styled('div')`
+    overflow-x: hidden;
+    overflow-y: scroll;
+    margin: 30px 0;
+    padding-right: 20px;
+    height: calc(100vh - 60px);
 `;
 
 export const Anchor = styled.div`
@@ -119,6 +119,7 @@ export const Link = styled.a(
         }
     `
 );
+
 type TTileProps = {
     display?: string;
     margin?: string;
@@ -151,6 +152,6 @@ export const Paragraph = styled.p<{ padding?: string; margin?: string }>(
 );
 
 export const TutorialGif = styled.img`
-    width: 400px;
+    width: 260px;
     height: auto;
 `;

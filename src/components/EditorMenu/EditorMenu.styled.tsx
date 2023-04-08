@@ -30,7 +30,8 @@ export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subL
         margin: ${margin};
         padding: ${padding};
         text-decoration: none;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.1s ease;
+        border-radius: 6px;
 
         &:hover,
         &:focus {
@@ -43,33 +44,11 @@ export const Link = styled(RouterLink)<{ margin?: string, padding?: string, subL
     `
 );
 
-// TODO: make this into regular button component
-export const MenuButton = styled.button<{ primary?: boolean }>(
-    ({ theme: { colors }, primary = false }) => css`
-        align-items: center;
-        background-color: ${primary ? colors.primaryDarker() : 'transparent'};
-        border: 1px solid ${primary ? 'transparent' : colors.shade(0.7)};
-        border-radius: 6px;
-        color: ${primary ? colors.primary() : colors.secondary()};
-        cursor: pointer;
-        display: flex;
-        height: 37px;
-        justify-content: center;
-        padding: 10px;
-        transition: background-color 0.15s ease, color 0.15s ease;
-        z-index: 11;
-
-        &:hover,
-        &:focus {
-            background-color: ${primary ? colors.primaryDarker(0.7) : colors.shade(0.25)};
-        }
-    `
-);
-
-export const BurgerIcon = styled.span<{ isActive?: boolean }>(
+export const BurgerIcon = styled.div<{ isActive?: boolean }>(
     ({ isActive = false, theme: { colors } }) => css`
         background-color: ${isActive ? 'transparent' : colors.secondary(0.8)};
         position: relative;
+        margin: 11px 0;
 
         &,
         &::before,
@@ -88,7 +67,7 @@ export const BurgerIcon = styled.span<{ isActive?: boolean }>(
         }
 
         &::before {
-            top: ${isActive ? '0' : '-6px'};
+            top: ${isActive ? '0' : '-5.5px'};
             transform: ${isActive ? 'rotate(45deg)' : 'none'};
         }
 

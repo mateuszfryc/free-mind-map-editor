@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useRef, useState } from 'react';
 import { useOnClickOutside } from '../../hooks/useOnClickOutside';
-import { MenuButton } from '../Navigation/Navigation.styled';
+import { Button } from '../Button';
 import * as Styled from './FoldableArea.styled';
 
 type ChildContext = { closeMenu?: () => void; isOpen?: boolean };
@@ -10,9 +10,10 @@ type ChildProps = React.PropsWithChildren<{
   onClick?: () => void;
   onCLickClose?: boolean;
   isOpen?: boolean;
+  style?: React.CSSProperties;
 }>;
 
-export function Child({ children, onClick = undefined, onCLickClose = undefined }: ChildProps) {
+export function Child({ children, onClick = undefined, onCLickClose = undefined, style = {} }: ChildProps) {
   const childContext = useContext(ChildrenContext);
 
   const onClickInner = useCallback(() => {
@@ -20,7 +21,11 @@ export function Child({ children, onClick = undefined, onCLickClose = undefined 
     if (onCLickClose) childContext.closeMenu?.();
   }, [childContext, onCLickClose, onClick]);
 
-  return <div onClick={onClickInner}>{children}</div>;
+  return (
+    <div style={style} onClick={onClickInner}>
+      {children}
+    </div>
+  );
 }
 
 type Props = React.PropsWithChildren<{
@@ -62,9 +67,9 @@ function FoldableArea({
   return (
     <ChildrenContext.Provider value={{ closeMenu, isOpen }}>
       <Styled.Wrapper ref={containerRef} style={style}>
-        <MenuButton onClick={toggleuserForm} primary={primary} type='button'>
+        <Button onClick={toggleuserForm} primary={primary} type='button'>
           {buttonContent}
-        </MenuButton>
+        </Button>
         <Styled.Container isOpen={isOpen} alignRight={alignContainerRight}>
           {children}
         </Styled.Container>

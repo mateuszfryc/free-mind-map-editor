@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import { ButtonLink } from '../Link';
 
-export const MindMap = styled.div`
+export const MindMapContainer = styled.div`
     height: 100%;
     overflow: hidden;
     position: relative;
@@ -14,35 +15,9 @@ export const Canvas = styled.canvas`
     z-index: 1;
 `;
 
-export const Tools = styled.div`
-    border: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    left: 15px;
+export const HelpButton = styled(ButtonLink)`
     position: fixed;
-    top: 15px;
-    width: 24px;
-    z-index: 5;
-`;
-
-export const Button = styled.a`
-    align-items: center;
-    border-radius: 50%;
-    border: none;
-    display: flex;
-    height: 32px;
-    justify-content: center;
-    width: 32px;
-
-    &:not(:last-child) {
-        margin-bottom: 10px;
-    }
-
-    & > svg {
-        cursor: pointer;
-        display: block;
-        width: 30px;
-        height: auto;
-    }
+    left: 10px;
+    bottom: 10px;
+    z-index: 2;
 `;
