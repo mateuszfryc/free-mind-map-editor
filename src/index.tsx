@@ -2,9 +2,9 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from 'styled-components';
 
+import { App } from 'components/App';
 import { GlobalStyles } from 'styles/globalStyles';
 import { theme } from 'styles/themeDefault';
-import { App } from 'components/App';
 
 const rootElement = document.getElementById('root');
 

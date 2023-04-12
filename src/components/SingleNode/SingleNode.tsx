@@ -87,6 +87,7 @@ export function SingleNode({ node }: NodeProps) {
       onMouseLeave={onMouseLeave}
       onMouseDown={onMouseDown}
       zIndex={node.zIndex}
+      isRoot={node.isRootNode}
     >
       <div className='underline' id={`${node.id}`} />
       {node.content}

@@ -7,10 +7,11 @@ type NodeStyleType = {
     isEdited: boolean;
     zIndex: number;
     fontSize: TFontSize;
+    isRoot?: boolean;
 };
 
 export const Node = styled.div<NodeStyleType>(
-    ({ maxWidth, isSelected, isEdited, zIndex, fontSize, theme: { colors, setFontSize } }) => css`
+    ({ isRoot = false, maxWidth, isSelected, isEdited, zIndex, fontSize, theme: { colors, setFontSize } }) => css`
         ${setFontSize(fontSize)}
         background-color: transparent;
         border: none;
@@ -67,6 +68,8 @@ export const Node = styled.div<NodeStyleType>(
         ${isEdited && css`
             visibility: hidden;
         `}
+
+        ${isRoot && css``}
     `
 );
 
