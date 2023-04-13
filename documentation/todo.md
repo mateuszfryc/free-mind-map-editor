@@ -2,6 +2,7 @@
 
 - [ ] !! fixfeat: new overlaps solver: move overlaps away for all ndoes? like in simple simulation?
 - [ ] feat: graphic circle around root
+- [ ] feat: use hand draw graphics for selection, highligt etc
 
 - [ ] new mind map button
   - [ ] modal informing that this will remove current mind map
@@ -22,6 +23,8 @@
 - [ ] feat: bezier curves or oter more accurate curves so that input/output arrives from the right direction
 - [ ] feat: arrows!
 - [ ] app styles: clean, programmer, doodle (doodle.css, forked)
+- [ ] feat: vertical text
+- [ ] feat: rotate node
 - [ ] feat: change size of the node with resize drag operations (like illustrator)
 - [ ] feat: attach link to node
 - [ ] feat: select multiple nodes

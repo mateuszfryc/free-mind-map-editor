@@ -36,6 +36,7 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true,
+        project: './src',
       },
       node: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -59,6 +60,7 @@ module.exports = {
 
     // rules turned off
     camelcase: off,
+    'import/no-extraneous-dependencies': off,
     'no-nested-ternary': off,
     // 'no-use-before-define': off,
     'class-methods-use-this': off,
