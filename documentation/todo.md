@@ -1,8 +1,6 @@
 ### MVP:
 
 - [ ] !! fixfeat: new overlaps solver: move overlaps away for all ndoes? like in simple simulation?
-- [ ] feat: graphic circle around root
-- [ ] feat: use hand draw graphics for selection, highligt etc
 
 - [ ] new mind map button
   - [ ] modal informing that this will remove current mind map
@@ -31,6 +29,9 @@
   - [ ] move multiple nodes
   - [ ] remove multiple nodes
 - [ ] fix: when draging node on the left of the parent sometimes children of that node get flipped to the right
+
+- [x] feat: use hand draw graphics for selection, highligt etc
+- [x] feat: graphic circle around root
 - [x] change parent change action to happen on mouse hover not entire node
 - [x] fix: while draging the mouse should not interact with minimap
 - [x] fix: click on minimap viewport miniature jumps that viewport to center on the mouse but shouldn't
