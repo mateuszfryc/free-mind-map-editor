@@ -74,5 +74,6 @@ module.exports = {
     'lines-between-class-members': off,
     '@typescript-eslint/lines-between-class-members': off,
     '@typescript-eslint/no-unsafe-assignment': off,
+    '@typescript-eslint/no-unsafe-call': off,
   },
 };

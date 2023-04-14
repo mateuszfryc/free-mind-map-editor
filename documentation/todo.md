@@ -26,7 +26,7 @@
   - [ ] remove multiple nodes
 - [ ] fix: when draging node on the left of the parent sometimes children of that node get flipped to the right
 
-- [x] connectors improvements
+- [x] connectors
 - [x] feat: new mind map button
   - [x] feat: modal informing that this will remove current mind map
     - [x] feat: add modal functionality

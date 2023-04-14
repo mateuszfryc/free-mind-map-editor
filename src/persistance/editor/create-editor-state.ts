@@ -75,6 +75,10 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       });
     },
 
+    unlockInit(): void {
+      set({ isInitialized: false });
+    },
+
     addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Idea {
       const store = get();
 

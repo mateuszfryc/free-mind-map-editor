@@ -1,7 +1,9 @@
 import { MutableRefObject, useRef } from 'react';
 
+import { Link as RouterLink } from 'react-router-dom';
+import { editorStore } from '../../../persistance/editor/editor-store';
 import { addClass, removeClass } from '../../utils/dom';
-import { ButtonLink } from '../Link';
+import { Button } from '../Button';
 import {
   Actions,
   Anchor,
@@ -19,6 +21,7 @@ import {
 import { TutorialItemType, TutorialItems } from './TutorialItems';
 
 export function Help() {
+  const unlockInit = editorStore.unlockInit();
   const actionsRefs: { [key: string]: MutableRefObject<null> } = {};
   TutorialItems.forEach((item: TutorialItemType): void => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -42,9 +45,15 @@ export function Help() {
     <SectionContainer id='howto'>
       <ColumnLeft style={{ justifyContent: 'right' }}>
         <StickyMenu>
-          <ButtonLink to='/' style={{ marginBottom: '40px' }}>
-            Back to editor
-          </ButtonLink>
+          <RouterLink to='/' style={{ marginBottom: '40px' }}>
+            <Button
+              onClick={() => {
+                unlockInit();
+              }}
+            >
+              Back to editor
+            </Button>
+          </RouterLink>
           <Title size='sectionTitle'>How To</Title>
           <Paragraph>Each action below has a description and visualisation showing how it can be performed.</Paragraph>
 
