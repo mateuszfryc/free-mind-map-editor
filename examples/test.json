@@ -1,9 +1,7 @@
 {
   "nodes": [
     {
-      "children": [
-        1
-      ],
+      "children": [1],
       "childrenRelativePosition": [
         {
           "position": {
