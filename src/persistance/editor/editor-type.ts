@@ -37,7 +37,6 @@ export type TEditorStore = IEditorState & {
   initialize(): Promise<void>;
   startDrawLoop(): void;
   cancelDrawLoop(): void;
-  unlockInit(): void;
   addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Idea;
   getNodeById(id: string): Idea | undefined;
   getNewID(): string;

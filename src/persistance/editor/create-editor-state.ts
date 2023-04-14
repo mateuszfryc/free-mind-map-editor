@@ -42,6 +42,7 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       view.centerOnNode(store.rootNode);
       store.cancelDrawLoop();
       store.startDrawLoop();
+      set({ isInitialized: false });
     },
 
     getNewID(): string {
@@ -73,10 +74,6 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       set({
         drawLoopRafId: undefined,
       });
-    },
-
-    unlockInit(): void {
-      set({ isInitialized: false });
     },
 
     addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Idea {

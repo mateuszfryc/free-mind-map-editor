@@ -161,7 +161,6 @@ export const draw = {
       const yDiff = me.y - parent.y;
       const horizontal = Math.max(0, xDiff * -sideMod);
       const verticall = Math.max(0, Math.min(50, Math.abs(yDiff) / 2 - 100));
-      console.log(xDiff * -sideMod);
       const mod = xDiff / connectorsWidth + (verticall + horizontal * 2) * sideMod;
       const bezierControlPointA = { x: -mod, y: 0 };
       const bezierControlPointB = { x: mod, y: 0 };
