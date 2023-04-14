@@ -1,13 +1,13 @@
 import { Vector } from 'persistance/editor/base-types';
 
 export interface IPointer {
-  isLeftButtonDown: boolean;
+  isAnyButtonPressed: boolean;
   wasShiftPressedOnDown: boolean;
   position: Vector;
   lastPosition: Vector;
   draggedItemId?: string;
   getPosition(): Vector;
-  setIsLeftButtonDown(isDown: boolean): void;
+  setisAnyButtonPressed(isDown: boolean): void;
   getCurrentToLastPositionDiff(): Vector;
   setDraggedId(id: string): void;
   clearDraggedId(): void;
@@ -15,7 +15,7 @@ export interface IPointer {
 }
 
 export const pointerBase: IPointer = {
-  isLeftButtonDown: false,
+  isAnyButtonPressed: false,
   wasShiftPressedOnDown: false,
   position: new Vector(),
   lastPosition: new Vector(),
@@ -24,8 +24,8 @@ export const pointerBase: IPointer = {
     return { x: this.position.x, y: this.position.y };
   },
 
-  setIsLeftButtonDown(isDown: boolean): void {
-    this.isLeftButtonDown = isDown;
+  setisAnyButtonPressed(isDown: boolean): void {
+    this.isAnyButtonPressed = isDown;
   },
 
   getCurrentToLastPositionDiff(): Vector {

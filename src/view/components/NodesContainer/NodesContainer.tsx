@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useRef } from 'react';
 import { editorStore } from '../../../persistance/editor/editor-store';
-import { view } from '../../../persistance/editor/view';
+import { view } from '../../../shared/view';
 import * as Styled from './NodesContainer.styled';
 
 type NodesContainerProps = {
@@ -12,7 +12,7 @@ export function NodesContainer({ children }: NodesContainerProps) {
   const ref = useRef(null);
 
   const onMouseMove = (): void => {
-    if (pointer.isLeftButtonDown) {
+    if (pointer.isAnyButtonPressed) {
       if (ref && ref.current) {
         const safeRef = ref.current as HTMLElement;
         if (view && ref.current && safeRef.id === pointer.draggedItemId) {

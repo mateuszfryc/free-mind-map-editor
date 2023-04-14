@@ -1,8 +1,7 @@
-import { Idea } from '../../services/models/idea';
-import { clamp } from '../../utils';
-import { colors } from '../../view/styles/themeDefault';
-import { get, getParsedStyle, getWindowInnerSize } from '../../view/utils/get';
-import { Miniature, Vector } from './base-types';
+import { Miniature, Vector } from '../persistance/editor/base-types';
+import { Idea } from '../persistance/editor/idea';
+import { clamp } from '../utils';
+import { get, getParsedStyle, getWindowInnerSize } from '../view/utils/get';
 
 export interface IView {
   canvas?: HTMLCanvasElement;
@@ -27,15 +26,6 @@ export interface IView {
   translateFullToMiniMapSize(width: number, height: number): Vector;
   translateCoordinatesToSpace(x?: number, y?: number, spaceName?: string): { x: number; y: number };
   getMapCenterCoordinates(): Vector;
-  drawBezierCurve(
-    start: Vector,
-    end: Vector,
-    controlPointA: Vector,
-    controlPointB: Vector,
-    lineWidth?: number,
-    color?: string,
-  ): void;
-  drawMiniature(miniature: Miniature): void;
 }
 
 export const view: IView = {
@@ -231,42 +221,5 @@ export const view: IView = {
       x: size.x * 0.5,
       y: size.y * 0.5,
     };
-  },
-
-  drawBezierCurve(
-    start: Vector,
-    end: Vector,
-    controlPointA: Vector,
-    controlPointB: Vector,
-    lineWidth = 3,
-    color = colors.defaultBezerCurve(),
-  ): void {
-    const { context } = this;
-    if (!context) return;
-
-    context.strokeStyle = color;
-    context.lineWidth = lineWidth;
-    context.beginPath();
-    context.moveTo(start.x, start.y);
-    context.bezierCurveTo(
-      start.x + controlPointA.x,
-      start.y + controlPointA.y,
-      end.x + controlPointB.x,
-      end.y + controlPointB.y,
-      end.x,
-      end.y,
-    );
-    context.stroke();
-  },
-
-  drawMiniature(miniature: Miniature): void {
-    const { context } = this;
-    if (!context) return;
-
-    const { x, y, width, height } = miniature;
-    context.strokeStyle = colors.miniMapMiniature();
-    context.fillStyle = 'transparent';
-    context.lineWidth = 1;
-    context.strokeRect(x, y, width, height);
   },
 };

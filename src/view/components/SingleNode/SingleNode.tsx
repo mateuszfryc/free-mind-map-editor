@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useRef } from 'react';
 
-import { Idea } from 'services/models/idea';
+import { Idea } from 'persistance/editor/idea';
 import { getSafeRef } from 'view/utils/get';
 import { editorStore } from '../../../persistance/editor/editor-store';
 import * as Styled from './SingleNode.styled';
@@ -32,7 +32,7 @@ export function SingleNode({ node }: NodeProps) {
         updateSelectionContent(value ?? '');
 
         window.setTimeout(() => {
-          textareaSafeRef.style.width = `${node.getOuterWidth()}px`;
+          textareaSafeRef.style.width = `${node.getWidth()}px`;
           textareaSafeRef.style.height = `${node.getHeight()}px`;
           node.refreshPosition();
         }, 0);
@@ -53,16 +53,16 @@ export function SingleNode({ node }: NodeProps) {
   }, [node, node.state]);
 
   const onMouseEnter = useCallback((): void => {
-    if (!pointer.isLeftButtonDown) {
+    if (!pointer.isAnyButtonPressed) {
       setHighlight(node.id);
     }
-  }, [pointer.isLeftButtonDown, setHighlight, node.id]);
+  }, [pointer.isAnyButtonPressed, setHighlight, node]);
 
   const onMouseLeave = useCallback((): void => {
-    if (!pointer.isLeftButtonDown) {
+    if (!pointer.isAnyButtonPressed) {
       clearHighlight();
     }
-  }, [clearHighlight, pointer.isLeftButtonDown]);
+  }, [clearHighlight, pointer.isAnyButtonPressed]);
 
   const onMouseDown = useCallback(() => {
     const selection = getSelectedNode();
@@ -84,7 +84,7 @@ export function SingleNode({ node }: NodeProps) {
       onMouseDown={onMouseDown}
       zIndex={node.zIndex}
     >
-      <div className='underline' id={`${node.id}`} />
+      {/* <div className='underline' id={`${node.id}`} /> */}
       {node.content}
       {isEdited && <Styled.Textarea id={`${node.id}`} onChange={updateContent} ref={contentRef} value={node.content} />}
     </Styled.Node>

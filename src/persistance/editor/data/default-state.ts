@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Idea, defaultTextTemplate } from '../../../services/models/idea';
 import { Vector } from '../base-types';
+import { Idea, defaultTextTemplate } from '../idea';
 
 const defaultRoot = new Idea(uuidv4(), new Vector(), undefined, true, defaultTextTemplate);
 
@@ -17,5 +17,6 @@ export const editorDefaultState = {
   savedMindMap: '',
   scale: 1,
   selectionId: undefined,
+  highlightId: undefined,
   saveDebounceId: undefined,
 };

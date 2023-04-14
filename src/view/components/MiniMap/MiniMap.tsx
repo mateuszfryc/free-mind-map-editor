@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 
 import { getSafeRef } from 'view/utils/get';
 import { editorStore } from '../../../persistance/editor/editor-store';
-import { view } from '../../../persistance/editor/view';
+import { view } from '../../../shared/view';
 import * as Styled from './MiniMap.styled';
 
 export function MiniMap() {
@@ -19,7 +19,7 @@ export function MiniMap() {
       const safeRefMap = getSafeRef(miniMapRef);
       const safeRefView = getSafeRef(viewportRef);
 
-      if (pointer.isLeftButtonDown && target && miniMapRef && safeRefView && safeRefMap) {
+      if (pointer.isAnyButtonPressed && target && miniMapRef && safeRefView && safeRefMap) {
         if (view && (safeRefMap.id === target.id || safeRefView.id === target.id)) {
           const { x, y } = pointer.getCurrentToLastPositionDiff();
           view.dragMinimapViewport(x, y);

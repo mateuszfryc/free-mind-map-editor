@@ -1,4 +1,4 @@
-import { NODE_STATE } from 'persistance/editor/base-types';
+import { ChildPositionData, NODE_STATE } from 'persistance/editor/base-types';
 import { useEditorStore } from '../../persistance/editor/editor-store';
 import { getAllElementsUnderPointer } from '../utils/dom';
 import { KEYS, SHIFT } from './keyboard';
@@ -12,7 +12,7 @@ export function onMouseDownHandler(event: MouseEvent): void {
   pointer.setDraggedId(target.id);
   const { id } = target;
 
-  pointer.setIsLeftButtonDown(true);
+  pointer.setisAnyButtonPressed(true);
   pointer.setWasShiftPressedOnDown(KEYS[SHIFT].isPressed);
 
   if (highlight && target && highlight.id === id) {
@@ -36,7 +36,7 @@ export function onMouseUpHandler(): void {
   const { pointer } = store;
   const highlight = store.getHighlightedNode();
   const selection = store.getSelectedNode();
-  pointer.setIsLeftButtonDown(false);
+  pointer.setisAnyButtonPressed(false);
 
   if (highlight && highlight.isBeingDragged()) {
     const { parentId } = highlight;
@@ -65,4 +65,47 @@ export function onMouseUpHandler(): void {
   setTimeout(() => {
     store.saveCurrentMindMapAsJSON();
   }, 100);
+}
+
+export function onMouseMove(event: MouseEvent): void {
+  const store = useEditorStore.getState();
+  const selection = store.getSelectedNode();
+  const { pointer: mouse } = store;
+
+  mouse.lastPosition.x = mouse.position.x;
+  mouse.lastPosition.y = mouse.position.y;
+  mouse.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+  mouse.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+
+  const selectionCanBeDragged =
+    mouse.isAnyButtonPressed &&
+    selection &&
+    selection.id === mouse.draggedItemId &&
+    selection.state !== NODE_STATE.EDITED;
+
+  if (selectionCanBeDragged) {
+    const { x, y } = mouse.position;
+    store.findClosestOverlapFor(selection);
+    selection.setState(NODE_STATE.DRAGGED);
+    selection.setOnTop();
+    selection.setPosition({
+      x: x + selection.diffX,
+      y: y + selection.diffY,
+    });
+
+    const canDragSelectionChildren = store.isGroupDragOn && selection.hasChildren();
+    const isParentOnLeft = store.isParentOnLeft(selection.id);
+    if (!canDragSelectionChildren) {
+      selection.setPrevIsParentOnLeft(isParentOnLeft);
+    } else {
+      if (!selection.isRootNode && isParentOnLeft !== selection.prevIsParentOnLeft) {
+        selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
+          const positionData = selection.childrenRelativePosition[index];
+          positionData.position.x *= -1; // eslint-disable-line no-param-reassign
+        });
+      }
+      store.restoreChildrenRelativePosition(selection.id);
+      selection.setPrevIsParentOnLeft(isParentOnLeft);
+    }
+  }
 }

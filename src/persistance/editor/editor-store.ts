@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Idea } from '../../services/models/idea';
 import { createSelectors } from '../utils';
 import { createEditorState } from './create-editor-state';
 import { TEditorStore } from './editor-type';
+import { Idea } from './idea';
 
 const localStorageOptions = {
   // local storage id, change to abandon current storage and use new local storage

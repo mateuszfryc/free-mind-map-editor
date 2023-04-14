@@ -1,12 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Idea } from '../../services/models/idea';
-import { awaitCondition, check } from '../../utils';
-import rough from '../../view/roughjs/rough';
-import { theme } from '../../view/styles/themeDefault';
+import { draw } from '../../shared/draw';
+import { view } from '../../shared/view';
+import { awaitCondition } from '../../utils';
 import { getTwoPointsDistance, getWindowInnerSize } from '../../view/utils/get';
 import {
   ChildPositionData,
-  Miniature,
   NODE_STATE,
   ObjectOfVectors,
   SavedNodeStateType,
@@ -15,8 +13,8 @@ import {
 } from './base-types';
 import { editorDefaultState } from './data/default-state';
 import { Get, OverlapResult, Set, TEditorStore } from './editor-type';
+import { Idea } from './idea';
 import { pointerBase } from './pointer';
-import { view } from './view';
 
 export const createEditorState = (set: Set, get: Get): TEditorStore => {
   const maxSteps = 100;
@@ -30,6 +28,7 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       const store = get();
 
       await awaitCondition(() => view.setReferences(), 0);
+      draw.setRoughCanvas(view.canvas!);
 
       window.addEventListener('resize', store.updateWorkspaceSize.bind(store));
       store.updateWorkspaceSize();
@@ -41,11 +40,17 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       view.centerOnNode(store.rootNode);
 
       function drawLoop(): void {
-        const s = get();
-        if (s) {
-          s.draw();
-          requestAnimationFrame(drawLoop);
+        const currentStore = get();
+        if (!currentStore.isDrawingLocked) {
+          draw.mindMap(
+            view,
+            currentStore.nodes,
+            currentStore.connectorsCurveDividerWidth,
+            currentStore.highlightId,
+            currentStore.selectionId,
+          );
         }
+        requestAnimationFrame(drawLoop);
       }
 
       drawLoop();
@@ -613,125 +618,6 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
 
     setDrawLock(isDrawingLocked: boolean): void {
       set(() => ({ isDrawingLocked }));
-    },
-
-    draw(): void {
-      const store = get();
-      if (store.isDrawingLocked) return;
-
-      check(view);
-      const { canvas, context } = view;
-      check(canvas);
-      check(context);
-
-      const { connectorsCurveDividerWidth, rootNode, nodes } = store;
-
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      context!.clearRect(0, 0, canvas!.width, canvas!.height);
-
-      if (nodes.length < 1 || rootNode === undefined) return;
-      const pos = rootNode.getViewportPosition();
-      const size = rootNode.getOuterSize();
-      const rc = view.canvas && rough.canvas(view.canvas);
-      const padding = 15;
-      if (rc) rc.ellipse(pos.x, pos.y, size.x + padding, size.y + padding, { seed: 6 });
-
-      const miniatures: Miniature[] = [];
-      nodes.forEach((node) => {
-        const miniature = view.getMiniMapMiniature(node.getPosition(), node.getSize(), node.id);
-        miniatures.push(miniature);
-        view.drawMiniature(miniature);
-      });
-
-      const rootsChildren: Idea[] = store.getChildren(rootNode.id, true);
-      const offset: Vector = view.getNodesContainerPosition();
-      if (rootsChildren.length < 1) return;
-
-      rootsChildren.forEach((child: Idea) => {
-        const { me, parent } = store.getConnectorPoints(child.id);
-        me.x += offset.x;
-        me.y += offset.y;
-        parent.x += offset.x;
-        parent.y += offset.y;
-        me.x += 1;
-        parent.x -= 1;
-        const { x } = me;
-        const { x: a } = parent;
-        const mod = (x - a) / connectorsCurveDividerWidth;
-        const bezierControlPointA = { x: -mod, y: 0 };
-        const bezierControlPointB = { x: mod, y: 0 };
-        view.drawBezierCurve(
-          me,
-          parent,
-          bezierControlPointA,
-          bezierControlPointB,
-          theme.connectorsWidth,
-          theme.colors.connectors(),
-        );
-
-        // draw miniatures connectors
-        const myMiniature = miniatures.filter((mini) => mini.id === child.id)[0];
-        const parentMiniature = miniatures.filter((mini) => mini.id === (child.parentId ?? -1))[0];
-        const xStart = myMiniature.x > parentMiniature.x ? myMiniature.x : myMiniature.x + myMiniature.width;
-        const yStart = myMiniature.y + myMiniature.height * 0.5;
-        const xEnd = myMiniature.x > parentMiniature.x ? parentMiniature.x + parentMiniature.width : parentMiniature.x;
-        const yEnd = parentMiniature.y + parentMiniature.height * 0.5;
-        const miniatureMod = (xStart - xEnd) / connectorsCurveDividerWidth;
-        const miniatureControlPointA = { x: -miniatureMod, y: 0 };
-        const miniatureControlPointB = { x: miniatureMod, y: 0 };
-
-        view.drawBezierCurve(
-          { x: xStart, y: yStart },
-          { x: xEnd, y: yEnd },
-          miniatureControlPointA,
-          miniatureControlPointB,
-          1,
-          theme.colors.miniatureConnector(),
-        );
-      });
-    },
-
-    onMouseMove(event: MouseEvent): void {
-      const store = get();
-      const { pointer: mouse } = store;
-      const selection = store.getSelectedNode();
-
-      mouse.lastPosition.x = mouse.position.x;
-      mouse.lastPosition.y = mouse.position.y;
-      mouse.position.x = event.pageX || event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-      mouse.position.y = event.pageY || event.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-
-      const selectionCanBeDragged =
-        mouse.isLeftButtonDown &&
-        selection &&
-        selection.id === mouse.draggedItemId &&
-        selection.state !== NODE_STATE.EDITED;
-      if (!selectionCanBeDragged) return;
-
-      const { x, y } = mouse.position;
-      store.findClosestOverlapFor(selection);
-      selection.setState(NODE_STATE.DRAGGED);
-      selection.setOnTop();
-      selection.setPosition({
-        x: x + selection.diffX,
-        y: y + selection.diffY,
-      });
-
-      const canDragSelectionChildren = store.isGroupDragOn && selection.hasChildren();
-      const isParentOnLeft = store.isParentOnLeft(selection.id);
-      if (!canDragSelectionChildren) {
-        selection.setPrevIsParentOnLeft(isParentOnLeft);
-        return;
-      }
-
-      if (!selection.isRootNode && isParentOnLeft !== selection.prevIsParentOnLeft) {
-        selection.childrenRelativePosition.forEach((_: ChildPositionData, index: number): void => {
-          const positionData = selection.childrenRelativePosition[index];
-          positionData.position.x *= -1; // eslint-disable-line no-param-reassign
-        });
-      }
-      store.restoreChildrenRelativePosition(selection.id);
-      selection.setPrevIsParentOnLeft(isParentOnLeft);
     },
 
     customOnFinishHydration(): void {

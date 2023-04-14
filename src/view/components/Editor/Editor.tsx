@@ -12,21 +12,20 @@ import { Canvas, HelpButton, MindMapContainer } from './Editor.styled';
 export function Editor() {
   const nodes = editorStore.nodes();
   const initialize = editorStore.initialize();
-  const onMouseMove = editorStore.onMouseMove();
 
   useEffect(() => {
-    initialize();
+    void initialize();
 
     document.addEventListener('mousedown', MouseInput.onMouseDownHandler);
     document.addEventListener('mouseup', MouseInput.onMouseUpHandler);
-    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', MouseInput.onMouseMove);
     document.addEventListener('keydown', KeyboardInput.onPressKeyHandler);
     document.addEventListener('keyup', KeyboardInput.onReleaseKeyHandler);
 
     return () => {
       document.removeEventListener('mousedown', MouseInput.onMouseDownHandler);
       document.removeEventListener('mouseup', MouseInput.onMouseUpHandler);
-      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mousemove', MouseInput.onMouseMove);
       document.removeEventListener('keydown', KeyboardInput.onPressKeyHandler);
       document.removeEventListener('keyup', KeyboardInput.onReleaseKeyHandler);
     };

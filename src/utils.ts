@@ -8,6 +8,12 @@ export const check = (obj: any, message?: string): boolean => {
   return true;
 };
 
+export const getSafe = <T>(obj: T | undefined | null): T => {
+  check(obj);
+
+  return obj as T;
+};
+
 export const awaitCondition = (callback: () => boolean, timeout: number, safeBreakCount = 100): Promise<void> =>
   new Promise((resolve) => {
     let count = 0;

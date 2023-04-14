@@ -1,8 +1,8 @@
-import { Idea } from '../../services/models/idea';
 import { clamp } from '../../utils';
 import { colors } from '../../view/styles/themeDefault';
 import { get, getParsedStyle, getWindowInnerSize } from '../../view/utils/get';
 import { Miniature, Vector } from './base-types';
+import { Idea } from './idea';
 
 export interface IView {
   canvas?: HTMLCanvasElement;

@@ -1,5 +1,5 @@
-import { Idea } from '../../services/models/idea';
 import { Axis, ObjectOfVectors, SavedStateType, Vector } from './base-types';
+import { Idea } from './idea';
 import { IPointer } from './pointer';
 
 export type Get = () => TEditorStore;
@@ -73,8 +73,6 @@ export type TEditorStore = IEditorState & {
   getCurrentMindMapState(): SavedStateType;
   deserializeMindMap(saved: SavedStateType): void;
   setDrawLock(isDrawingLocked: boolean): void;
-  draw(): void;
   updateSingleItem(item: Idea): void;
-  onMouseMove(event: MouseEvent): void;
   customOnFinishHydration(): void;
 };
