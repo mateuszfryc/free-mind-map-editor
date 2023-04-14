@@ -2,12 +2,7 @@
 
 - [ ] !! fixfeat: new overlaps solver: move overlaps away for all ndoes? like in simple simulation?
 
-- [ ] new mind map button
-  - [ ] modal informing that this will remove current mind map
-    - [ ] add modal functionality
 - [ ] fix: small shadow (or other indication) showing which node will become new parent while dragging
-- [ ] feat: on hover over potential parent indicate new parent (shadow or something)
-
 - [ ] some kind of indication that single mind map mode can be expanded to list of mind maps
 - [ ] three (or any number) of basic styles
 - [ ] info of upcomming paid bonuses
@@ -30,6 +25,9 @@
   - [ ] remove multiple nodes
 - [ ] fix: when draging node on the left of the parent sometimes children of that node get flipped to the right
 
+- [x] feat: new mind map button
+  - [x] feat: modal informing that this will remove current mind map
+    - [x] feat: add modal functionality
 - [x] feat: use hand draw graphics for selection, highligt etc
 - [x] feat: graphic circle around root
 - [x] change parent change action to happen on mouse hover not entire node
