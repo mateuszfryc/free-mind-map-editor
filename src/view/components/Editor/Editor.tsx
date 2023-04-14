@@ -12,6 +12,7 @@ import { Canvas, HelpButton, MindMapContainer } from './Editor.styled';
 export function Editor() {
   const nodes = editorStore.nodes();
   const initialize = editorStore.initialize();
+  const cancelDrawLoop = editorStore.cancelDrawLoop();
 
   useEffect(() => {
     void initialize();
@@ -23,6 +24,7 @@ export function Editor() {
     document.addEventListener('keyup', KeyboardInput.onReleaseKeyHandler);
 
     return () => {
+      cancelDrawLoop();
       document.removeEventListener('mousedown', MouseInput.onMouseDownHandler);
       document.removeEventListener('mouseup', MouseInput.onMouseUpHandler);
       document.removeEventListener('mousemove', MouseInput.onMouseMove);

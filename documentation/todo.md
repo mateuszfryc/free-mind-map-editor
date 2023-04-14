@@ -16,6 +16,7 @@
 - [ ] feat: bezier curves or oter more accurate curves so that input/output arrives from the right direction
 - [ ] feat: arrows!
 - [ ] app styles: clean, programmer, doodle (doodle.css, forked)
+- [ ] feat: small image on connector, e.g. flower or stuff (emoji?)
 - [ ] feat: vertical text
 - [ ] feat: rotate node
 - [ ] feat: change size of the node with resize drag operations (like illustrator)
@@ -25,6 +26,7 @@
   - [ ] remove multiple nodes
 - [ ] fix: when draging node on the left of the parent sometimes children of that node get flipped to the right
 
+- [x] connectors improvements
 - [x] feat: new mind map button
   - [x] feat: modal informing that this will remove current mind map
     - [x] feat: add modal functionality

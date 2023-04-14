@@ -26,6 +26,8 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
 
     async initialize(): Promise<void> {
       const store = get();
+      if (store.isInitialized) return;
+      set({ isInitialized: true });
 
       await awaitCondition(() => view.setReferences(), 0);
       draw.setRoughCanvas(view.canvas!);
@@ -35,11 +37,19 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       view.setNodesContainerPosition();
       const root = store.rootNode;
       store.setSelection(root.id);
-      store.editSelection();
+      //   store.editSelection();
       store.initPositions();
       view.centerOnNode(store.rootNode);
+      store.cancelDrawLoop();
+      store.startDrawLoop();
+    },
 
-      function drawLoop(): void {
+    getNewID(): string {
+      return uuidv4();
+    },
+
+    startDrawLoop(): void {
+      const drawLoop = (): void => {
         const currentStore = get();
         if (!currentStore.isDrawingLocked) {
           draw.mindMap(
@@ -50,14 +60,19 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
             currentStore.selectionId,
           );
         }
-        requestAnimationFrame(drawLoop);
-      }
-
+        set({
+          drawLoopRafId: requestAnimationFrame(drawLoop),
+        });
+      };
       drawLoop();
     },
 
-    getNewID(): string {
-      return uuidv4();
+    cancelDrawLoop(): void {
+      const store = get();
+      if (store.drawLoopRafId) cancelAnimationFrame(store.drawLoopRafId);
+      set({
+        drawLoopRafId: undefined,
+      });
     },
 
     addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Idea {

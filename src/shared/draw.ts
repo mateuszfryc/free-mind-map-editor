@@ -150,17 +150,32 @@ export const draw = {
     const offset: Vector = view.getNodesContainerPosition();
 
     rootsChildren.forEach((idea: Idea) => {
+      const sideMod = idea.prevIsParentOnLeft ? 1 : -1;
       const { me, parent } = this.getConnectorPoints(nodes, idea.id);
       const connectorPadding = idea.parentId === rootNode.id ? padding * 1.3 : 0;
-      me.x += offset.x /* + connectorPadding * Math.sign(me.x - idea.x) */;
-      me.y += offset.y /* + connectorPadding * Math.sign(me.y - idea.y) */;
-      parent.x += offset.x + connectorPadding * (idea.prevIsParentOnLeft ? 1 : -1);
-      parent.y += offset.y /* + connectorPadding * Math.sign(idea.y - parent.y) */;
-      const { x } = me;
-      const { x: a } = parent;
-      const mod = (x - a) / connectorsWidth;
+      me.x += offset.x;
+      me.y += offset.y;
+      parent.x += offset.x + connectorPadding * sideMod;
+      parent.y += offset.y;
+      const xDiff = me.x - parent.x;
+      const yDiff = me.y - parent.y;
+      const horizontal = Math.max(0, xDiff * -sideMod);
+      const verticall = Math.max(0, Math.min(50, Math.abs(yDiff) / 2 - 100));
+      console.log(xDiff * -sideMod);
+      const mod = xDiff / connectorsWidth + (verticall + horizontal * 2) * sideMod;
       const bezierControlPointA = { x: -mod, y: 0 };
       const bezierControlPointB = { x: mod, y: 0 };
+
+      // Debug draw controll points
+      //   this.roughCanvas?.circle(bezierControlPointA.x + me.x, bezierControlPointA.y + me.y, 10, {
+      //     seed: 1,
+      //     stroke: 'red',
+      //   });
+      //   this.roughCanvas?.circle(bezierControlPointB.x + parent.x, bezierControlPointB.y + parent.y, 10, {
+      //     seed: 1,
+      //     stroke: 'blue',
+      //   });
+
       this.drawBezierCurve(
         context,
         me,

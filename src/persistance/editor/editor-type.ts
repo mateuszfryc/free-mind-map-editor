@@ -21,19 +21,22 @@ export interface IEditorState {
   rootNode: Idea;
   connectorsCurveDividerWidth: number;
   highlightId?: string;
+  selectionId?: string;
+  savedMindMap: string;
+  maxNodeWidth: number;
+  initialNodeWidth: number;
+  scale: number;
   isDrawingLocked: boolean;
   isGroupDragOn: boolean;
   isInitialized: boolean;
-  initialNodeWidth: number;
-  maxNodeWidth: number;
-  savedMindMap: string;
-  scale: number;
-  selectionId?: string;
   saveDebounceId?: NodeJS.Timeout;
+  drawLoopRafId?: number;
 }
 
 export type TEditorStore = IEditorState & {
   initialize(): Promise<void>;
+  startDrawLoop(): void;
+  cancelDrawLoop(): void;
   addNode(position: Vector, isRoot?: boolean, parentId?: string, initText?: string, existingId?: string): Idea;
   getNodeById(id: string): Idea | undefined;
   getNewID(): string;
