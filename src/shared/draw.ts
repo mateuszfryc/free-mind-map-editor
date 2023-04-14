@@ -134,7 +134,7 @@ export const draw = {
 
     nodes.forEach((idea, index) => {
       if (idea.id === highlightId || idea.id === selectedId) {
-        const pad = idea.isRootNode ? padding * 3 : padding;
+        const pad = idea.isRootNode ? padding * 5 : padding;
         this.roughEllipse(idea, index + 2, 2.1, pad, transparent, '#ccc');
       }
     });

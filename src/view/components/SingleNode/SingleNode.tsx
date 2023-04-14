@@ -32,7 +32,7 @@ export function SingleNode({ node }: NodeProps) {
         updateSelectionContent(value ?? '');
 
         window.setTimeout(() => {
-          textareaSafeRef.style.width = `${node.getWidth()}px`;
+          textareaSafeRef.style.width = `${node.getOuterWidth()}px`;
           textareaSafeRef.style.height = `${node.getHeight()}px`;
           node.refreshPosition();
         }, 0);
@@ -84,7 +84,6 @@ export function SingleNode({ node }: NodeProps) {
       onMouseDown={onMouseDown}
       zIndex={node.zIndex}
     >
-      {/* <div className='underline' id={`${node.id}`} /> */}
       {node.content}
       {isEdited && <Styled.Textarea id={`${node.id}`} onChange={updateContent} ref={contentRef} value={node.content} />}
     </Styled.Node>

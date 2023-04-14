@@ -23,51 +23,19 @@ export const Node = styled.div<NodeStyleType>(
     padding: 7px 12px;
     position: absolute;
     user-select: none;
-    /* white-space: pre-wrap; */
+    white-space: pre-wrap;
     transition: text-shadow 0.15s linear;
     z-index: ${zIndex};
-
-    & .underline {
-      border-color: ${colors.secondary()};
-      border-style: solid;
-      /* border-width: 0 0 3px; */
-      border-width: 0;
-      bottom: 0;
-      left: 0;
-      height: 12px;
-      position: absolute;
-      transition: border-color 0.2s ease, border-radius 0.2s ease, border-width 0.2s ease, bottom 0.2s ease,
-        margin 0.2s ease, padding 0.2s ease;
-      width: 100%;
-      z-index: -1;
-    }
-
     overflow-wrap: break-word;
-    word-break: break-all;
-    -ms-word-break: break-word;
     word-break: break-word;
+    word-wrap: break-word;
     hyphens: auto;
 
     &:hover {
       text-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
-
-      &.underline {
-        border-width: 0 0 8px 0;
-        bottom: -6px;
-      }
     }
 
-    ${isSelected &&
-    css`
-      /* text-shadow: 0 0 20px rgba(0, 255, 255, 1); */
-
-      & .underline {
-        border-radius: 12px;
-        padding-bottom: 4px;
-        margin-bottom: -3px;
-        border-width: 0 0 5px 0;
-      }
-    `}
+    ${isSelected && css``}
 
     ${isEdited &&
     css`
@@ -77,13 +45,9 @@ export const Node = styled.div<NodeStyleType>(
 );
 
 export const Textarea = styled.textarea`
-  ${({ theme }) => css`
+  ${() => css`
+    border: none;
     background-color: transparent;
-    border-color: ${theme.colors.secondary()};
-    border-radius: 12px;
-    border-style: solid;
-    /* border-width: 0 0 5px 0; */
-    border-width: 0 0 0 0;
     font-family: inherit;
     font-size: inherit;
     left: -2px;
@@ -99,11 +63,7 @@ export const Textarea = styled.textarea`
 
     overflow-wrap: break-word;
     word-wrap: break-word;
-    -ms-word-break: break-word;
     word-break: break-word;
-    -ms-hyphens: auto;
-    -moz-hyphens: auto;
-    -webkit-hyphens: auto;
     hyphens: auto;
   `}
 `;
