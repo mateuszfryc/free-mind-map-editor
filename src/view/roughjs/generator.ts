@@ -161,9 +161,9 @@ export class RoughGenerator {
       const bcurve = curveToBezier(points);
       const polyPoints = pointsOnBezierCurves(bcurve, 10, (1 + o.roughness) / 2);
       if (o.fillStyle === 'solid') {
-        paths.push(solidFillPolygon([polyPoints], o));
+        paths.push(solidFillPolygon([polyPoints as Point[]], o));
       } else {
-        paths.push(patternFillPolygons([polyPoints], o));
+        paths.push(patternFillPolygons([polyPoints as Point[]], o));
       }
     }
     if (o.stroke !== NOS) {
@@ -200,7 +200,7 @@ export class RoughGenerator {
     const hasFill = o.fill && o.fill !== 'transparent' && o.fill !== NOS;
     const hasStroke = o.stroke !== NOS;
     const simplified = !!(o.simplification && o.simplification < 1);
-    const distance = simplified ? 4 - 4 * o.simplification! : (1 + o.roughness) / 2;
+    const distance = simplified ? 4 - 4 * (o.simplification ?? 1) : (1 + o.roughness) / 2;
     const sets = pointsOnPath(d, 1, distance);
 
     if (hasFill) {

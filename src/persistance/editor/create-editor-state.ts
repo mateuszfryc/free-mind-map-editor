@@ -30,7 +30,7 @@ export const createEditorState = (set: Set, get: Get): TEditorStore => {
       set({ isInitialized: true });
 
       await awaitCondition(() => view.setReferences(), 0);
-      draw.setRoughCanvas(view.canvas!);
+      if (view.canvas) draw.setRoughCanvas(view.canvas);
 
       window.addEventListener('resize', store.updateWorkspaceSize.bind(store));
       store.updateWorkspaceSize();

@@ -10,7 +10,7 @@ type NodeStyleType = {
 };
 
 export const Node = styled.div<NodeStyleType>(
-  ({ maxWidth, isSelected, isEdited, zIndex, fontSize, theme: { colors, setFontSize } }) => css`
+  ({ maxWidth, isSelected, isEdited, zIndex, fontSize, theme: { setFontSize } }) => css`
     ${setFontSize(fontSize)}
     background-color: transparent;
     border: none;

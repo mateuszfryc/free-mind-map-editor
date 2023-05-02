@@ -5,18 +5,20 @@ import { Point } from './geometry';
 export class RoughCanvas {
   private gen: RoughGenerator;
   private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
+  private ctx: CanvasRenderingContext2D | null;
 
   constructor(canvas: HTMLCanvasElement, config?: Config) {
     this.canvas = canvas;
-    this.ctx = this.canvas.getContext('2d')!;
+    this.ctx = this.canvas.getContext('2d');
     this.gen = new RoughGenerator(config);
   }
 
   draw(drawable: Drawable): void {
+    const { ctx } = this;
+    if (ctx === null) throw new Error('canvas context nov avilable');
+
     const sets = drawable.sets || [];
     const o = drawable.options || this.getDefaultOptions();
-    const ctx = this.ctx;
     const precision = drawable.options.fixedDecimalPlaceDigits;
     for (const drawing of sets) {
       switch (drawing.type) {

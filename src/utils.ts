@@ -1,4 +1,5 @@
 /** Make sure the passed value is not undefined or null */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const check = (obj: any, message?: string): boolean => {
   if (obj === undefined || obj === null) {
     console.trace();

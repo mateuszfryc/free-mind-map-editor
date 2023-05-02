@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
 /* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { absolutize, normalize, parsePath } from 'path-data-parser';
 import { Op, OpSet, ResolvedOptions } from './core';
 import { getFiller } from './fillers/filler';
