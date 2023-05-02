@@ -1,3 +1,4 @@
+import { getSafe } from '../../utils';
 import { Config, Drawable, OpSet, Options, ResolvedOptions } from './core';
 import { RoughGenerator } from './generator';
 import { Point } from './geometry';
@@ -14,9 +15,7 @@ export class RoughCanvas {
   }
 
   draw(drawable: Drawable): void {
-    const { ctx } = this;
-    if (ctx === null) throw new Error('canvas context nov avilable');
-
+    const ctx = getSafe(this.ctx);
     const sets = drawable.sets || [];
     const o = drawable.options || this.getDefaultOptions();
     const precision = drawable.options.fixedDecimalPlaceDigits;
