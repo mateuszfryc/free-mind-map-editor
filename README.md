@@ -3,7 +3,7 @@
 Simple tool do draw mind maps. Detailed "How To" describing how to use it: [LINK](https://mindmapeditor.dysonspheregames.com/#howto).
 
 Currently deployed at:
-[https://mindmapeditor.dysonspheregames.com/](https://mindmapeditor.dysonspheregames.com/#howto)
+[https://mapymind.com/](https://mapymind.com/)
 
 ### Tech-stack
 
