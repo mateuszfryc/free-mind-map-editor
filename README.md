@@ -1,6 +1,6 @@
 # Free Mind Map Editor
 
-Simple tool do draw mind maps. Detailed "How To" describing how to use it: [LINK](https://mindmapeditor.dysonspheregames.com/#howto).
+Simple tool do draw mind maps. Detailed "How To" describing how to use it: [LINK](https://mapymind.com/#howto).
 
 Currently deployed at:
 [https://mapymind.com/](https://mapymind.com/)
